@@ -1,15 +1,17 @@
 package fr.turfu.urbapp2;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.view.MenuItem;
-import android.view.MenuItem;
+import android.widget.Toast;
 
 import fr.turfu.urbapp2.db.LocalDataSource;
 
@@ -32,8 +34,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Handling toolbar
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(mainToolbar);
+        ActionBar menu = getSupportActionBar();
+        menu.setTitle(R.string.home);
 
      // trying to create and then get projects from DB... not working, nullpointerexception
         datasource = new LocalDataSource(this);
@@ -79,6 +84,15 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.settings:
+                return true;
+
+            case R.id.connectedAs:
+                Context context = getApplicationContext();
+                CharSequence text = getString(R.string.dialogClickOnConnectedAs);
+                int duration = Toast.LENGTH_SHORT;
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.setGravity(Gravity.CENTER, 0, 0); //To show the toast in the center of the screen
+                toast.show();
                 return true;
 
             default:

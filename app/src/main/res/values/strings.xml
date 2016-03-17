@@ -3,4 +3,6 @@
     <string name="home">Accueil</string>
     <string name="virtual_reality">Réalité virtuelle</string>
     <string name="settings">Réglages</string>
+    <string name="connectedAs">Connecté en tant que :</string>
+    <string name="dialogClickOnConnectedAs">Allez dans le menu \"Réglages\" pour changer d\'utilisateur</string>
 </resources>
