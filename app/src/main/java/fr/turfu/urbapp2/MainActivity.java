@@ -6,9 +6,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
+import java.util.List;
 
 import fr.turfu.urbapp2.R;
 import fr.turfu.urbapp2.db.LocalDataSource;
+import fr.turfu.urbapp2.db.Project;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,14 +21,28 @@ public class MainActivity extends AppCompatActivity {
      * Attribut representing the local database
      */
     public static LocalDataSource datasource;
+    ListView mListView ;
+    String[] maListe = new String[]{
+            "Valentin", "is big", "shit"
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        setSupportActionBar(mainToolbar);
+//        Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
+//        setSupportActionBar(mainToolbar);
+
+     // test de recup des noms de projets: en espérant qu'il y en ait dans la db locale...........
+        datasource = new LocalDataSource(this);
+      //  List<Project> projs = datasource.getAllProjects();
+     //   Project proj = projs.get(0);
+     //   maListe[3]=proj.getProjectName();
+        mListView = (ListView) findViewById(R.id.listView);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this,
+                android.R.layout.simple_list_item_1, maListe);
+        mListView.setAdapter(adapter);
 
     }
 
