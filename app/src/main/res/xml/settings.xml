@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ListPreference
+        android:key="language_preference"
+        android:title="@string/language"
+        android:summary="@string/language_summary"
+        android:entries="@array/language_entries"
+        android:entryValues="@array/language_values"
+        android:dialogTitle="@string/dialog_language"
+        android:defaultValue="francais"/>
+
+    <EditTextPreference
+        android:key="user_preference"
+        android:title="@string/user"
+        android:summary="@string/user_summary"
+        android:dialogTitle="@string/user_dialog" />
+
+</PreferenceScreen>

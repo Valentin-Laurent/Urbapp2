@@ -1,6 +1,7 @@
 package fr.turfu.urbapp2;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -84,6 +85,8 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
                 return true;
 
             case R.id.connectedAs:

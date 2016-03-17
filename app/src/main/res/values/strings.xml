@@ -5,4 +5,11 @@
     <string name="settings">Réglages</string>
     <string name="connectedAs">Connecté en tant que :</string>
     <string name="dialogClickOnConnectedAs">Allez dans le menu \"Réglages\" pour changer d\'utilisateur</string>
+    <string name="language">Langue</string>
+    <string name="dialog_language">Veuillez choisir la langue par défaut</string>
+    <string name="language_summary">Choisir la langue par défaut de l\'application</string>
+    <string name="user">Utilisateur</string>
+    <string name="user_summary">Changer d\'utilisateur</string>
+    <string name="user_dialog">Veuillez entrer votre nom d\'utilisateur</string>
+
 </resources>
