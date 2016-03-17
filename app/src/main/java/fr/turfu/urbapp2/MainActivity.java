@@ -2,7 +2,6 @@ package fr.turfu.urbapp2;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -10,20 +9,19 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.view.MenuItem;
 
-import java.util.List;
-
-import fr.turfu.urbapp2.R;
 import fr.turfu.urbapp2.db.LocalDataSource;
-import fr.turfu.urbapp2.db.Project;
 
 public class MainActivity extends AppCompatActivity {
 
     /**
-     * Attribut representing the local database
+     * Attribut representing the local database, to try to get data from it
      */
     public static LocalDataSource datasource;
     ListView mListView ;
-    String[] maListe = new String[]{
+    /**
+     * Projects list
+     */
+    String[] list_projs = new String[]{
             "Valentin", "is big", "shit"
     };
 
@@ -32,21 +30,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-    Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
+     Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
      setSupportActionBar(mainToolbar);
 
-     // test de recup des noms de projets: en espérant qu'il y en ait dans la db locale...........
+     // trying to create and then get projects from DB... not working, nullpointerexception
         datasource = new LocalDataSource(this);
-      //  List<Project> projs = datasource.getAllProjects();
-     //   Project proj = projs.get(0);
-     //   maListe[3]=proj.getProjectName();
+       // datasource.createProject(21, "TEST");
+
+     //displaying the list
         mListView = (ListView) findViewById(R.id.listView);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this,
-                android.R.layout.simple_list_item_1, maListe);
+                android.R.layout.simple_list_item_1, list_projs);
         mListView.setAdapter(adapter);
-
     }
-
 
     /**
      * Method to inflate the xml menu file
