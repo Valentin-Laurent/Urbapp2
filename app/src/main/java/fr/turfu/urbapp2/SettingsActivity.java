@@ -12,6 +12,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+
+//TODO Gérer le cycle d'activité de façon à ce qu'une seule activité Réglage puisse exister
+
 public class SettingsActivity extends AppCompatActivity {
 
     @Override
