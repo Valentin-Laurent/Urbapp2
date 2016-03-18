@@ -17,7 +17,6 @@ import android.widget.Toast;
 import fr.turfu.urbapp2.db.LocalDataSource;
 
 //TODO Gérer le cycle d'activité de façon à ce qu'une seule activité Main puisse exister
-//TODO Inclure la toolbar dans un layout pour éviter qu'elle ne se superpose sur les autres éléments
 
 public class MainActivity extends AppCompatActivity {
 
