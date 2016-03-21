@@ -4,6 +4,11 @@ android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
 
+    sourceSets.main {
+        jni.srcDirs = []
+        jniLibs.srcDir "src/main/java/fr/turfu/urbapp2/AR/VuforiaSDK/build/lib"
+    }
+
     defaultConfig {
         applicationId "fr.turfu.urbapp2"
         minSdkVersion 16
@@ -25,4 +30,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:support-v4:23.1.1'
     compile 'com.android.support:design:23.1.1'
+    compile files('src/main/java/fr/turfu/urbapp2/AR/VuforiaSDK/build/java/vuforia/Vuforia.jar')
 }
