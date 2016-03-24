@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Urbapp2</string>
+    <string name="home">Accueil</string>
+    <string name="virtual_reality">Réalité virtuelle</string>
+    <string name="settings">Réglages</string>
+    <string name="connectedAs">Connecté en tant que :</string>
+    <string name="dialogClickOnConnectedAs">Allez dans le menu \"Réglages\" pour changer d\'utilisateur</string>
+    <string name="language">Langue</string>
+    <string name="dialog_language">Veuillez choisir la langue par défaut</string>
+    <string name="language_summary">Choisir la langue par défaut de l\'application</string>
+    <string name="user">Utilisateur</string>
+    <string name="user_summary">Changer d\'utilisateur</string>
+    <string name="user_dialog">Veuillez entrer votre nom d\'utilisateur</string>
 
     <!-- Resources for Augmented Reality activity-->
     <string name="ar_add_image">Ajouter une image</string>
