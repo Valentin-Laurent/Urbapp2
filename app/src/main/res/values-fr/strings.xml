@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Resources for Augmented Reality activity-->
+    <string name="ar_add_image">Ajouter une image</string>
+    <string name="ar_instruction">Zoomer afin d\'ajuster l\'image</string>
+    <string name="ar_rotate">Pivoter</string>
+    <string name="ar_validation">Activer</string>
+</resources>
