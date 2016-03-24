@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
      * Projects list
      */
     String[] list_projs = new String[]{
-            "Valentin", "is big", "shit"
+            "Projet 1", "Projet 2", "Projet 3"
     };
 
     @Override
