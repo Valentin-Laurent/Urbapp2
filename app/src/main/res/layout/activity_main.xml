@@ -1,24 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include layout="@layout/main_toolbar"/>
+    "
+    android:orientation="horizontal">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">  <!--Ce paramètre est indispensable pour que la barre de menu ne se superpose pas au contenu de l'activité -->
+    <include layout="@layout/main_toolbar" />
 
-        <ListView
-            android:id="@+id/listView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/layoutContainer"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="horizontal"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    </RelativeLayout>
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="0dip"
+            android:layout_height="fill_parent"
+            android:layout_weight=".40"
+            android:background="@color/grisClair"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/grisClair"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                android:id="@+id/linearLayout"
+                android:gravity="center_horizontal">
+
+                <Button
+                    android:id="@+id/buttonNewProject"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginTop="49dp"
+                    android:background="@drawable/button_new"
+                    android:text="+"
+                    android:textSize="30sp" />
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="84dp"
+                    android:layout_alignBottom="@+id/buttonNewProject"
+                    android:layout_marginLeft="30dp"
+                    android:layout_toEndOf="@+id/buttonNewProject"
+                    android:layout_toRightOf="@+id/buttonNewProject"
+                    android:color="@color/vert2"
+                    android:gravity="left|center_vertical"
+                    android:text="Nouveau projet"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/ardoise1"
+                    android:textSize="20dp"
+                    android:layout_gravity="bottom" />
+
+            </LinearLayout>
+
+
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="1px"
+                android:layout_marginTop="180dp"
+                android:background="@color/grisFonce"
+                android:id="@+id/view" />
+
+
+            <ListView
+                android:id="@+id/listView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/textView3"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:layout_marginTop="40dp"
+                android:textColor="@color/grisFonce" />
+
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="left|center_vertical"
+                android:text="Ouvrir un projet existant : "
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/ardoise1"
+                android:textStyle="bold"
+                android:layout_below="@+id/view"
+                android:layout_alignLeft="@+id/listView"
+                android:layout_alignStart="@+id/listView"
+                android:layout_marginTop="50dp" />
+
+
+        </RelativeLayout>
+
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight=".60"
+            android:background="@color/grisFonce"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"></RelativeLayout>
+    </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>

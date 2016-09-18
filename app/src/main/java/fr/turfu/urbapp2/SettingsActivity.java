@@ -1,16 +1,13 @@
 package fr.turfu.urbapp2;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 
 //TODO Gérer le cycle d'activité de façon à ce qu'une seule activité Réglage puisse exister
@@ -60,22 +57,22 @@ public class SettingsActivity extends AppCompatActivity {
                 startActivity(intent);
                 return true;
 
-            case R.id.virtual_reality:
+          /*  case R.id.virtual_reality:
                 intent = new Intent(this, AugmentedRealityActivity.class);
                 startActivity(intent);
-                return true;
+                return true;*/
 
             case R.id.settings:
                 return true;
 
-            case R.id.connectedAs:
+            /*case R.id.connectedAs:
                 Context context = getApplicationContext();
                 CharSequence text = getString(R.string.dialogClickOnConnectedAs);
                 int duration = Toast.LENGTH_SHORT;
                 Toast toast = Toast.makeText(context, text, duration);
                 toast.setGravity(Gravity.CENTER, 0, 0); //To show the toast in the center of the screen
                 toast.show();
-                return true;
+                return true;*/
 
             default:
                 // If we got here, the user's action was not recognized.

@@ -8,16 +8,16 @@
         android:title="@string/home"
         app:showAsAction="ifRoom"/>
 
-    <item android:id="@+id/virtual_reality"
+   <!-- <item android:id="@+id/virtual_reality"
         android:title="@string/virtual_reality"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom"/>-->
 
     <item android:id="@+id/settings"
         android:title="@string/settings"
         app:showAsAction="ifRoom"/>
 
-    <item android:id="@+id/connectedAs"
+    <!--<item android:id="@+id/connectedAs"
         android:title="@string/connectedAs"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom"/>-->
 
 </menu>
