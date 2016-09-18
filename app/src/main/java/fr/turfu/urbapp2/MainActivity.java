@@ -1,18 +1,16 @@
 package fr.turfu.urbapp2;
 
-import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import fr.turfu.urbapp2.db.LocalDataSource;
 
@@ -20,6 +18,7 @@ import fr.turfu.urbapp2.db.LocalDataSource;
 
 public class MainActivity extends AppCompatActivity {
 
+    private Button b1;
     /**
      * Attribut representing the local database, to try to get data from it
      */
@@ -40,18 +39,31 @@ public class MainActivity extends AppCompatActivity {
         //Handling toolbar
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(mainToolbar);
-        ActionBar menu = getSupportActionBar();
-        menu.setTitle(R.string.home);
+       // ActionBar menu = getSupportActionBar();
+       // menu.setTitle(R.string.home);
 
-     // trying to create and then get projects from DB... not working, nullpointerexception
+        // Button new project
+        b1 = (Button) findViewById(R.id.buttonNewProject);
+        b1.setTextColor(Color.parseColor("#ffffff"));
+
+
+        /* // trying to create and then get projects from DB... not working, nullpointerexception
         datasource = new LocalDataSource(this);
-       // datasource.createProject(21, "TEST");
+       // datasource.createProject(21, "TEST");*/
 
-     //displaying the list
+
+
+       //Displaying the list
         mListView = (ListView) findViewById(R.id.listView);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this,
                 android.R.layout.simple_list_item_1, list_projs);
         mListView.setAdapter(adapter);
+
+        // Map
+        //TODO : Carte avec géolocalisation
+
+
+
     }
 
 
@@ -86,24 +98,24 @@ public class MainActivity extends AppCompatActivity {
             case R.id.home:
                 return true;
 
-            case R.id.virtual_reality:
+           /* case R.id.virtual_reality:
                 intent = new Intent(this, AugmentedRealityActivity.class);
                 startActivity(intent);
-                return true;
+                return true;*/
 
             case R.id.settings:
                 intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
 
-            case R.id.connectedAs:
+           /* case R.id.connectedAs:
                 Context context = getApplicationContext();
                 CharSequence text = getString(R.string.dialogClickOnConnectedAs);
                 int duration = Toast.LENGTH_SHORT;
                 Toast toast = Toast.makeText(context, text, duration);
                 toast.setGravity(Gravity.CENTER, 0, 0); //To show the toast in the center of the screen
                 toast.show();
-                return true;
+                return true;*/
 
             default:
                 // If we got here, the user's action was not recognized.
