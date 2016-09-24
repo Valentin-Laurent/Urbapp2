@@ -1,8 +1,9 @@
 package fr.turfu.urbapp2;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -22,8 +23,9 @@ public class SettingsActivity extends AppCompatActivity {
         //Handling toolbar
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(mainToolbar);
-        ActionBar menu = getSupportActionBar();
-        menu.setTitle(R.string.settings);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        mainToolbar.setTitle("");
+        mainToolbar.setSubtitle("");
     }
 
     /**
@@ -38,6 +40,12 @@ public class SettingsActivity extends AppCompatActivity {
         //On sérialise le fichier menu.xml pour l'afficher dans la barre de menu
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
+
+        //Display Username
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String u = preferences.getString("user_preference","");
+        MenuItem i = menu.findItem(R.id.connectedAs);
+        i.setTitle(u);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -64,15 +72,6 @@ public class SettingsActivity extends AppCompatActivity {
 
             case R.id.settings:
                 return true;
-
-            /*case R.id.connectedAs:
-                Context context = getApplicationContext();
-                CharSequence text = getString(R.string.dialogClickOnConnectedAs);
-                int duration = Toast.LENGTH_SHORT;
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.setGravity(Gravity.CENTER, 0, 0); //To show the toast in the center of the screen
-                toast.show();
-                return true;*/
 
             default:
                 // If we got here, the user's action was not recognized.
