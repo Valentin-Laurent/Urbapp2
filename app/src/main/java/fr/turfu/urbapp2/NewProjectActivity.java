@@ -12,28 +12,35 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-
+/**
+ * Activité pour la création d'un nouveau projet
+ */
 public class NewProjectActivity extends AppCompatActivity {
 
+    /**
+     * Création de l'activité
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Ajout du layout
         setContentView(R.layout.activity_new_project);
 
-        //Handling toolbar
+        //Mise en place de la toolbar
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(mainToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         mainToolbar.setTitle("");
         mainToolbar.setSubtitle("");
 
-        //Bouton de localisation
+        //Bouton de localisation qui affiche une pop up
         Button bouton = (Button) findViewById(R.id.buttonLocalisationProject);
         bouton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
                 popUp();
-
             }
         });
 
@@ -93,7 +100,6 @@ public class NewProjectActivity extends AppCompatActivity {
     /**
      * Lancement de la pop up de localisation
      */
-    //TODO : ajouter la carte dans la pop-up
     public void popUp() {
         CustomPopUp cdd=new CustomPopUp(NewProjectActivity.this);
         cdd.show();
