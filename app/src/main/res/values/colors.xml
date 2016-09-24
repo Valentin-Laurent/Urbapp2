@@ -10,5 +10,6 @@
     <color name="grisClair">#d6dce5</color>
     <color name="grisFonce">#333333</color>
     <color name="bleu1">#9ec4e4</color>
-    <color name="rouge">#d59192</color>
+    <color name="rouge1">#d59192</color>
+    <color name="rouge2">#DF4648</color>
 </resources>

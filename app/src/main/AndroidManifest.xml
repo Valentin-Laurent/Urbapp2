@@ -27,6 +27,7 @@
         </activity>
         <activity android:name=".SettingsActivity"></activity>
         <activity android:name=".AugmentedRealityActivity"></activity>
+        <activity android:name=".NewProjectActivity" />
     </application>
 
 </manifest>

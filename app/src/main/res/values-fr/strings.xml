@@ -12,10 +12,18 @@
     <string name="user">Utilisateur</string>
     <string name="user_summary">Changer d\'utilisateur</string>
     <string name="user_dialog">Veuillez entrer votre nom d\'utilisateur</string>
+    <string name="validation">Valider</string>
 
     <!-- Resources for Augmented Reality activity-->
     <string name="ar_add_image">Ajouter une image</string>
     <string name="ar_instruction">Zoomer afin d\'ajuster l\'image</string>
     <string name="ar_rotate">Pivoter</string>
     <string name="ar_validation">Activer</string>
+
+    <!-- Resources for project creation-->
+    <string name="project_creation_title">Création d\'un projet</string>
+    <string name="project_creation_name">Intitulé</string>
+    <string name="project_creation_description">Description</string>
+    <string name="project_creation_location">Localisation</string>
+    <string name="project_creation_location_instruction">Localiser le projet</string>
 </resources>

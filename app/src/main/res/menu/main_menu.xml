@@ -5,19 +5,25 @@
 
     <item
         android:id="@+id/home"
+        android:icon="@drawable/home_icon"
         android:title="@string/home"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom" />
 
-   <!-- <item android:id="@+id/virtual_reality"
-        android:title="@string/virtual_reality"
-        app:showAsAction="ifRoom"/>-->
+    <item
+        android:id="@+id/projectTitle"
+        android:enabled="false"
+        android:title=""
+        app:showAsAction="ifRoom" />
 
-    <item android:id="@+id/settings"
+    <item
+        android:id="@+id/connectedAs"
+        android:enabled="false"
+        android:title="User1"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/settings"
+        android:icon="@drawable/settings_icon"
         android:title="@string/settings"
-        app:showAsAction="ifRoom"/>
-
-    <!--<item android:id="@+id/connectedAs"
-        android:title="@string/connectedAs"
-        app:showAsAction="ifRoom"/>-->
-
+        app:showAsAction="ifRoom" />
 </menu>
