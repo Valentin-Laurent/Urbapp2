@@ -1,11 +1,10 @@
 package fr.turfu.urbapp2.db;
 
+import android.content.ContentValues;
+
 import java.util.Vector;
 
-
 //TODO WTF import src.com.ecn.urbapp.syncToExt.Sync;
-
-import android.content.ContentValues;
 
 public class Element extends DataObject {
 
@@ -31,10 +30,6 @@ public class Element extends DataObject {
 	 * long id of the pixel_geom which represents the element
 	 */
 	private long pixelGeom_id;
-	/**
-	 * long id of the gps_geom which represents the element
-	 */
-	private long gpsGeom_id;
 	/**
 	 * element_color of the element
 	 */
@@ -90,14 +85,7 @@ public class Element extends DataObject {
 		return pixelGeom_id;
 	}
 	
-	/**
-	 * getter for the gpsGeom_id
-	 * @return long gpsGeom_id
-	 */
-	public long getGpsGeom_id() {
-		return gpsGeom_id;
-	}
-	
+
 	/**
 	 * getter for the element_color
 	 * @return String element_color
@@ -164,13 +152,6 @@ public class Element extends DataObject {
 		this.pixelGeom_id = pixelGeom_id;
 	}
 	
-	/**
-	 * setter for the gpsGeom_id
-	 * @param gpsGeom_id
-	 */
-	public void setGpsGeom_id(long gpsGeom_id) {
-		this.gpsGeom_id = gpsGeom_id;
-	}
 
 	/**
 	 * setter for the element_color
@@ -206,8 +187,7 @@ public class Element extends DataObject {
 		return "Element [element_id=" + element_id + ", photo_id=" + photo_id
 				+ ", material_id=" + material_id + ", elementType_id="
 				+ elementType_id + ", pixelGeom_id=" + pixelGeom_id
-				+ ", gpsGeom_id=" + gpsGeom_id + ", element_color="
-				+ element_color + "]";
+				+ ", element_color=" + element_color + "]";
 	}
 
 
@@ -238,7 +218,6 @@ public class Element extends DataObject {
 			values.put(MySQLiteHelper.COLUMN_MATERIALID, this.material_id);
 			values.put(MySQLiteHelper.COLUMN_ELEMENTTYPEID, this.elementType_id);
 			values.put(MySQLiteHelper.COLUMN_PIXELGEOMID, this.pixelGeom_id);
-			values.put(MySQLiteHelper.COLUMN_GPSGEOMID, this.gpsGeom_id);
 			datasource.getDatabase().insert(MySQLiteHelper.TABLE_ELEMENT, null, values);
 			this.setRegistredInLocal(true);
 		}

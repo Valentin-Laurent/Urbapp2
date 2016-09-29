@@ -1,16 +1,13 @@
 package fr.turfu.urbapp2.db;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
-import fr.turfu.urbapp2.MainActivity;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LocalDataSource {
 	private static final String TAG = "localDataSource";
@@ -27,7 +24,7 @@ public class LocalDataSource {
 	
 	//TODO Adddescription for javadoc
 	private String[] allColumnsProject = {MySQLiteHelper.COLUMN_PROJECTID, MySQLiteHelper.COLUMN_PROJECTNAME, MySQLiteHelper.COLUMN_GPSGEOMID};
-	private String[] allColumnsPhoto = {MySQLiteHelper.COLUMN_PHOTOID, MySQLiteHelper.COLUMN_PHOTODESCRIPTION, MySQLiteHelper.COLUMN_PHOTOAUTHOR, MySQLiteHelper.COLUMN_PHOTOURL, MySQLiteHelper.COLUMN_PHOTOADRESSE, MySQLiteHelper.COLUMN_PHOTONBRPOINTS, MySQLiteHelper.COLUMN_PHOTODERNIEREMODIF, MySQLiteHelper.COLUMN_GPSGEOMID};
+	private String[] allColumnsPhoto = {MySQLiteHelper.COLUMN_PHOTOID, MySQLiteHelper.COLUMN_PHOTODESCRIPTION, MySQLiteHelper.COLUMN_PHOTOAUTHOR, MySQLiteHelper.COLUMN_PHOTONAME, MySQLiteHelper.COLUMN_PHOTOPATH, MySQLiteHelper.COLUMN_PHOTOLASTMODIFICATION, MySQLiteHelper.COLUMN_GPSGEOMID};
 	private String[] allColumnsGpsGeom = {MySQLiteHelper.COLUMN_GPSGEOMID, MySQLiteHelper.COLUMN_GPSGEOMCOORD};
 	private String[] allColumnsPixelGeom = {MySQLiteHelper.COLUMN_PIXELGEOMID, MySQLiteHelper.COLUMN_PIXELGEOMCOORD};
 	private String[] allColumnsMaterial = {MySQLiteHelper.COLUMN_MATERIALID, MySQLiteHelper.COLUMN_MATERIALNAME};
@@ -231,11 +228,11 @@ public class LocalDataSource {
 			+" ORDER BY DESC LIMIT 1 ;"
 		;
 	
-	/**
+/**
 	 * query to get information of every photos and theirs geolocalisation knowing a project id
 	 * need to add the project id and the ";" in the method argument
 	 */
-	private static final String
+/**	private static final String
 	GETPHOTOLINK = 
 		"SELECT "+MySQLiteHelper.TABLE_PHOTO+".*, "+MySQLiteHelper.TABLE_GPSGEOM+".* FROM ("
 		+ MySQLiteHelper.TABLE_PHOTO 
@@ -244,7 +241,7 @@ public class LocalDataSource {
 		+ ") INNER JOIN " + MySQLiteHelper.TABLE_GPSGEOM 
 		+" ON "+MySQLiteHelper.TABLE_PHOTO+"."+MySQLiteHelper.COLUMN_GPSGEOMID+"="+MySQLiteHelper.TABLE_GPSGEOM+"."+MySQLiteHelper.COLUMN_GPSGEOMID
 		+" WHERE "+MySQLiteHelper.TABLE_COMPOSED+"."+MySQLiteHelper.COLUMN_PROJECTID+" = "
-	;
+	;**/
 		
 	/**
 	 * execution of the query GETALLPROJECTS
@@ -333,7 +330,7 @@ public class LocalDataSource {
 	 * @param project_id 
 	 * @return photosList found by the query
 	 */
-	public List<Photo> getAllPhotolinkedtoProject(long project_id){
+	/**public List<Photo> getAllPhotolinkedtoProject(long project_id){
 		List<Photo> photosList = new ArrayList<Photo>();
 		
 		Cursor cursor = database.rawQuery(GETPHOTOLINK+project_id+";",null);
@@ -346,7 +343,7 @@ public class LocalDataSource {
 		}
 		cursor.close();
 		return photosList;
-	}
+	}**/
 
 	/**
 	 * delete a photo
@@ -362,14 +359,14 @@ public class LocalDataSource {
 	 * create a photo with the following attributes
 	 * @param descr
 	 * @param author
-	 * @param url is the name of the pohot with its extension
+	 * @param name is the name of the photo with its extension
 	 * @return the created photo
 	 */
-	public Photo createPhoto (String descr, String author, String url){
+	public Photo createPhoto (String descr, String author, String name){
 		ContentValues values = new ContentValues(); 
 		values.put(MySQLiteHelper.COLUMN_PHOTODESCRIPTION, descr);
 		values.put(MySQLiteHelper.COLUMN_PHOTOAUTHOR, author);
-		values.put(MySQLiteHelper.COLUMN_PHOTOURL, url);
+		values.put(MySQLiteHelper.COLUMN_PHOTONAME, name);
 		long insertId = database.insert(MySQLiteHelper.TABLE_PHOTO, null, values);
 		//TODO check the utily of autoincrement
 		Cursor cursor = 
@@ -394,10 +391,9 @@ public class LocalDataSource {
 		p1.setPhoto_id(cursor.getLong(0));
 		p1.setPhoto_description(cursor.getString(1));
 		p1.setPhoto_author(cursor.getString(2));
-		p1.setPhoto_url(cursor.getString(3));
-		p1.setPhoto_adresse(cursor.getString(4));
-		p1.setPhoto_nbrPoints(cursor.getLong(5));
-		p1.setPhoto_derniereModif(cursor.getInt(6));
+		p1.setPhoto_name(cursor.getString(3));
+		p1.setPhoto_path(cursor.getString(4));
+		p1.setPhoto_last_modification(cursor.getInt(6));
 		p1.setGpsGeom_id(cursor.getLong(7));
 		//TODO créer 2 fonctions, une pour l'instanciation du projet, une pour la recopie des gpsgeom
 		try {
@@ -496,41 +492,6 @@ public class LocalDataSource {
 	    return p1;
 	}
 
-	// methods related to Composed.java that represents the link between Photos and projects
-	/**
-	 * create an object Composed that link a photo and a project
-	 * @param proj_id of the project
-	 * @param photo_id of the photo
-	 * @return Composed object that links both elements
-	 */
-	public Composed createLink (long proj_id, long photo_id){
-		ContentValues values = new ContentValues(); 
-		values.put(MySQLiteHelper.COLUMN_PROJECTID, proj_id);
-		values.put(MySQLiteHelper.COLUMN_PHOTOID, photo_id);
-		database.insert(MySQLiteHelper.TABLE_COMPOSED, null, values);
-		//TODO check the utily of autoincrement
-		Cursor cursor = database.query(
-			MySQLiteHelper.TABLE_COMPOSED,
-			allColumnsComposed,
-			MySQLiteHelper.COLUMN_PROJECTID+" = "+proj_id +" AND "+MySQLiteHelper.COLUMN_PHOTOID+" = "+photo_id,
-			null, null, null, null);
-		cursor.moveToFirst();
-		Composed link1 = cursorToComposed(cursor);//method at the end of the class
-		cursor.close();
-		return link1;
-	}
-
-	/**
-	 * translate a cursor to a composed
-	 * @param cursor
-	 * @return
-	 */
-	private Composed cursorToComposed(Cursor cursor) {
-	    Composed link1 = new Composed();
-	    link1.setProject_id(cursor.getLong(0));
-	    link1.setPhoto_id(cursor.getLong(1));
-	    return link1;
-	}
 
 	// OTHER METHODS TO GET LOCAL ITEMS FROM ID. ADDED FOR USE IN THE SYNC CLASS
 	/**
@@ -561,7 +522,6 @@ public class LocalDataSource {
 		e.setMaterial_id(cursor.getLong(2));
 		e.setElementType_id(cursor.getLong(3));
 		e.setPixelGeom_id(cursor.getLong(4));
-		e.setGpsGeom_id(cursor.getLong(5));
 		e.setElement_color(cursor.getString(6));
 	    return e;
 	}
