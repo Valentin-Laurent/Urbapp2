@@ -1,10 +1,8 @@
 package fr.turfu.urbapp2.db;
 
-import java.util.ArrayList;
-
 import android.content.ContentValues;
 
-import fr.turfu.urbapp2.MainActivity;
+import java.util.ArrayList;
 //TODO WTF import src.com.ecn.urbapp.syncToExt.Sync;
 
 public class GpsGeom extends DataObject{
@@ -18,10 +16,7 @@ public class GpsGeom extends DataObject{
 	 * String that describes a the_geom dataType in postgis
 	 */
 	private String gpsGeom_the_geom;
-	/**
-	 * Field containing the addressof the GpsGeom.
-	 */
-	private String gpsGeom_address;
+
 
 	//Getters
 	/**
@@ -40,14 +35,7 @@ public class GpsGeom extends DataObject{
 		return gpsGeom_the_geom;
 	}
 	
-	/**
-	 * getter for gpsGeom_address
-	 * @return String gpsGeom_address;
-	 */
-	public String getAddress(){
-		return gpsGeom_address;
-	}	
-	
+
 	//Setters
 	/**
 	 * setter for gpsGeom_id
@@ -64,15 +52,8 @@ public class GpsGeom extends DataObject{
 	public void setGpsGeomCoord(String str) {
 		this.gpsGeom_the_geom = "srid=4326;"+str;
 	}
-	
-	/**
-	 * setter for gpsGeom_address
-	 * @param  s which will be gpsGeom_address;
-	 */
-	public void setAddress(String s){
-		gpsGeom_address=s;
-	}
-	
+
+
 	//Ovveride methods
 	@Override
 	public String toString() {
@@ -148,15 +129,6 @@ public class GpsGeom extends DataObject{
 				}
 			}
 		}
-		/**
-		 * we update gpsGeom_id from past to new in the elements that are geolocalised by this gpsGeom
-		 */
-		if (list_element!=null){
-			for (Element e : list_element){
-				if(e.getGpsGeom_id()==old_id){
-					e.setGpsGeom_id(new_id);
-				}
-			}
-		}
+
 	}
 }

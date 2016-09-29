@@ -15,7 +15,12 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import fr.turfu.urbapp2.db.LocalDataSource;
+import fr.turfu.urbapp2.db.Project;
+import fr.turfu.urbapp2.db.ProjectBDD;
 
 //TODO Gérer le cycle d'activité de façon à ce qu'une seule activité Main puisse exister
 
@@ -26,17 +31,14 @@ public class MainActivity extends AppCompatActivity {
      */
     private Button b1;
 
+
     /**
      * Attribut representing the local database, to try to get data from it
      */
     public static LocalDataSource datasource;
     ListView mListView ;
-    /**
-     * Projects list
-     */
-    String[] list_projs = new String[]{
-            "Projet 1", "Projet 2", "Projet 3"
-    };
+
+    String[] list_projs = new String[]{};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +68,19 @@ public class MainActivity extends AppCompatActivity {
         /* // trying to create and then get projects from DB... not working, nullpointerexception
         datasource = new LocalDataSource(this);
        // datasource.createProject(21, "TEST");*/
+
+        /* Lister les projets*/
+        List<Project> lp = getProjects();
+
+        List<String> lpn = new ArrayList<>();
+        for(Project p:lp){
+            lpn.add(p.getProjectName());
+        }
+
+        list_projs =  new String[lpn.size()];
+        for(int i=0;i<lpn.size();i++){
+            list_projs[i]=lpn.get(i);
+        }
 
        //Displaying the list
         mListView = (ListView) findViewById(R.id.listView);
@@ -132,4 +147,18 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
+    /**
+     * Récupérer la liste des projets de la base de données
+     * @return Liste des projets
+     */
+    public List<Project> getProjects(){
+
+        ProjectBDD pbdd = new ProjectBDD(MainActivity.this);
+        pbdd.open();
+        List<Project> lp = pbdd.getProjects();
+        pbdd.close();
+        return lp;
+    }
+    
 }
