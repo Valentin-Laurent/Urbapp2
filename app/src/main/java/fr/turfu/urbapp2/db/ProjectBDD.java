@@ -5,6 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Laura on 29/09/2016.
  */
@@ -19,9 +22,10 @@ public class ProjectBDD {
 
     /**
      * Constructeur
+     *
      * @param context
      */
-    public ProjectBDD(Context context){
+    public ProjectBDD(Context context) {
         sqlHelper = new MySQLiteHelper(context);
     }
 
@@ -58,12 +62,16 @@ public class ProjectBDD {
      */
     public Project getProjectByName(String n) {
         Cursor c = bdd.query(MySQLiteHelper.TABLE_PROJECT, new String[]{MySQLiteHelper.COLUMN_PROJECTID, MySQLiteHelper.COLUMN_PROJECTNAME, MySQLiteHelper.COLUMN_PROJECTDESCRIPTION, MySQLiteHelper.COLUMN_GPSGEOMID}, "project_name" + " LIKE \"" + n + "\"", null, null, null, null);
+        if (c.getCount() != 0) {
+            c.moveToFirst();
+        }
         return cursorToProject(c);
     }
 
 
     /**
      * Transformer un curseur en projet
+     *
      * @param c Curseur
      * @return Projet
      */
@@ -72,8 +80,7 @@ public class ProjectBDD {
         if (c.getCount() == 0) {
             return null;
         } else {
-            //Sinon on se place sur le premier élément
-            c.moveToFirst();
+
             //On créé un projet
             Project p = new Project();
             //on lui affecte toutes les infos grâce aux infos contenues dans le Cursor
@@ -81,16 +88,19 @@ public class ProjectBDD {
             p.setProjectName(c.getString(1));
             p.setProjectDescription(c.getString(2));
             p.setGpsGeom_id(c.getLong(3));
-            //On ferme le cursor
-            c.close();
 
             //On retourne le projet
             return p;
         }
     }
 
-
-    public long insert(Project p){
+    /**
+     * Ajout d'un projet p à la base de données
+     *
+     * @param p Project
+     * @return id du projet
+     */
+    public long insert(Project p) {
 
         ContentValues values = new ContentValues();
 
@@ -101,5 +111,25 @@ public class ProjectBDD {
         return bdd.insert(MySQLiteHelper.TABLE_PROJECT, null, values);
     }
 
+
+    /**
+     * Lister les projets de la base de données
+     *
+     * @return Liste des projets
+     */
+    public List<Project> getProjects() {
+
+        Cursor cursor =  bdd.query(MySQLiteHelper.TABLE_PROJECT, new String[]{MySQLiteHelper.COLUMN_PROJECTID, MySQLiteHelper.COLUMN_PROJECTNAME, MySQLiteHelper.COLUMN_PROJECTDESCRIPTION, MySQLiteHelper.COLUMN_GPSGEOMID}, null, null, null, null, null);
+
+        List<Project> lp = new ArrayList<>();
+
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            Project p = cursorToProject(cursor);
+            lp.add(p);
+        }
+        cursor.close();
+
+        return lp;
+    }
 
 }
