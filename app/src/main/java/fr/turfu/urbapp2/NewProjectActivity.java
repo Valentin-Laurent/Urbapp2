@@ -153,6 +153,7 @@ public class NewProjectActivity extends AppCompatActivity {
 
             //TODO : Passer à l'activité suivante
             message("OK");
+            //finish();
 
         } else {
             id = p.getProjectId();

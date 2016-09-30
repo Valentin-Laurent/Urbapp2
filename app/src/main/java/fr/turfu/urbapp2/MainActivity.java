@@ -18,7 +18,6 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.turfu.urbapp2.db.LocalDataSource;
 import fr.turfu.urbapp2.db.Project;
 import fr.turfu.urbapp2.db.ProjectBDD;
 
@@ -31,17 +30,20 @@ public class MainActivity extends AppCompatActivity {
      */
     private Button b1;
 
+    /**
+     * Liste pour les projets
+     */
+    ListView mListView;
 
     /**
-     * Attribut representing the local database, to try to get data from it
+     * Tableau pour les projets
      */
-    public static LocalDataSource datasource;
-    ListView mListView ;
-
     String[] list_projs = new String[]{};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        //Creation
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -65,28 +67,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        /* // trying to create and then get projects from DB... not working, nullpointerexception
-        datasource = new LocalDataSource(this);
-       // datasource.createProject(21, "TEST");*/
-
-        /* Lister les projets*/
-        List<Project> lp = getProjects();
-
-        List<String> lpn = new ArrayList<>();
-        for(Project p:lp){
-            lpn.add(p.getProjectName());
-        }
-
-        list_projs =  new String[lpn.size()];
-        for(int i=0;i<lpn.size();i++){
-            list_projs[i]=lpn.get(i);
-        }
-
-       //Displaying the list
-        mListView = (ListView) findViewById(R.id.listView);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this,
-                android.R.layout.simple_list_item_1, list_projs);
-        mListView.setAdapter(adapter);
 
         // Map
         //TODO : Carte avec géolocalisation
@@ -95,11 +75,12 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Method to inflate the xml menu file (Ajout des différents onglets dans la toolbar)
+     *
      * @param menu the menu
      * @return true if everything went good
      */
     @Override
-    public boolean onCreateOptionsMenu(Menu menu){
+    public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
 
         //On sérialise le fichier menu.xml pour l'afficher dans la barre de menu
@@ -108,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Display Username
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String u = preferences.getString("user_preference","");
+        String u = preferences.getString("user_preference", "");
         MenuItem i = menu.findItem(R.id.connectedAs);
         i.setTitle(u);
 
@@ -124,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        Intent intent ;
+        Intent intent;
 
         switch (item.getItemId()) {
             case R.id.home:
@@ -150,15 +131,39 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Récupérer la liste des projets de la base de données
+     *
      * @return Liste des projets
      */
-    public List<Project> getProjects(){
-
-        ProjectBDD pbdd = new ProjectBDD(MainActivity.this);
-        pbdd.open();
-        List<Project> lp = pbdd.getProjects();
-        pbdd.close();
+    public List<Project> getProjects() {
+        ProjectBDD pbdd = new ProjectBDD(MainActivity.this); //Instanciation de ProjectBdd pour manipuler les projets de la base de données
+        pbdd.open(); //Ouverture de la base de données
+        List<Project> lp = pbdd.getProjects(); // Récupération des projets
+        pbdd.close(); // Fermeture de la base de données
         return lp;
     }
-    
+
+    @Override
+    protected void onResume() {
+
+         /* Lister les projets*/
+        List<Project> lp = getProjects();
+
+        List<String> lpn = new ArrayList<>();
+        for (Project p : lp) {
+            lpn.add(p.getProjectName());
+        }
+
+        list_projs = new String[lpn.size()];
+        for (int i = 0; i < lpn.size(); i++) {
+            list_projs[i] = lpn.get(i);
+        }
+
+        //Displaying the list
+        mListView = (ListView) findViewById(R.id.listView);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this,
+                android.R.layout.simple_list_item_1, list_projs);
+        mListView.setAdapter(adapter);
+
+        super.onResume();
+    }
 }
