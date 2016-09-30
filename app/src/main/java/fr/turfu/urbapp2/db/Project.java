@@ -160,10 +160,8 @@ public class Project extends DataObject {
     @Override
     public void saveToLocal(LocalDataSource datasource) {
         ContentValues values = new ContentValues();
-
         values.put(MySQLiteHelper.COLUMN_PROJECTNAME, this.project_name);
         values.put(MySQLiteHelper.COLUMN_PROJECTDESCRIPTION, this.project_description);
-
     }
 
 

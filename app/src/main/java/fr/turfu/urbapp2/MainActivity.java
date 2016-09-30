@@ -18,7 +18,6 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.turfu.urbapp2.db.LocalDataSource;
 import fr.turfu.urbapp2.db.Project;
 import fr.turfu.urbapp2.db.ProjectBDD;
 
@@ -31,17 +30,20 @@ public class MainActivity extends AppCompatActivity {
      */
     private Button b1;
 
-
     /**
-     * Attribut representing the local database, to try to get data from it
+     * Liste pour les projets
      */
-    public static LocalDataSource datasource;
     ListView mListView ;
 
+    /**
+     * Tableau pour les projets
+     */
     String[] list_projs = new String[]{};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        //Creation
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -63,11 +65,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-
-        /* // trying to create and then get projects from DB... not working, nullpointerexception
-        datasource = new LocalDataSource(this);
-       // datasource.createProject(21, "TEST");*/
 
         /* Lister les projets*/
         List<Project> lp = getProjects();
@@ -153,11 +150,10 @@ public class MainActivity extends AppCompatActivity {
      * @return Liste des projets
      */
     public List<Project> getProjects(){
-
-        ProjectBDD pbdd = new ProjectBDD(MainActivity.this);
-        pbdd.open();
-        List<Project> lp = pbdd.getProjects();
-        pbdd.close();
+        ProjectBDD pbdd = new ProjectBDD(MainActivity.this); //Instanciation de ProjectBdd pour manipuler les projets de la base de données
+        pbdd.open(); //Ouverture de la base de données
+        List<Project> lp = pbdd.getProjects(); // Récupération des projets
+        pbdd.close(); // Fermeture de la base de données
         return lp;
     }
     

@@ -12,10 +12,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="50dp"
+    android:paddingTop="50dp"
+    android:background="@color/grisClair"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="fr.turfu.urbapp2.SettingsActivity"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"> <!--Ce paramètre est indispensable pour que la barre de menu ne se superpose pas au contenu de l'activité -->
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    android:foregroundTint="@color/ardoise2"> <!--Ce paramètre est indispensable pour que la barre de menu ne se superpose pas au contenu de l'activité -->
 
 
     <fragment android:name="fr.turfu.urbapp2.fragments.SettingsFragment"

@@ -16,14 +16,11 @@ public class ProjectBDD {
 
     private SQLiteDatabase bdd;
     private MySQLiteHelper sqlHelper;
-    public static final String DATABASE_NAME = "local3.db";
-    public static final int DATABASE_VERSION = 3;
-
 
     /**
      * Constructeur
      *
-     * @param context
+     * @param context contexte de l'activité
      */
     public ProjectBDD(Context context) {
         sqlHelper = new MySQLiteHelper(context);
@@ -47,7 +44,7 @@ public class ProjectBDD {
     /**
      * Getter pour la base de données
      *
-     * @return
+     * @return Database
      */
     public SQLiteDatabase getBDD() {
         return bdd;
@@ -119,7 +116,7 @@ public class ProjectBDD {
      */
     public List<Project> getProjects() {
 
-        Cursor cursor =  bdd.query(MySQLiteHelper.TABLE_PROJECT, new String[]{MySQLiteHelper.COLUMN_PROJECTID, MySQLiteHelper.COLUMN_PROJECTNAME, MySQLiteHelper.COLUMN_PROJECTDESCRIPTION, MySQLiteHelper.COLUMN_GPSGEOMID}, null, null, null, null, null);
+        Cursor cursor = bdd.query(MySQLiteHelper.TABLE_PROJECT, new String[]{MySQLiteHelper.COLUMN_PROJECTID, MySQLiteHelper.COLUMN_PROJECTNAME, MySQLiteHelper.COLUMN_PROJECTDESCRIPTION, MySQLiteHelper.COLUMN_GPSGEOMID}, null, null, null, null, MySQLiteHelper.COLUMN_PROJECTNAME +"  ASC");
 
         List<Project> lp = new ArrayList<>();
 

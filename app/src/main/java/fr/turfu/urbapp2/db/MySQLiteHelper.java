@@ -5,12 +5,34 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+/**
+ * Class MySQLiteHelper
+ * Role : implémentation de la base de données
+ * <p/>
+ * Cette classe comporte :
+ * - La déclaration des tables de la base
+ * - La déclaration des colonnes de la base
+ * - La création des requêtes qui permettent de créer la base
+ * - Les méthode de création de la base
+ */
 public class MySQLiteHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "SQLite";
+
     /**
-     * declaration of tables
+     * Name of the local database
      */
+    public static final String DATABASE_NAME = "local3.db";
+    /*
+     * NB : upgrading the version force the database to be deleted and recreated
+     */
+    public static final int DATABASE_VERSION = 3;
+
+    /************************************************
+     * Declaration of tables
+     ************************************************/
+
+    //--------------------------TABLES----------------------------
     public static final String TABLE_PROJECT = "Project";
     public static final String TABLE_GPSGEOM = "GpsGeom";
     public static final String TABLE_PIXELGEOM = "PixelGeom";
@@ -19,7 +41,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String TABLE_ELEMENTTYPE = "ElementType";
     public static final String TABLE_ELEMENT = "Element";
 
-    //creation of tables getters
+    //--------------------------TABLES GETTERS----------------------------
 
     /**
      * get the name of Table project
@@ -84,50 +106,51 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return TABLE_GPSGEOM;
     }
 
-    /**
-     * names of the columns of the whole database
-     */
 
+    /************************************************
+     * Declaration of columns
+     ************************************************/
+
+    //-------------------------- Table Project----------------------------
     public static final String COLUMN_PROJECTID = "project_id";
     public static final String COLUMN_PROJECTNAME = "project_name";
     public static final String COLUMN_PROJECTDESCRIPTION = "project_description";
     //PROJECTGPSGEOM refers to GPSGEOM
 
+    //-------------------------- Table GpsGeom----------------------------
     public static final String COLUMN_GPSGEOMID = "gpsGeom_id";
     public static final String COLUMN_GPSGEOMCOORD = "gpsGeom_the_geom";
 
+    //-------------------------- Table Pixel Geom----------------------------
     public static final String COLUMN_PIXELGEOMID = "pixelGeom_id";
     public static final String COLUMN_PIXELGEOMCOORD = "pixelGeom_the_geom";
 
+    //-------------------------- Table Photo----------------------------
     public static final String COLUMN_PHOTOID = "photo_id";
     public static final String COLUMN_PHOTODESCRIPTION = "photo_description";
     public static final String COLUMN_PHOTOAUTHOR = "photo_author";
     public static final String COLUMN_PHOTONAME = "photo_name";
     public static final String COLUMN_PHOTOPATH = "photo_path";
-    public static final String COLUMN_PHOTONBRPOINTS = "photo_nbrPoints";
     public static final String COLUMN_PHOTOLASTMODIFICATION = "photo_last_modification";
     //PHOTOGPSGEOM refers to GPSGEOM
 
+    //-------------------------- Table Material----------------------------
     public static final String COLUMN_MATERIALID = "material_id";
     public static final String COLUMN_MATERIALNAME = "material_name";
     public static final String COLUMN_MATERIALCONDUCT = "material_conduct";
     public static final String COLUMN_MATERIALHEAT = "material_heat_capa";
     public static final String COLUMN_MATERIALMASS = "material_mass_density";
 
+    //-------------------------- Table Element----------------------------
     public static final String COLUMN_ELEMENTTYPEID = "elementType_id";
     public static final String COLUMN_ELEMENTTYPENAME = "elementType_name";
-
     public static final String COLUMN_ELEMENTID = "element_id";
     public static final String COLUMN_ELEMENTCOLOR = "element_color";
 
-    /**
-     * name of the local database
-     * upgrading the version force the database to be deleted and recreated
-     */
-    public static final String DATABASE_NAME = "local3.db";
-    public static final int DATABASE_VERSION = 3;
 
-
+    /************************************************
+     * QUERIES
+     ************************************************/
     /**
      * query to create table GPSGEOM
      */
@@ -224,43 +247,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
                     + "FOREIGN KEY(" + COLUMN_ELEMENTTYPEID + ") REFERENCES " + TABLE_ELEMENTTYPE + " (" + COLUMN_ELEMENTTYPEID + ")"
                     + ");";
 
-    /**
-     * constructor
-     *
-     * @param context of our activity
-     */
-    public MySQLiteHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
-    }
-
-    @Override
-    public void onCreate(SQLiteDatabase database) {
-        /**
-         * we call each methods to create every table
-         */
-        database.execSQL(getDatabaseCreate());
-        database.execSQL(getDatabaseCreate2());
-        database.execSQL(getDatabaseCreate3());
-        database.execSQL(getDatabaseCreate4());
-        database.execSQL(getDatabaseCreate5());
-        database.execSQL(getDatabaseCreate6());
-        database.execSQL(getDatabaseCreate7());
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.w(MySQLiteHelper.class.getName(),
-                "Upgrading database from version" + oldVersion + " to " + newVersion + ", which will destroy all your data");
-        db.execSQL(
-                "DROP TABLE IF EXISTS"
-                        + TABLE_PROJECT + ", "
-                        + TABLE_GPSGEOM + ", "
-                        + TABLE_PIXELGEOM + ", "
-                        + TABLE_PHOTO
-                        + "; "
-        );
-        onCreate(db);
-    }
+    //-------------------------QUERIES GETTERS----------------------------
 
     /**
      * getter for createquery of related number
@@ -324,5 +311,61 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static String getDatabaseCreate7() {
         return DATABASE_CREATE8;
     }
+
+
+    /************************************************
+     * Construction de la base de données
+     ************************************************/
+    /**
+     * Constructor
+     *
+     * @param context context of our activity
+     */
+    public MySQLiteHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    /**
+     * Methode onCreate : création des tables lors de la création de la base de données
+     *
+     * @param database Base de données
+     */
+    @Override
+    public void onCreate(SQLiteDatabase database) {
+        /**
+         * we call each methods to create every table
+         */
+        database.execSQL(getDatabaseCreate());
+        database.execSQL(getDatabaseCreate2());
+        database.execSQL(getDatabaseCreate3());
+        database.execSQL(getDatabaseCreate4());
+        database.execSQL(getDatabaseCreate5());
+        database.execSQL(getDatabaseCreate6());
+        database.execSQL(getDatabaseCreate7());
+    }
+
+    /**
+     * Méthode onUpgrade : appelée à chaque changement de version pour la base de données
+     *
+     * @param db         Base de données
+     * @param oldVersion Ancienne version
+     * @param newVersion Nouvelle version
+     */
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        Log.w(MySQLiteHelper.class.getName(),
+                "Upgrading database from version" + oldVersion + " to " + newVersion + ", which will destroy all your data");
+        db.execSQL(
+                "DROP TABLE IF EXISTS"
+                        + TABLE_PROJECT + ", "
+                        + TABLE_GPSGEOM + ", "
+                        + TABLE_PIXELGEOM + ", "
+                        + TABLE_PHOTO
+                        + "; "
+        );
+        onCreate(db);
+    }
+
+
 }
 
