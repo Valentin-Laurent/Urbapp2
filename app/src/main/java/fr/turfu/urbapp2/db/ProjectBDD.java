@@ -58,7 +58,7 @@ public class ProjectBDD {
      * @return Project
      */
     public Project getProjectByName(String n) {
-        Cursor c = bdd.query(MySQLiteHelper.TABLE_PROJECT, new String[]{MySQLiteHelper.COLUMN_PROJECTID, MySQLiteHelper.COLUMN_PROJECTNAME, MySQLiteHelper.COLUMN_PROJECTDESCRIPTION, MySQLiteHelper.COLUMN_GPSGEOMID}, "project_name" + " LIKE \"" + n + "\"", null, null, null, null);
+        Cursor c = bdd.query(MySQLiteHelper.TABLE_PROJECT, new String[]{MySQLiteHelper.COLUMN_PROJECTID,MySQLiteHelper.COLUMN_PROJECTVERSION ,MySQLiteHelper.COLUMN_PROJECTNAME, MySQLiteHelper.COLUMN_PROJECTDESCRIPTION, MySQLiteHelper.COLUMN_GPSGEOMID}, "project_name" + " LIKE \"" + n + "\"", null, null, null, null);
         if (c.getCount() != 0) {
             c.moveToFirst();
         }
@@ -82,9 +82,10 @@ public class ProjectBDD {
             Project p = new Project();
             //on lui affecte toutes les infos grâce aux infos contenues dans le Cursor
             p.setProjectId(c.getInt(0));
-            p.setProjectName(c.getString(1));
-            p.setProjectDescription(c.getString(2));
-            p.setGpsGeom_id(c.getLong(3));
+            p.setProjectVersion(c.getInt(1));
+            p.setProjectName(c.getString(2));
+            p.setProjectDescription(c.getString(3));
+            p.setGpsGeom_id(c.getLong(4));
 
             //On retourne le projet
             return p;
@@ -102,6 +103,7 @@ public class ProjectBDD {
         ContentValues values = new ContentValues();
 
         values.put(MySQLiteHelper.COLUMN_PROJECTNAME, p.getProjectName());
+        values.put(MySQLiteHelper.COLUMN_PROJECTVERSION, p.getVersion());
         values.put(MySQLiteHelper.COLUMN_PROJECTDESCRIPTION, p.getProjectDescription());
         values.put(MySQLiteHelper.COLUMN_GPSGEOMID, p.getGpsGeom_id());
 
@@ -116,7 +118,7 @@ public class ProjectBDD {
      */
     public List<Project> getProjects() {
 
-        Cursor cursor = bdd.query(MySQLiteHelper.TABLE_PROJECT, new String[]{MySQLiteHelper.COLUMN_PROJECTID, MySQLiteHelper.COLUMN_PROJECTNAME, MySQLiteHelper.COLUMN_PROJECTDESCRIPTION, MySQLiteHelper.COLUMN_GPSGEOMID}, null, null, null, null, MySQLiteHelper.COLUMN_PROJECTNAME +"  ASC");
+        Cursor cursor = bdd.query(MySQLiteHelper.TABLE_PROJECT, new String[]{MySQLiteHelper.COLUMN_PROJECTID, MySQLiteHelper.COLUMN_PROJECTVERSION ,MySQLiteHelper.COLUMN_PROJECTNAME, MySQLiteHelper.COLUMN_PROJECTDESCRIPTION, MySQLiteHelper.COLUMN_GPSGEOMID}, null, null, null, null, MySQLiteHelper.COLUMN_PROJECTNAME +"  ASC");
 
         List<Project> lp = new ArrayList<>();
 

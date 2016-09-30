@@ -26,7 +26,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     /*
      * NB : upgrading the version force the database to be deleted and recreated
      */
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION =4;
 
     /************************************************
      * Declaration of tables
@@ -115,6 +115,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_PROJECTID = "project_id";
     public static final String COLUMN_PROJECTNAME = "project_name";
     public static final String COLUMN_PROJECTDESCRIPTION = "project_description";
+    public static final String COLUMN_PROJECTVERSION = "project_version";
     //PROJECTGPSGEOM refers to GPSGEOM
 
     //-------------------------- Table GpsGeom----------------------------
@@ -182,6 +183,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
                     + TABLE_PROJECT + " ("
                     + COLUMN_PROJECTID + " INTEGER PRIMARY KEY, "
                     + COLUMN_PROJECTNAME + " text not null, "
+                    + COLUMN_PROJECTVERSION + " INTEGER not null, "
                     + COLUMN_PROJECTDESCRIPTION + " text , "
                     + COLUMN_GPSGEOMID + " INTEGER, "
                     + "FOREIGN KEY(" + COLUMN_GPSGEOMID + ") REFERENCES " + TABLE_GPSGEOM + " (" + COLUMN_GPSGEOMID + ")"
@@ -353,16 +355,15 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
      */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.w(MySQLiteHelper.class.getName(),
-                "Upgrading database from version" + oldVersion + " to " + newVersion + ", which will destroy all your data");
-        db.execSQL(
-                "DROP TABLE IF EXISTS"
-                        + TABLE_PROJECT + ", "
-                        + TABLE_GPSGEOM + ", "
-                        + TABLE_PIXELGEOM + ", "
-                        + TABLE_PHOTO
-                        + "; "
-        );
+        Log.w(MySQLiteHelper.class.getName(),"Upgrading database from version" + oldVersion + " to " + newVersion + ", which will destroy all your data");
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PROJECT +" ;");
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_GPSGEOM +" ;");
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PIXELGEOM+" ;" );
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PHOTO+" ;" );
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_MATERIAL +" ;");
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ELEMENT +" ;");
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ELEMENTTYPE +" ;");
+
         onCreate(db);
     }
 

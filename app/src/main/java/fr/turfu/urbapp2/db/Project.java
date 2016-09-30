@@ -27,6 +27,11 @@ public class Project extends DataObject {
     private String project_description;
 
     /**
+     * Int project version
+     */
+    private int project_version;
+
+    /**
      * long id of the gpsgeom that locates to the project
      */
     private long gpsGeom_id;
@@ -47,6 +52,7 @@ public class Project extends DataObject {
         this.project_name = n;
         this.project_description = d;
         this.gpsGeom_id=gps;
+        this.project_version=0;
     }
 
 
@@ -99,7 +105,14 @@ public class Project extends DataObject {
     public String getExt_GpsGeomCoord() {
         return Ext_GpsGeomCoord;
     }
-
+    /**
+     * get the value of the version
+     *
+     * @return Int version
+     */
+    public int getVersion() {
+        return project_version;
+    }
 
     /*******************
      * SETTERS
@@ -149,6 +162,14 @@ public class Project extends DataObject {
     public void setProjectId(long id) {
         this.project_id = id;
     }
+    /**
+     * setter for the project version
+     *
+     * @param v
+     */
+    public void setProjectVersion(int v) {
+        this.project_version = v;
+    }
 
 
     //Override methods
@@ -161,6 +182,7 @@ public class Project extends DataObject {
     public void saveToLocal(LocalDataSource datasource) {
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.COLUMN_PROJECTNAME, this.project_name);
+        values.put(MySQLiteHelper.COLUMN_PROJECTVERSION, this.project_version);
         values.put(MySQLiteHelper.COLUMN_PROJECTDESCRIPTION, this.project_description);
     }
 
