@@ -21,6 +21,9 @@ import java.util.List;
 import fr.turfu.urbapp2.db.Project;
 import fr.turfu.urbapp2.db.ProjectBDD;
 
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.views.MapView;
+
 //TODO Gérer le cycle d'activité de façon à ce qu'une seule activité Main puisse exister
 
 public class MainActivity extends AppCompatActivity {
@@ -69,7 +72,13 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Map
-        //TODO : Carte avec géolocalisation
+        org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants.setUserAgentValue(BuildConfig.APPLICATION_ID);
+
+        MapView map = (MapView) findViewById(R.id.map);
+        map.setTileSource(TileSourceFactory.MAPNIK);
+
+        map.setBuiltInZoomControls(true);
+        map.setMultiTouchControls(true);
     }
 
 
