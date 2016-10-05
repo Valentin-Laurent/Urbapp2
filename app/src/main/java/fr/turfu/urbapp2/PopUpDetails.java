@@ -12,6 +12,9 @@ import android.widget.EditText;
 import fr.turfu.urbapp2.db.Project;
 import fr.turfu.urbapp2.db.ProjectBDD;
 
+/**
+ * Pop up dans laquelle sont récapitulées toutes les information d'un projet
+ */
 public class PopUpDetails extends Dialog implements android.view.View.OnClickListener {
 
     /**
@@ -44,18 +47,23 @@ public class PopUpDetails extends Dialog implements android.view.View.OnClickLis
      */
     private MenuItem mi;
 
+
     /**
      * Constructeur
      *
-     * @param a Activité
+     * @param a  Activité
+     * @param n  Nom du projet
+     * @param d  Description du projet
+     * @param mi Menu item de l'activité dans lequel est inscrit le nom du projet
      */
     public PopUpDetails(Activity a, String n, String d, MenuItem mi) {
         super(a);
         this.c = a;
         this.name = n;
         this.descr = d;
-        this.mi=mi;
+        this.mi = mi;
     }
+
 
     /**
      * Création de la pop up.
@@ -95,16 +103,18 @@ public class PopUpDetails extends Dialog implements android.view.View.OnClickLis
      * @param v Vue représentant la pop up elle-même
      */
     @Override
-    //TODO : Quand on clique sur le bouton ok, valider les changements
+    //TODO : prendre en compte la carte
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_ok:
 
+                //On récupère les changements
                 EditText et1 = (EditText) findViewById(R.id.NameValue);
                 String newName = et1.getText().toString();
                 EditText et2 = (EditText) findViewById(R.id.DescrValue);
                 String newDescr = et2.getText().toString();
 
+                //Mise à jour du projet
                 ProjectBDD pbdd = new ProjectBDD(this.getContext()); //Instanciation de ProjectBdd pour manipuler les projets de la base de données
                 pbdd.open(); //Ouverture de la base de données
                 Project p = pbdd.getProjectByName(name); // Récupération du projet
@@ -113,8 +123,10 @@ public class PopUpDetails extends Dialog implements android.view.View.OnClickLis
                 pbdd.update(p);
                 pbdd.close(); // Fermeture de la base de données
 
+                //Mise à jour de l'affichage
                 mi.setTitle(p.getProjectName());
 
+                //Fermeture de la pop up
                 dismiss();
                 break;
             case R.id.btn_cancel:

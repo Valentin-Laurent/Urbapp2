@@ -23,7 +23,7 @@ import fr.turfu.urbapp2.db.Project;
 import fr.turfu.urbapp2.db.ProjectBDD;
 
 /**
- * Created by Laura on 05/10/2016.
+ * Activité qui permet de visualiser un projet ouvert
  */
 public class ProjectOpenActivity extends AppCompatActivity {
 
@@ -186,7 +186,7 @@ public class ProjectOpenActivity extends AppCompatActivity {
         mListView.setAdapter(adapter);
 
         //Si il n'y a pas de photo, affichage d'un message
-        if(lpn.size()==0) {
+        if (lpn.size() == 0) {
             TextView tv = (TextView) findViewById(R.id.textViewNoPhoto);
             tv.setVisibility(View.VISIBLE);
         }
@@ -195,7 +195,7 @@ public class ProjectOpenActivity extends AppCompatActivity {
     }
 
     /**
-     * Lancement de la pop up avec les détails du projets
+     * Lancement de la pop up avec les détails du projet
      */
     public void popUpDetails(String name, String descr) {
         PopUpDetails pud = new PopUpDetails(ProjectOpenActivity.this, name, descr, mi);
@@ -218,6 +218,7 @@ public class ProjectOpenActivity extends AppCompatActivity {
 
     /**
      * Lister les photos du projet
+     *
      * @return Liste des photos du projet
      */
     public List<String> getPhotoNames() {

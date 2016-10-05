@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Laura on 29/09/2016.
+ * Classe qui permet de manipuler les projets enregistrés dans la base de données locale
  */
 
 public class ProjectBDD {
@@ -65,6 +65,12 @@ public class ProjectBDD {
         return cursorToProject(c);
     }
 
+    /**
+     * Get a project with his id
+     *
+     * @param n id of a project
+     * @return Project
+     */
     public Project getProjectById(long n) {
         Cursor c = bdd.query(MySQLiteHelper.TABLE_PROJECT, new String[]{MySQLiteHelper.COLUMN_PROJECTID,MySQLiteHelper.COLUMN_PROJECTVERSION ,MySQLiteHelper.COLUMN_PROJECTNAME, MySQLiteHelper.COLUMN_PROJECTDESCRIPTION, MySQLiteHelper.COLUMN_GPSGEOMID}, "project_id" + " == " + n + "", null, null, null, null);
         if (c.getCount() != 0) {
@@ -147,6 +153,12 @@ public class ProjectBDD {
         bdd.execSQL("UPDATE Project SET project_name='"+p.getProjectName()+"' WHERE project_id ="+p.getProjectId());
         bdd.execSQL("UPDATE Project SET project_description= '"+p.getProjectDescription()+"' WHERE project_id ="+p.getProjectId());
     }
+
+    /**
+     * Obtenir toutes les photos d'un projet
+     * @param p Projet
+     * @return List des noms des photos du projet
+     */
 
     public List<String> getPhotos(Project p){
         List<String> lp = new ArrayList<>();
