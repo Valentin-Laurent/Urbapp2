@@ -21,6 +21,7 @@
     <string name="ar_validation">Activer</string>
 
     <!-- Resources for project creation-->
+    <string name="no_project">Aucun projet disponible. </string>
     <string name="project_creation_title">Création d\'un projet</string>
     <string name="project_creation_name">Intitulé</string>
     <string name="project_creation_description">Description</string>
@@ -35,6 +36,7 @@
     <string name="new_photo">Nouvelle photo</string>
     <string name="open_photo">Ouvrir une photo : </string>
     <string name="project_details_instruction">Détails du projet </string>
+    <string name="no_photo">Aucune photo n\'a été ajoutée à ce projet. </string>
 
     <!-- Resources for project details-->
     <string name="project_details_description">Description : </string>

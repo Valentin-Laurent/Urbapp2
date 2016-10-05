@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.views.MapView;
@@ -154,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
 
-         /* Lister les projets*/
+        /* Lister les projets*/
         List<Project> lp = getProjects();
 
         List<String> lpn = new ArrayList<>();
@@ -183,6 +184,12 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        //Si il n'y a pas de projets, affichage d'un message
+        if(lpn.size()==0) {
+            TextView tv = (TextView) findViewById(R.id.textViewNoProject);
+            tv.setVisibility(View.VISIBLE);
+        }
 
         super.onResume();
     }
