@@ -11,18 +11,19 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.views.MapView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import fr.turfu.urbapp2.db.Project;
 import fr.turfu.urbapp2.db.ProjectBDD;
-
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.views.MapView;
 
 //TODO Gérer le cycle d'activité de façon à ce qu'une seule activité Main puisse exister
 
@@ -68,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
 
 
         // Map
@@ -172,6 +172,17 @@ public class MainActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this,
                 android.R.layout.simple_list_item_1, list_projs);
         mListView.setAdapter(adapter);
+
+        //Ajouter les listeners
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
+                Intent intent = new Intent(MainActivity.this, ProjectOpenActivity.class);
+                String name = (String) mListView.getItemAtPosition(position);
+                intent.putExtra("projectName", name);
+                startActivity(intent);
+            }
+        });
 
         super.onResume();
     }

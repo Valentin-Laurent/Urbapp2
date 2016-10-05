@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <include layout="@layout/main_toolbar" />
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/layoutContainer"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="horizontal"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="0dip"
+            android:layout_height="fill_parent"
+            android:layout_weight=".40"
+            android:background="@color/grisClair"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/linearLayout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/grisClair"
+                android:gravity="center_horizontal"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+                <Button
+                    android:id="@+id/buttonNewPhoto"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginTop="49dp"
+                    android:background="@drawable/button_new"
+                    android:text="+"
+                    android:textSize="30sp" />
+
+                <TextView
+                    android:id="@+id/textViewNewPhoto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="84dp"
+                    android:layout_alignBottom="@+id/buttonNewProject"
+                    android:layout_gravity="bottom"
+                    android:layout_marginLeft="30dp"
+                    android:layout_toEndOf="@+id/buttonNewProject"
+                    android:layout_toRightOf="@+id/buttonNewProject"
+                    android:color="@color/vert2"
+                    android:gravity="left|center_vertical"
+                    android:text="@string/new_photo"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/ardoise1"
+                    android:textSize="20dp" />
+
+            </LinearLayout>
+
+
+            <View
+                android:id="@+id/view"
+                android:layout_width="wrap_content"
+                android:layout_height="1px"
+                android:layout_marginTop="180dp"
+                android:background="@color/grisFonce" />
+
+
+            <ListView
+                android:id="@+id/listViewPhoto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/textView3"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:layout_marginTop="40dp"
+                android:textColor="@color/grisFonce" />
+
+
+            <TextView
+                android:id="@+id/textViewOpenPhoto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/listViewPhoto"
+                android:layout_alignStart="@+id/listViewPhoto"
+                android:layout_below="@+id/view"
+                android:layout_marginTop="50dp"
+                android:gravity="left|center_vertical"
+                android:text="@string/open_photo"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/ardoise1"
+                android:textStyle="bold" />
+
+
+        </RelativeLayout>
+
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight=".60"
+            android:background="@color/grisFonce"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</android.support.design.widget.CoordinatorLayout>

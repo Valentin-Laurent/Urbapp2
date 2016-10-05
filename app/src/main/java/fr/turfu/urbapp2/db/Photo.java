@@ -113,7 +113,7 @@ public class Photo extends DataObject {
      *
      * @return
      */
-    public int getPhoto_derniereModif() {
+    public int getPhoto_last_modification() {
         return photo_last_modification;
     }
 

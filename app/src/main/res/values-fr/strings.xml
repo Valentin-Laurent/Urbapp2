@@ -29,4 +29,16 @@
     <string name="empty_project_name">Vous n\'avez pas entré le nom du projet</string>
     <string name="project_already_created">Ce nom de projet est déjà pris. Merci d\'en choisir un autre.</string>
 
+    <!-- Resources for project opened-->
+    <string name="project">Projet : </string>
+    <string name="see_details">Voir détails</string>
+    <string name="new_photo">Nouvelle photo</string>
+    <string name="open_photo">Ouvrir une photo : </string>
+    <string name="project_details_instruction">Détails du projet </string>
+
+    <!-- Resources for project details-->
+    <string name="project_details_description">Description : </string>
+    <string name="project_details_name">Intitulé : </string>
+
+
 </resources>

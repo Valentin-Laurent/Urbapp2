@@ -65,6 +65,14 @@ public class ProjectBDD {
         return cursorToProject(c);
     }
 
+    public Project getProjectById(long n) {
+        Cursor c = bdd.query(MySQLiteHelper.TABLE_PROJECT, new String[]{MySQLiteHelper.COLUMN_PROJECTID,MySQLiteHelper.COLUMN_PROJECTVERSION ,MySQLiteHelper.COLUMN_PROJECTNAME, MySQLiteHelper.COLUMN_PROJECTDESCRIPTION, MySQLiteHelper.COLUMN_GPSGEOMID}, "project_id" + " == " + n + "", null, null, null, null);
+        if (c.getCount() != 0) {
+            c.moveToFirst();
+        }
+        return cursorToProject(c);
+    }
+
 
     /**
      * Transformer un curseur en projet
@@ -129,6 +137,12 @@ public class ProjectBDD {
         cursor.close();
 
         return lp;
+    }
+
+
+    public void update(Project p){
+        bdd.execSQL("UPDATE Project SET project_name='"+p.getProjectName()+"' WHERE project_id ="+p.getProjectId());
+        bdd.execSQL("UPDATE Project SET project_description= '"+p.getProjectDescription()+"' WHERE project_id ="+p.getProjectId());
     }
 
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
@@ -9,16 +10,28 @@
         android:title="@string/home"
         app:showAsAction="ifRoom" />
 
-    <item
-        android:id="@+id/projectTitle"
-        android:enabled="false"
-        android:title=""
-        app:showAsAction="ifRoom" />
+
+        <item
+            android:id="@+id/projectTitle"
+            android:enabled="false"
+            android:title=""
+            android:visible="false"
+            app:showAsAction="ifRoom" />
+
+        <item
+            android:id="@+id/seeDetails"
+            android:enabled="true"
+            android:icon="@drawable/oeil"
+            android:title="@string/see_details"
+            android:visible="false"
+            app:showAsAction="ifRoom" />
+
+
 
     <item
         android:id="@+id/connectedAs"
         android:enabled="false"
-        android:title="User1"
+        android:title=""
         app:showAsAction="ifRoom" />
 
     <item
@@ -26,4 +39,5 @@
         android:icon="@drawable/settings_icon"
         android:title="@string/settings"
         app:showAsAction="ifRoom" />
+
 </menu>

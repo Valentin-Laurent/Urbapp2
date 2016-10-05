@@ -65,10 +65,13 @@ public class NewProjectActivity extends AppCompatActivity {
 
                 if(control(name)) {
                     save(name, descr);
+                    Intent intent = new Intent(NewProjectActivity.this, ProjectOpenActivity.class);
+                    intent.putExtra("projectName", name);
+                    startActivity(intent);
+                    finish();
                 }
             }
         });
-
     }
 
 
