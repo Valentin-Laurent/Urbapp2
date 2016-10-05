@@ -139,10 +139,24 @@ public class ProjectBDD {
         return lp;
     }
 
-
+    /**
+     * Mise à jour d'un projet
+     * @param p Nouveau projet à synchroniser
+     */
     public void update(Project p){
         bdd.execSQL("UPDATE Project SET project_name='"+p.getProjectName()+"' WHERE project_id ="+p.getProjectId());
         bdd.execSQL("UPDATE Project SET project_description= '"+p.getProjectDescription()+"' WHERE project_id ="+p.getProjectId());
+    }
+
+    public List<String> getPhotos(Project p){
+        List<String> lp = new ArrayList<>();
+        String q = "SELECT photo_name FROM Photo WHERE project_id ="+p.getProjectId();
+        Cursor cursor = bdd.rawQuery(q, null);
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            String s = cursor.getString(0);
+            lp.add(s);
+        }
+        return lp;
     }
 
 }

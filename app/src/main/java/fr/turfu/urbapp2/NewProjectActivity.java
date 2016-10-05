@@ -1,6 +1,5 @@
 package fr.turfu.urbapp2;
 
-import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -154,9 +153,10 @@ public class NewProjectActivity extends AppCompatActivity {
             pbdd.insert(p1);
             id = p1.getProjectId();
 
-            //TODO : Passer à l'activité suivante
-            message("OK");
-            //finish();
+            Intent intent = new Intent(NewProjectActivity.this, ProjectOpenActivity.class);
+            intent.putExtra("projectName", p1.getProjectName());
+            startActivity(intent);
+            finish();
 
         } else {
             id = p.getProjectId();
@@ -180,12 +180,6 @@ public class NewProjectActivity extends AppCompatActivity {
         return true;
     }
 
-
-    public void message(String m) {
-        Dialog dialog = new Dialog(NewProjectActivity.this);
-        dialog.setTitle(m);
-        dialog.show();
-    }
 
 }
 

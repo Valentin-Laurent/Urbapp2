@@ -26,7 +26,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     /*
      * NB : upgrading the version force the database to be deleted and recreated
      */
-    public static final int DATABASE_VERSION =4;
+    public static final int DATABASE_VERSION =5;
 
     /************************************************
      * Declaration of tables
@@ -133,6 +133,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_PHOTONAME = "photo_name";
     public static final String COLUMN_PHOTOPATH = "photo_path";
     public static final String COLUMN_PHOTOLASTMODIFICATION = "photo_last_modification";
+    public static final String COLUMN_PHOTOPROJECTID = "project_id";
     //PHOTOGPSGEOM refers to GPSGEOM
 
     //-------------------------- Table Material----------------------------
@@ -200,9 +201,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
                     + COLUMN_PHOTOAUTHOR + " text not null, "
                     + COLUMN_PHOTONAME + " text not null, "
                     + COLUMN_PHOTOPATH + " text not null, "
+                    + COLUMN_PHOTOPROJECTID + " INTEGER not null, "
                     + COLUMN_PHOTOLASTMODIFICATION + " DATETIME, "
                     + COLUMN_GPSGEOMID + " INTEGER, "
-                    + "FOREIGN KEY(" + COLUMN_GPSGEOMID + ") REFERENCES " + TABLE_GPSGEOM + " (" + COLUMN_GPSGEOMID + ")"
+                    + "FOREIGN KEY(" + COLUMN_GPSGEOMID + ") REFERENCES " + TABLE_GPSGEOM + " (" + COLUMN_GPSGEOMID + "),"
+                    + "FOREIGN KEY(" + COLUMN_PHOTOPROJECTID + ") REFERENCES " + TABLE_PROJECT + " (" + COLUMN_PROJECTID + ")"
                     + ");";
     /**
      * query to create table MATERIAL

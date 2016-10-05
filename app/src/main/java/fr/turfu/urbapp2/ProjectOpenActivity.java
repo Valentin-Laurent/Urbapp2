@@ -16,10 +16,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import fr.turfu.urbapp2.db.Photo;
 import fr.turfu.urbapp2.db.Project;
 import fr.turfu.urbapp2.db.ProjectBDD;
 
@@ -65,7 +63,7 @@ public class ProjectOpenActivity extends AppCompatActivity {
         //Ajout du layout
         setContentView(R.layout.activity_project_open);
 
-       //Mise en place de la toolbar
+        //Mise en place de la toolbar
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(mainToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -78,7 +76,7 @@ public class ProjectOpenActivity extends AppCompatActivity {
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               // Intent intent = new Intent(ProjectOpenActivity.this, PhotoOpenActivity.class);
+                // Intent intent = new Intent(ProjectOpenActivity.this, PhotoOpenActivity.class);
                 //startActivity(intent);
             }
         });
@@ -92,7 +90,7 @@ public class ProjectOpenActivity extends AppCompatActivity {
         pbdd.open(); //Ouverture de la base de données
         Project p = pbdd.getProjectByName(name); // Récupération du projet
         pbdd.close(); // Fermeture de la base de données
-        project_id=p.getProjectId();
+        project_id = p.getProjectId();
     }
 
 
@@ -122,8 +120,8 @@ public class ProjectOpenActivity extends AppCompatActivity {
         Resources res = getResources();
         String s = res.getString(R.string.project);
         Project p = getProject();
-        i1.setTitle(s+" "+p.getProjectName());
-        mi=i1;
+        i1.setTitle(s + " " + p.getProjectName());
+        mi = i1;
 
         //Affichage du bouton pour voir les détails du projet
         MenuItem i2 = menu.findItem(R.id.seeDetails);
@@ -131,7 +129,6 @@ public class ProjectOpenActivity extends AppCompatActivity {
 
         return super.onCreateOptionsMenu(menu);
     }
-
 
 
     /**
@@ -158,7 +155,7 @@ public class ProjectOpenActivity extends AppCompatActivity {
 
             case R.id.seeDetails:
                 Project p = getProject();
-                popUpDetails(p.getProjectName(),p.getProjectDescription());
+                popUpDetails(p.getProjectName(), p.getProjectDescription());
                 return true;
 
             default:
@@ -172,15 +169,9 @@ public class ProjectOpenActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-         /* Lister les photos*/
-        //TODO
-        List<Photo> lp = new ArrayList<>();
 
-
-        List<String> lpn = new ArrayList<>();
-        for (Photo p : lp) {
-            lpn.add(p.getPhoto_name());
-        }
+        /* Lister les photos*/
+        List<String> lpn = getPhotoNames();
 
         list_photo = new String[lpn.size()];
         for (int i = 0; i < lpn.size(); i++) {
@@ -200,12 +191,17 @@ public class ProjectOpenActivity extends AppCompatActivity {
      * Lancement de la pop up avec les détails du projets
      */
     public void popUpDetails(String name, String descr) {
-        PopUpDetails pud = new PopUpDetails(ProjectOpenActivity.this, name, descr,mi);
+        PopUpDetails pud = new PopUpDetails(ProjectOpenActivity.this, name, descr, mi);
         pud.show();
     }
 
 
-    public Project getProject(){
+    /**
+     * Obtenir le projet ouvert
+     *
+     * @return Projet ouvert
+     */
+    public Project getProject() {
         ProjectBDD pbdd = new ProjectBDD(ProjectOpenActivity.this); //Instanciation de ProjectBdd pour manipuler les projets de la base de données
         pbdd.open(); //Ouverture de la base de données
         Project p = pbdd.getProjectById(project_id); // Récupération du projet
@@ -213,4 +209,16 @@ public class ProjectOpenActivity extends AppCompatActivity {
         return p;
     }
 
+    /**
+     * Lister les photos du projet
+     * @return Liste des photos du projet
+     */
+    public List<String> getPhotoNames() {
+        ProjectBDD pbdd = new ProjectBDD(ProjectOpenActivity.this); //Instanciation de ProjectBdd pour manipuler les projets de la base de données
+        pbdd.open(); //Ouverture de la base de données
+        List<String> lp = pbdd.getPhotos(pbdd.getProjectById(project_id));
+        pbdd.close(); // Fermeture de la base de données
+        return lp;
     }
+
+}

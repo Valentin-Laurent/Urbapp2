@@ -28,6 +28,11 @@ public class Photo extends DataObject {
     private String photo_path;
 
     /**
+     * contains the id of the project
+     */
+    private Long project_id;
+
+    /**
      * contains the last modification
      * set to 0 by default
      */
@@ -127,6 +132,14 @@ public class Photo extends DataObject {
         return photo_name;
     }
 
+    /**
+     * getter for the project id
+     *
+     * @return
+     */
+    public long getProject_id() {
+        return project_id;
+    }
 
     //Setters
 
@@ -138,7 +151,14 @@ public class Photo extends DataObject {
     public void setExt_GpsGeomCoord(String ext_GpsGeomCoord) {
         Ext_GpsGeomCoord = ext_GpsGeomCoord;
     }
-
+    /**
+     * setter for the project id
+     *
+     * @param id
+     */
+    public void setProject_id(Long id) {
+        project_id= id;
+    }
 
     /**
      * setter for the name of the photo
@@ -214,6 +234,7 @@ public class Photo extends DataObject {
         values.put(MySQLiteHelper.COLUMN_PHOTOAUTHOR, this.photo_author);
         values.put(MySQLiteHelper.COLUMN_PHOTOPATH, this.photo_path);
         values.put(MySQLiteHelper.COLUMN_PHOTOLASTMODIFICATION, this.photo_last_modification);
+        values.put(MySQLiteHelper.COLUMN_PHOTOPROJECTID, this.project_id);
 
         // TODO WTF if(this.registredInLocal){
         String str = "photo_id " + "=" + this.photo_id;
