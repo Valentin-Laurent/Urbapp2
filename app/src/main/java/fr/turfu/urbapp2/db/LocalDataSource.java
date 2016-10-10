@@ -446,7 +446,7 @@ public class LocalDataSource {
 	
 	/**
 	 * create a GPSGeom in the database and update the project tuple where project_id = id with this gpsgeom_id
-	 * @param str need to use convertion method of utils package
+	 * @param str need to use convertion method of java.utils package
 	 * @param id is the project_id were we need to update the gpsGeom_id foreign key
 	 * @return gs1 is the gpsGeom created
 	 */

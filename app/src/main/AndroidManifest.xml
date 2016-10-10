@@ -4,12 +4,13 @@
 
     <!-- Features needed for Augmented Reality with Vuforia-->
     <uses-feature android:name="android.hardware.camera" />
+
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <!-- Features needed for Augmented Reality with OpenStreetMap with osmdroid-->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
@@ -34,11 +35,12 @@
         </activity>
         <activity
             android:name=".SettingsActivity"
-            android:launchMode="singleTask">
-        </activity>
+            android:launchMode="singleTask"></activity>
         <activity android:name=".AugmentedRealityActivity"></activity>
         <activity android:name=".NewProjectActivity" />
         <activity android:name=".ProjectOpenActivity" />
+        <activity  android:name=".NewPhotoPopUpActivity" android:theme="@android:style/Theme.Dialog"/>
+        <activity android:name=".PhotoOpenActivity" />
     </application>
 
 </manifest>

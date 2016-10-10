@@ -77,8 +77,8 @@ public class ProjectOpenActivity extends AppCompatActivity {
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Intent intent = new Intent(ProjectOpenActivity.this, PhotoOpenActivity.class);
-                //startActivity(intent);
+               Intent i = new Intent(ProjectOpenActivity.this,NewPhotoPopUpActivity.class);
+               startActivity(i);
             }
         });
 
