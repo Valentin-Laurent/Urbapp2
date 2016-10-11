@@ -1,10 +1,14 @@
 package fr.turfu.urbapp2;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -25,6 +29,7 @@ import java.util.List;
 
 import fr.turfu.urbapp2.db.Project;
 import fr.turfu.urbapp2.db.ProjectBDD;
+import fr.turfu.urbapp2.tools.ConnexionCheck;
 
 //TODO Gérer le cycle d'activité de façon à ce qu'une seule activité Main puisse exister
 
@@ -45,6 +50,27 @@ public class MainActivity extends AppCompatActivity {
      */
     String[] list_projs = new String[]{};
 
+    /**
+     * Link to ask google to create a specific connexion code to check if there is no portal between android and server
+     */
+    public static final String CONNECTIVITY_URL = "http://clients3.google.com/generate_204";
+
+    /**
+     * Context of the app
+     */
+    public static Context baseContext;
+
+    /**
+     * Dialog box displayed in the entire screen
+     */
+    private static AlertDialog.Builder alertDialog;
+
+    /**
+     * Boolean to check if internet is on
+     */
+
+    public static boolean internet = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -52,13 +78,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Setting the Context of app
+        baseContext = getBaseContext();
+
+        //Checking internet
+        alertDialog = new AlertDialog.Builder(MainActivity.this);
+        isInternetOn();
+
         //Handling toolbar
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(mainToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         mainToolbar.setTitle("");
         mainToolbar.setSubtitle("");
-
 
         // Button new project
         b1 = (Button) findViewById(R.id.buttonNewProject);
@@ -177,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
         //Ajouter les listeners
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(MainActivity.this, ProjectOpenActivity.class);
                 String name = (String) mListView.getItemAtPosition(position);
                 intent.putExtra("projectName", name);
@@ -186,11 +218,39 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //Si il n'y a pas de projets, affichage d'un message
-        if(lpn.size()==0) {
+        if (lpn.size() == 0) {
             TextView tv = (TextView) findViewById(R.id.textViewNoProject);
             tv.setVisibility(View.VISIBLE);
         }
 
         super.onResume();
+    }
+
+    /**
+     * Method to check if internet is available (and no portal !)
+     */
+    public final void isInternetOn() {
+        ConnectivityManager con = (ConnectivityManager) getSystemService(Activity.CONNECTIVITY_SERVICE);
+        boolean wifi = con.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnectedOrConnecting();
+        boolean mobile = false;
+        try {
+            mobile = con.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnectedOrConnecting();
+        } catch (NullPointerException e) {
+            mobile = false;
+        }
+        boolean internet = wifi | mobile;
+        if (internet) {
+            new ConnexionCheck().Connectivity();
+        }
+    }
+
+
+    /**
+     * Method if no internet connectivity to print a Dialog.
+     */
+    public static void errorConnect() {
+        alertDialog.setTitle("");
+        alertDialog.setView(R.layout.error_pop_up);
+        alertDialog.show();
     }
 }
