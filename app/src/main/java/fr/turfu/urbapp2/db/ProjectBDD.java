@@ -58,7 +58,7 @@ public class ProjectBDD {
      * @return Project
      */
     public Project getProjectByName(String n) {
-        Cursor c = bdd.query(MySQLiteHelper.TABLE_PROJECT, new String[]{MySQLiteHelper.COLUMN_PROJECTID,MySQLiteHelper.COLUMN_PROJECTVERSION ,MySQLiteHelper.COLUMN_PROJECTNAME, MySQLiteHelper.COLUMN_PROJECTDESCRIPTION, MySQLiteHelper.COLUMN_GPSGEOMID}, "project_name" + " LIKE \"" + n + "\"", null, null, null, null);
+        Cursor c = bdd.query(MySQLiteHelper.TABLE_PROJECT, new String[]{MySQLiteHelper.COLUMN_PROJECTID, MySQLiteHelper.COLUMN_PROJECTVERSION, MySQLiteHelper.COLUMN_PROJECTNAME, MySQLiteHelper.COLUMN_PROJECTDESCRIPTION, MySQLiteHelper.COLUMN_GPSGEOMID, MySQLiteHelper.COLUMN_PROJECTISAVAILABLE}, "project_name" + " LIKE \"" + n + "\"", null, null, null, null);
         if (c.getCount() != 0) {
             c.moveToFirst();
         }
@@ -72,7 +72,7 @@ public class ProjectBDD {
      * @return Project
      */
     public Project getProjectById(long n) {
-        Cursor c = bdd.query(MySQLiteHelper.TABLE_PROJECT, new String[]{MySQLiteHelper.COLUMN_PROJECTID,MySQLiteHelper.COLUMN_PROJECTVERSION ,MySQLiteHelper.COLUMN_PROJECTNAME, MySQLiteHelper.COLUMN_PROJECTDESCRIPTION, MySQLiteHelper.COLUMN_GPSGEOMID}, "project_id" + " == " + n + "", null, null, null, null);
+        Cursor c = bdd.query(MySQLiteHelper.TABLE_PROJECT, new String[]{MySQLiteHelper.COLUMN_PROJECTID, MySQLiteHelper.COLUMN_PROJECTVERSION, MySQLiteHelper.COLUMN_PROJECTNAME, MySQLiteHelper.COLUMN_PROJECTDESCRIPTION, MySQLiteHelper.COLUMN_GPSGEOMID, MySQLiteHelper.COLUMN_PROJECTISAVAILABLE}, "project_id" + " == " + n + "", null, null, null, null);
         if (c.getCount() != 0) {
             c.moveToFirst();
         }
@@ -94,12 +94,14 @@ public class ProjectBDD {
 
             //On créé un projet
             Project p = new Project();
+
             //on lui affecte toutes les infos grâce aux infos contenues dans le Cursor
             p.setProjectId(c.getInt(0));
             p.setProjectVersion(c.getInt(1));
             p.setProjectName(c.getString(2));
             p.setProjectDescription(c.getString(3));
             p.setGpsGeom_id(c.getLong(4));
+            p.setProjectIsavailable(c.getInt(5) > 0);
 
             //On retourne le projet
             return p;
@@ -120,7 +122,7 @@ public class ProjectBDD {
         values.put(MySQLiteHelper.COLUMN_PROJECTVERSION, p.getVersion());
         values.put(MySQLiteHelper.COLUMN_PROJECTDESCRIPTION, p.getProjectDescription());
         values.put(MySQLiteHelper.COLUMN_GPSGEOMID, p.getGpsGeom_id());
-
+        values.put(MySQLiteHelper.COLUMN_PROJECTISAVAILABLE, p.getIsAvailable());
         return bdd.insert(MySQLiteHelper.TABLE_PROJECT, null, values);
     }
 
@@ -132,7 +134,7 @@ public class ProjectBDD {
      */
     public List<Project> getProjects() {
 
-        Cursor cursor = bdd.query(MySQLiteHelper.TABLE_PROJECT, new String[]{MySQLiteHelper.COLUMN_PROJECTID, MySQLiteHelper.COLUMN_PROJECTVERSION ,MySQLiteHelper.COLUMN_PROJECTNAME, MySQLiteHelper.COLUMN_PROJECTDESCRIPTION, MySQLiteHelper.COLUMN_GPSGEOMID}, null, null, null, null, MySQLiteHelper.COLUMN_PROJECTNAME +"  ASC");
+        Cursor cursor = bdd.query(MySQLiteHelper.TABLE_PROJECT, new String[]{MySQLiteHelper.COLUMN_PROJECTID, MySQLiteHelper.COLUMN_PROJECTVERSION, MySQLiteHelper.COLUMN_PROJECTNAME, MySQLiteHelper.COLUMN_PROJECTDESCRIPTION, MySQLiteHelper.COLUMN_GPSGEOMID, MySQLiteHelper.COLUMN_PROJECTISAVAILABLE}, null, null, null, null, MySQLiteHelper.COLUMN_PROJECTNAME + "  ASC");
 
         List<Project> lp = new ArrayList<>();
 
@@ -147,22 +149,24 @@ public class ProjectBDD {
 
     /**
      * Mise à jour d'un projet
+     *
      * @param p Nouveau projet à synchroniser
      */
-    public void update(Project p){
-        bdd.execSQL("UPDATE Project SET project_name='"+p.getProjectName()+"' WHERE project_id ="+p.getProjectId());
-        bdd.execSQL("UPDATE Project SET project_description= '"+p.getProjectDescription()+"' WHERE project_id ="+p.getProjectId());
+    public void update(Project p) {
+        bdd.execSQL("UPDATE Project SET project_name='" + p.getProjectName() + "' WHERE project_id =" + p.getProjectId());
+        bdd.execSQL("UPDATE Project SET project_description= '" + p.getProjectDescription() + "' WHERE project_id =" + p.getProjectId());
     }
 
     /**
      * Obtenir toutes les photos d'un projet
+     *
      * @param p Projet
      * @return List des noms des photos du projet
      */
 
-    public List<String> getPhotos(Project p){
+    public List<String> getPhotos(Project p) {
         List<String> lp = new ArrayList<>();
-        String q = "SELECT photo_name FROM Photo WHERE project_id ="+p.getProjectId();
+        String q = "SELECT photo_name FROM Photo WHERE project_id =" + p.getProjectId();
         Cursor cursor = bdd.rawQuery(q, null);
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             String s = cursor.getString(0);

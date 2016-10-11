@@ -124,7 +124,7 @@ public class PopUpDetails extends Dialog implements android.view.View.OnClickLis
                 pbdd.close(); // Fermeture de la base de données
 
                 //Mise à jour de l'affichage
-                mi.setTitle(p.getProjectName());
+                mi.setTitle("Projet : "+p.getProjectName());
 
                 //Fermeture de la pop up
                 dismiss();

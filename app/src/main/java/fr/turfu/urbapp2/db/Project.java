@@ -1,10 +1,6 @@
 package fr.turfu.urbapp2.db;
 
-import android.content.ContentValues;
-//TODO WTF import src.com.ecn.urbapp.syncToExt.Sync;
-
-
-public class Project extends DataObject {
+public class Project {
 
     private static final String TAG = "projet";
 
@@ -27,9 +23,14 @@ public class Project extends DataObject {
     private String project_description;
 
     /**
-     * Int project version
+     * Date project version
      */
     private int project_version;
+
+    /**
+     * Boolean to tell if the project is currently opened by a user or not
+     */
+    private boolean project_isavailable;
 
     /**
      * long id of the gpsgeom that locates to the project
@@ -44,15 +45,16 @@ public class Project extends DataObject {
      * CONSTRUCTORS
      *******************/
 
-    public Project(){
+    public Project() {
 
     }
 
-    public Project(String n, String d,long gps) {
+    public Project(String n, String d, long gps) {
         this.project_name = n;
         this.project_description = d;
-        this.gpsGeom_id=gps;
-        this.project_version=0;
+        this.gpsGeom_id = gps;
+        this.project_version = 0;
+        this.project_isavailable = false;
     }
 
 
@@ -105,6 +107,7 @@ public class Project extends DataObject {
     public String getExt_GpsGeomCoord() {
         return Ext_GpsGeomCoord;
     }
+
     /**
      * get the value of the version
      *
@@ -113,6 +116,16 @@ public class Project extends DataObject {
     public int getVersion() {
         return project_version;
     }
+
+    /**
+     * Get the availability of the project
+     *
+     * @return Boolean isAvailable
+     */
+    public boolean getIsAvailable() {
+        return project_isavailable;
+    }
+
 
     /*******************
      * SETTERS
@@ -162,6 +175,7 @@ public class Project extends DataObject {
     public void setProjectId(long id) {
         this.project_id = id;
     }
+
     /**
      * setter for the project version
      *
@@ -171,6 +185,15 @@ public class Project extends DataObject {
         this.project_version = v;
     }
 
+    /**
+     * setter for the project availability
+     *
+     * @param a
+     */
+    public void setProjectIsavailable(boolean a) {
+        this.project_isavailable = a;
+    }
+
 
     //Override methods
     @Override
@@ -178,23 +201,5 @@ public class Project extends DataObject {
         return project_name + " " + project_id;
     }
 
-    @Override
-    public void saveToLocal(LocalDataSource datasource) {
-        ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.COLUMN_PROJECTNAME, this.project_name);
-        values.put(MySQLiteHelper.COLUMN_PROJECTVERSION, this.project_version);
-        values.put(MySQLiteHelper.COLUMN_PROJECTDESCRIPTION, this.project_description);
-    }
-
-
-    /**
-     * query to get the biggest photo_id from local db
-     */
-    private static final String
-            GETMAXPROJECTID =
-            "SELECT " + MySQLiteHelper.TABLE_PHOTO + "." + MySQLiteHelper.COLUMN_PHOTOID + " FROM "
-                    + MySQLiteHelper.TABLE_PHOTO
-                    + " ORDER BY " + MySQLiteHelper.TABLE_PHOTO + "." + MySQLiteHelper.COLUMN_PHOTOID
-                    + " DESC LIMIT 1 ;";
 
 }

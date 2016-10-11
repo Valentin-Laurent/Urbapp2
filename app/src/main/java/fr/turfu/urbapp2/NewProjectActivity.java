@@ -134,8 +134,6 @@ public class NewProjectActivity extends AppCompatActivity {
 
     /**
      * Sauvegarde d'un nouveau projet
-     *
-     * @return
      */
 
     // TODO : prendre en compte la géolocalisation
@@ -179,6 +177,9 @@ public class NewProjectActivity extends AppCompatActivity {
         }
         return true;
     }
+
+
+
 
 
 }

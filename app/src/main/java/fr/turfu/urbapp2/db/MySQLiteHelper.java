@@ -8,7 +8,7 @@ import android.util.Log;
 /**
  * Class MySQLiteHelper
  * Role : implémentation de la base de données
- * <p/>
+ * <p>
  * Cette classe comporte :
  * - La déclaration des tables de la base
  * - La déclaration des colonnes de la base
@@ -26,7 +26,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     /*
      * NB : upgrading the version force the database to be deleted and recreated
      */
-    public static final int DATABASE_VERSION =5;
+    public static final int DATABASE_VERSION = 6;
 
     /************************************************
      * Declaration of tables
@@ -116,15 +116,16 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_PROJECTNAME = "project_name";
     public static final String COLUMN_PROJECTDESCRIPTION = "project_description";
     public static final String COLUMN_PROJECTVERSION = "project_version";
+    public static final String COLUMN_PROJECTISAVAILABLE = "project_isavailable";
     //PROJECTGPSGEOM refers to GPSGEOM
 
     //-------------------------- Table GpsGeom----------------------------
     public static final String COLUMN_GPSGEOMID = "gpsGeom_id";
-    public static final String COLUMN_GPSGEOMCOORD = "gpsGeom_the_geom";
+    public static final String COLUMN_GPSGEOMCOORD = "gpsGeom_thegeom";
 
     //-------------------------- Table Pixel Geom----------------------------
     public static final String COLUMN_PIXELGEOMID = "pixelGeom_id";
-    public static final String COLUMN_PIXELGEOMCOORD = "pixelGeom_the_geom";
+    public static final String COLUMN_PIXELGEOMCOORD = "pixelGeom_thegeom";
 
     //-------------------------- Table Photo----------------------------
     public static final String COLUMN_PHOTOID = "photo_id";
@@ -184,7 +185,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
                     + TABLE_PROJECT + " ("
                     + COLUMN_PROJECTID + " INTEGER PRIMARY KEY, "
                     + COLUMN_PROJECTNAME + " text not null, "
-                    + COLUMN_PROJECTVERSION + " INTEGER not null, "
+                    + COLUMN_PROJECTVERSION + " DATE not null, "
+                    + COLUMN_PROJECTISAVAILABLE + " BOOLEAN not null, "
                     + COLUMN_PROJECTDESCRIPTION + " text , "
                     + COLUMN_GPSGEOMID + " INTEGER, "
                     + "FOREIGN KEY(" + COLUMN_GPSGEOMID + ") REFERENCES " + TABLE_GPSGEOM + " (" + COLUMN_GPSGEOMID + ")"
@@ -197,9 +199,9 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             "create table "
                     + TABLE_PHOTO + " ("
                     + COLUMN_PHOTOID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                    + COLUMN_PHOTODESCRIPTION + " text not null, "
+                    + COLUMN_PHOTODESCRIPTION + " text , "
                     + COLUMN_PHOTOAUTHOR + " text not null, "
-                    + COLUMN_PHOTONAME + " text not null, "
+                    + COLUMN_PHOTONAME + " text , "
                     + COLUMN_PHOTOPATH + " text not null, "
                     + COLUMN_PHOTOPROJECTID + " INTEGER not null, "
                     + COLUMN_PHOTOLASTMODIFICATION + " DATETIME, "
@@ -358,14 +360,14 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
      */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.w(MySQLiteHelper.class.getName(),"Upgrading database from version" + oldVersion + " to " + newVersion + ", which will destroy all your data");
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PROJECT +" ;");
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_GPSGEOM +" ;");
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PIXELGEOM+" ;" );
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PHOTO+" ;" );
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_MATERIAL +" ;");
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ELEMENT +" ;");
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ELEMENTTYPE +" ;");
+        Log.w(MySQLiteHelper.class.getName(), "Upgrading database from version" + oldVersion + " to " + newVersion + ", which will destroy all your data");
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PROJECT + " ;");
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_GPSGEOM + " ;");
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PIXELGEOM + " ;");
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PHOTO + " ;");
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_MATERIAL + " ;");
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ELEMENT + " ;");
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ELEMENTTYPE + " ;");
 
         onCreate(db);
     }

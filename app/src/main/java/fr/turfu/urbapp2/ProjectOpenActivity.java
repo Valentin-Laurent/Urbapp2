@@ -71,17 +71,6 @@ public class ProjectOpenActivity extends AppCompatActivity {
         mainToolbar.setTitle("");
         mainToolbar.setSubtitle("");
 
-        // Button new photo
-        b1 = (Button) findViewById(R.id.buttonNewPhoto);
-        b1.setTextColor(Color.parseColor("#ffffff"));
-        b1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-               Intent i = new Intent(ProjectOpenActivity.this,NewPhotoPopUpActivity.class);
-               startActivity(i);
-            }
-        });
-
         //Nom du projet
         final Intent intent = getIntent();
         String name = intent.getStringExtra("projectName");
@@ -92,6 +81,20 @@ public class ProjectOpenActivity extends AppCompatActivity {
         Project p = pbdd.getProjectByName(name); // Récupération du projet
         pbdd.close(); // Fermeture de la base de données
         project_id = p.getProjectId();
+
+        // Button new photo
+        b1 = (Button) findViewById(R.id.buttonNewPhoto);
+        b1.setTextColor(Color.parseColor("#ffffff"));
+        b1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(ProjectOpenActivity.this, NewPhotoPopUpActivity.class);
+                i.putExtra("project_id", project_id);
+                startActivity(i);
+                //finish();
+            }
+        });
+
     }
 
 

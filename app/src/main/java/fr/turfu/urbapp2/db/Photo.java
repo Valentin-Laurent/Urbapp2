@@ -1,10 +1,6 @@
 package fr.turfu.urbapp2.db;
 
-import android.content.ContentValues;
-
-import java.util.ArrayList;
-
-public class Photo extends DataObject {
+public class Photo {
 
     /**
      * contains the id of the photo
@@ -51,6 +47,24 @@ public class Photo extends DataObject {
      */
     private String Ext_GpsGeomCoord;
 
+
+    /**
+     * Constructeur
+     *
+     * @param path chemin menant à la photo
+     */
+    public Photo(String path, Long pid, String author) {
+        this.photo_path = path;
+        this.photo_author = author;
+        this.project_id = pid;
+    }
+
+    /**
+     * Constructeur vide
+     */
+    public Photo() {
+
+    }
 
     /**
      * getter for the photo id
@@ -151,13 +165,14 @@ public class Photo extends DataObject {
     public void setExt_GpsGeomCoord(String ext_GpsGeomCoord) {
         Ext_GpsGeomCoord = ext_GpsGeomCoord;
     }
+
     /**
      * setter for the project id
      *
      * @param id
      */
     public void setProject_id(Long id) {
-        project_id= id;
+        project_id = id;
     }
 
     /**
@@ -225,65 +240,5 @@ public class Photo extends DataObject {
                 + "]";
     }
 
-    @Override
-    public void saveToLocal(LocalDataSource datasource) {
-        ContentValues values = new ContentValues();
-
-        values.put(MySQLiteHelper.COLUMN_PHOTONAME, this.photo_name);
-        values.put(MySQLiteHelper.COLUMN_PHOTODESCRIPTION, this.photo_description);
-        values.put(MySQLiteHelper.COLUMN_PHOTOAUTHOR, this.photo_author);
-        values.put(MySQLiteHelper.COLUMN_PHOTOPATH, this.photo_path);
-        values.put(MySQLiteHelper.COLUMN_PHOTOLASTMODIFICATION, this.photo_last_modification);
-        values.put(MySQLiteHelper.COLUMN_PHOTOPROJECTID, this.project_id);
-
-        // TODO WTF if(this.registredInLocal){
-        String str = "photo_id " + "=" + this.photo_id;
-        datasource.getDatabase().update(MySQLiteHelper.TABLE_PHOTO, values, str, null);
-        /*}
-		else{
-			//Cursor cursor = datasource.getDatabase().rawQuery(GETMAXPHOTOID, null);
-			//cursor.moveToFirst();
-
-			long old_id = this.getPhoto_id();
-			//long new_id = 1+cursor.getLong(0);
-			long new_id = Sync.getMaxId().get("Photo")+1;
-			this.setPhoto_id(new_id);
-			this.trigger(old_id, new_id, MainActivity.element, MainActivity.composed);
-
-			values.put(MySQLiteHelper.COLUMN_GPSGEOMID, this.gpsGeom_id);
-			datasource.getDatabase().insert(MySQLiteHelper.TABLE_PHOTO, null, values);
-		}*/
-    }
-
-    /**
-     * query to get the biggest photo_id from local db
-     */
-    private static final String
-            GETMAXPHOTOID =
-            "SELECT " + MySQLiteHelper.TABLE_PHOTO + "." + MySQLiteHelper.COLUMN_PHOTOID + " FROM "
-                    + MySQLiteHelper.TABLE_PHOTO
-                    + " ORDER BY " + MySQLiteHelper.TABLE_PHOTO + "." + MySQLiteHelper.COLUMN_PHOTOID
-                    + " DESC LIMIT 1 ;";
-
-    /**
-     * trigger method is used to update foreign keys in the dataObjects
-     * this method is used before saving objects in database thank's to the "saved fragment"
-     *
-     * @param old_id
-     * @param new_id
-     * @param list_element
-     */
-    public void trigger(long old_id, long new_id, ArrayList<Element> list_element) {
-
-        if (list_element != null) {
-            for (Element e : list_element) {
-                if (e.getPhoto_id() == old_id) {
-                    e.setPhoto_id(new_id);
-                }
-            }
-
-        }
-
-    }
 
 }
