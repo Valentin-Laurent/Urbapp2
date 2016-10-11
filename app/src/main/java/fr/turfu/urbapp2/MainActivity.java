@@ -1,10 +1,16 @@
 package fr.turfu.urbapp2;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -17,7 +23,9 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
 import java.util.ArrayList;
@@ -29,6 +37,11 @@ import fr.turfu.urbapp2.db.ProjectBDD;
 //TODO Gérer le cycle d'activité de façon à ce qu'une seule activité Main puisse exister
 
 public class MainActivity extends AppCompatActivity {
+
+    /**
+     * Permet d'obtenir la position de l'utilisateur
+     */
+    private LocationManager locationManager;
 
     /**
      * Bouton pour créer un nouveau projet
@@ -78,8 +91,32 @@ public class MainActivity extends AppCompatActivity {
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
-        map.setMaxZoomLevel(19);
 
+        IMapController mapController = map.getController();
+        mapController.setZoom(16);
+
+        //The following code is to get the location of the user
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        //Even of the following code is useless, it is necessary or Android Studio won't compile the code
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+        }
+        Location lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        GeoPoint startPoint;
+        if (lastLocation != null) {
+            startPoint = new GeoPoint(lastLocation);
+
+        } else {
+            //These are the coordinate of the center of Nantes city
+            startPoint = new GeoPoint(47.2172500, -1.5533600);
+        }
+        mapController.setCenter(startPoint);
     }
 
 
