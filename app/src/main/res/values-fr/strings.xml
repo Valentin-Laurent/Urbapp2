@@ -41,6 +41,7 @@
     <!-- Resources for project details-->
     <string name="project_details_description">Description : </string>
     <string name="project_details_name">Intitulé : </string>
+    <string name="projectName_taken">Le nom du projet choisi est déjà pris. La mise à jour n\'a pas pu être faite. </string>
 
     <!-- Resources for new photo -->
     <string name="new_photo_galery">Choisir une photo de la galerie </string>
