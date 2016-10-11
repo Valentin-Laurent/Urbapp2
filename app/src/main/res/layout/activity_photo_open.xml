@@ -13,10 +13,12 @@
         android:id="@+id/layoutContainer"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:baselineAligned="false"
         android:background="@color/grisFonce"
+        android:baselineAligned="false"
         android:orientation="horizontal"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:gravity="right">
+
 
 
         <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -28,101 +30,162 @@
             android:background="@color/grisClair"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
+
+
+                <Button
+                    android:id="@+id/buttonBack"
+                    android:layout_width="70dp"
+                    android:layout_height="60dp"
+                    android:layout_alignParentTop="true"
+                    android:background="@drawable/button_back"
+                    android:layout_gravity="left"
+                    android:layout_marginTop="25dp"
+                    android:layout_marginLeft="20dp" />
+
+                <Button
+                    android:id="@+id/buttonSavePhoto"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:background="@drawable/button_save"
+                    android:gravity="right"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="false"
+                    android:foregroundGravity="right"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginTop="20dp" />
+
+
+
             <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/ScrollView01"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent">
+                android:layout_height="fill_parent"
+                android:layout_below="@+id/buttonSavePhoto">
 
-                <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/layout2"
+            </ScrollView>
+
+            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/layout2"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:background="@color/grisClair"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                android:layout_below="@+id/buttonSavePhoto"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true">
+
+
+                <EditText
+                    android:id="@+id/EditTextNamePhoto"
                     android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/textView1"
+                    android:layout_marginTop="50dp"
+                    android:hint="@string/photo_name"
+                    android:inputType="textPersonName">
+
+                </EditText>
+
+                <EditText
+                    android:id="@+id/EditTextDescrPhoto"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/EditTextNamePhoto"
+                    android:layout_marginTop="50dp"
+                    android:hint="@string/photo_descr"
+                    android:inputType="textMultiLine"
+                    android:lines="5"></EditText>
+
+
+                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/linearLayout"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/EditTextDescrPhoto"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginTop="10dp"
                     android:background="@color/grisClair"
+                    android:gravity="left"
                     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
+                    <Button
+                        android:id="@+id/buttonLocalisationPhoto"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginLeft="0dp"
+                        android:layout_marginStart="0dp"
+                        android:layout_marginTop="49dp"
+                        android:background="@drawable/button_localisation" />
 
-                    <EditText
-                        android:id="@+id/EditTextNamePhoto"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_alignParentStart="true"
-                        android:layout_below="@+id/textView1"
-                        android:layout_marginTop="50dp"
-                        android:hint="@string/photo_name"
-                        android:inputType="textPersonName">
+                    <TextView
+                        android:id="@+id/textView2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="84dp"
+                        android:layout_alignBottom="@+id/buttonLocalisationPhoto"
+                        android:layout_gravity="bottom"
+                        android:layout_marginLeft="30dp"
+                        android:layout_toEndOf="@+id/buttonLocalisationPhoto"
+                        android:layout_toRightOf="@+id/buttonLocalisationPhoto"
+                        android:color="@color/vert2"
+                        android:gravity="left|center_vertical"
+                        android:text="@string/photo_localisation_instruction"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="@color/ardoise1"
+                        android:textSize="20dp" />
+                </LinearLayout>
 
-                    </EditText>
+                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/linearLayout2"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/linearLayout"
+                    android:layout_marginLeft="15dp"
+                    android:background="@color/grisClair"
+                    android:gravity="left"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-                    <EditText
-                        android:id="@+id/EditTextDescrPhoto"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_alignParentStart="true"
-                        android:layout_below="@+id/EditTextNamePhoto"
-                        android:layout_marginTop="50dp"
-                        android:hint="@string/photo_descr"
-                        android:inputType="textMultiLine"
-                        android:lines="5"></EditText>
+                    <Button
+                        android:id="@+id/buttonEditPhoto"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginLeft="0dp"
+                        android:layout_marginStart="0dp"
+                        android:layout_marginTop="20dp"
+                        android:background="@drawable/button_pen" />
 
-                    <EditText
-                        android:id="@+id/EditTextAdressPhoto"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_alignParentStart="true"
-                        android:layout_below="@+id/EditTextDescrPhoto"
-                        android:layout_marginTop="50dp"
-                        android:hint="@string/photo_adress"
-                        android:inputType="textPersonName"></EditText>
+                    <TextView
+                        android:id="@+id/textView3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="84dp"
+                        android:layout_alignBottom="@+id/buttonEditnPhoto"
+                        android:layout_gravity="bottom"
+                        android:layout_marginLeft="30dp"
+                        android:layout_toEndOf="@+id/buttonEditPhoto"
+                        android:layout_toRightOf="@+id/buttonEditPhoto"
+                        android:color="@color/vert2"
+                        android:gravity="left|center_vertical"
+                        android:text="@string/photo_edition_instruction"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="@color/ardoise1"
+                        android:textSize="20dp" />
 
+                </LinearLayout>
 
-                    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                        xmlns:app="http://schemas.android.com/apk/res-auto"
-                        android:id="@+id/linearLayout"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_alignParentStart="true"
-                        android:layout_below="@+id/EditTextAdressPhoto"
-                        android:layout_marginLeft="15dp"
-                        android:layout_marginTop="10dp"
-                        android:background="@color/grisClair"
-                        android:gravity="left"
-                        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            </RelativeLayout>
 
-                        <Button
-                            android:id="@+id/buttonLocalisationPhoto"
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
-                            android:layout_alignParentTop="true"
-                            android:layout_marginLeft="0dp"
-                            android:layout_marginStart="0dp"
-                            android:layout_marginTop="49dp"
-                            android:background="@drawable/button_localisation" />
-
-                        <TextView
-                            android:id="@+id/textView2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="84dp"
-                            android:layout_alignBottom="@+id/buttonLocalisationPhoto"
-                            android:layout_gravity="bottom"
-                            android:layout_marginLeft="30dp"
-                            android:layout_toEndOf="@+id/buttonLocalisationPhoto"
-                            android:layout_toRightOf="@+id/buttonLocalisationPhoto"
-                            android:color="@color/vert2"
-                            android:gravity="left|center_vertical"
-                            android:text="@string/photo_localisation_instruction"
-                            android:textAppearance="?android:attr/textAppearanceMedium"
-                            android:textColor="@color/ardoise1"
-                            android:textSize="20dp" />
-
-                    </LinearLayout>
-
-                </RelativeLayout>
-            </ScrollView>
         </RelativeLayout>
 
 

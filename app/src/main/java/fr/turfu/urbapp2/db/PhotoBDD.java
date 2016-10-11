@@ -76,7 +76,6 @@ public class PhotoBDD {
         }
     }
 
-
     /**
      * Ajout d'une photo p à la base de données
      *
@@ -85,12 +84,12 @@ public class PhotoBDD {
      */
     public long insert(Photo p) {
         ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.COLUMN_PHOTONAME,"");
-        values.put(MySQLiteHelper.COLUMN_PHOTODESCRIPTION,"");
-        values.put(MySQLiteHelper.COLUMN_PHOTOLASTMODIFICATION,0);
-        values.put(MySQLiteHelper.COLUMN_PHOTOAUTHOR,p.getPhoto_author());
-        values.put(MySQLiteHelper.COLUMN_PHOTOPROJECTID,p.getProject_id());
-        values.put(MySQLiteHelper.COLUMN_PHOTOPATH,p.getPhoto_path());
+        values.put(MySQLiteHelper.COLUMN_PHOTONAME, "");
+        values.put(MySQLiteHelper.COLUMN_PHOTODESCRIPTION, "");
+        values.put(MySQLiteHelper.COLUMN_PHOTOLASTMODIFICATION, 0);
+        values.put(MySQLiteHelper.COLUMN_PHOTOAUTHOR, p.getPhoto_author());
+        values.put(MySQLiteHelper.COLUMN_PHOTOPROJECTID, p.getProject_id());
+        values.put(MySQLiteHelper.COLUMN_PHOTOPATH, p.getPhoto_path());
 
         return bdd.insert(MySQLiteHelper.TABLE_PHOTO, null, values);
     }
@@ -102,12 +101,49 @@ public class PhotoBDD {
      * @return Photo
      */
     public Photo getPhotoByPath(String n) {
-        Cursor c = bdd.query(MySQLiteHelper.TABLE_PROJECT, new String[]{MySQLiteHelper.COLUMN_PHOTOID, MySQLiteHelper.COLUMN_PHOTONAME, MySQLiteHelper.COLUMN_PHOTOPROJECTID, MySQLiteHelper.COLUMN_PHOTOAUTHOR, MySQLiteHelper.COLUMN_PHOTODESCRIPTION, MySQLiteHelper.COLUMN_PHOTOLASTMODIFICATION,MySQLiteHelper.COLUMN_PHOTOPATH}, "photo_path" + " LIKE \"" + n + "\"", null, null, null, null);
+        Cursor c = bdd.query(MySQLiteHelper.TABLE_PHOTO , new String[]{MySQLiteHelper.COLUMN_PHOTOID, MySQLiteHelper.COLUMN_PHOTONAME, MySQLiteHelper.COLUMN_PHOTOPROJECTID, MySQLiteHelper.COLUMN_PHOTOAUTHOR, MySQLiteHelper.COLUMN_PHOTODESCRIPTION, MySQLiteHelper.COLUMN_PHOTOLASTMODIFICATION, MySQLiteHelper.COLUMN_PHOTOPATH}, "photo_path" + " LIKE \"" + n + "\"", null, null, null, null);
         if (c.getCount() != 0) {
             c.moveToFirst();
         }
         return cursorToPhoto(c);
     }
 
+    /**
+     * Mise à jour du nom et de la description d'une photo
+     *
+     * @param p
+     */
+    public void updatePhotoInfos(Photo p) {
+        bdd.execSQL("UPDATE Photo SET photo_name='" + p.getPhoto_name() + "' WHERE photo_id =" + p.getPhoto_id());
+        bdd.execSQL("UPDATE Photo SET photo_description='" + p.getPhoto_description() + "' WHERE photo_id =" + p.getPhoto_id());
+    }
+
+    /**
+     * Get a photo with the name
+     *
+     * @param n Name of the photo we are looking for
+     * @return the Photo
+     */
+    public Photo getPhotoByName(String n) {
+        Cursor c = bdd.query(MySQLiteHelper.TABLE_PHOTO, new String[]{MySQLiteHelper.COLUMN_PHOTOID, MySQLiteHelper.COLUMN_PHOTONAME, MySQLiteHelper.COLUMN_PHOTOPROJECTID, MySQLiteHelper.COLUMN_PHOTOAUTHOR, MySQLiteHelper.COLUMN_PHOTODESCRIPTION, MySQLiteHelper.COLUMN_PHOTOLASTMODIFICATION, MySQLiteHelper.COLUMN_PHOTOPATH}, "photo_name" + " LIKE \"" + n + "\"", null, null, null, null);
+        if (c.getCount() != 0) {
+            c.moveToFirst();
+        }
+        return cursorToPhoto(c);
+    }
+
+    /**
+     * Get a photo with the id
+     *
+     * @param i id of the photo
+     * @return the Photo
+     */
+    public Photo getPhotoById(Long i) {
+        Cursor c = bdd.query(MySQLiteHelper.TABLE_PHOTO, new String[]{MySQLiteHelper.COLUMN_PHOTOID, MySQLiteHelper.COLUMN_PHOTONAME, MySQLiteHelper.COLUMN_PHOTOPROJECTID, MySQLiteHelper.COLUMN_PHOTOAUTHOR, MySQLiteHelper.COLUMN_PHOTODESCRIPTION, MySQLiteHelper.COLUMN_PHOTOLASTMODIFICATION, MySQLiteHelper.COLUMN_PHOTOPATH}, "photo_id" + " =" + i , null, null, null, null);
+        if (c.getCount() != 0) {
+            c.moveToFirst();
+        }
+        return cursorToPhoto(c);
+    }
 
 }

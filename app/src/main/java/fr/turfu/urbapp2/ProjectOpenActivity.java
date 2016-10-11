@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -19,6 +20,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import fr.turfu.urbapp2.db.Photo;
+import fr.turfu.urbapp2.db.PhotoBDD;
 import fr.turfu.urbapp2.db.Project;
 import fr.turfu.urbapp2.db.ProjectBDD;
 
@@ -187,6 +190,28 @@ public class ProjectOpenActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(ProjectOpenActivity.this,
                 android.R.layout.simple_list_item_1, list_photo);
         mListView.setAdapter(adapter);
+
+
+        //Ajouter les listeners
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(ProjectOpenActivity.this, PhotoOpenActivity.class);
+                String name = (String) mListView.getItemAtPosition(position);
+
+                PhotoBDD pbdd = new PhotoBDD(ProjectOpenActivity.this); //Instanciation de ProjectBdd pour manipuler les projets de la base de données
+                pbdd.open(); //Ouverture de la base de données
+                Photo p = pbdd.getPhotoByName(name); // Récupération de la photo
+                pbdd.close();
+
+                intent.putExtra("project_id", project_id);
+                intent.putExtra("photo_path",p.getPhoto_path());
+                intent.putExtra("photo_id",p.getPhoto_id());
+                startActivity(intent);
+                finish();
+            }
+        });
+
 
         //Si il n'y a pas de photo, affichage d'un message
         if (lpn.size() == 0) {

@@ -58,4 +58,12 @@
     <string name="photo_localisation_instruction"> Localiser la photo </string>
     <string name="photo_edition_instruction"> Définir des zones sur la photo </string>
 
+    <!-- Resources for save info pop up-->
+    <string name="save"> Enregistrer </string>
+    <string name="cancel_modif"> Ne pas enregistrer les modifications </string>
+    <string name="save_instruction"> Voulez-vous sauvegarder les modifications effectuées? (Sinon, elles seront perdues.) </string>
+    <string name="photoName_taken">Le nom de photo choisi est déjà pris. La mise à jour n\'a pas pu être faite. </string>
+    <string name="saved">Enregistrement effectué </string>
+
+
 </resources>

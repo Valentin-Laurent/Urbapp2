@@ -155,12 +155,12 @@ public class NewPhotoPopUpActivity extends Activity {
             // CAMERA
             if (requestCode == CAMERA_REQUEST) {
                 currentPhotoPath = path;
-                Bitmap bit= (Bitmap) data.getExtras().get("data");
+                Bitmap bit = (Bitmap) data.getExtras().get("data");
                 File photo = new File(Environment.getExternalStorageDirectory(), path);
 
                 try {
-                OutputStream os = new BufferedOutputStream(new FileOutputStream(photo));
-                bit.compress(Bitmap.CompressFormat.JPEG, 100, os);
+                    OutputStream os = new BufferedOutputStream(new FileOutputStream(photo));
+                    bit.compress(Bitmap.CompressFormat.JPEG, 100, os);
                     os.close();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -184,6 +184,7 @@ public class NewPhotoPopUpActivity extends Activity {
         if (currentPhotoPath != null) {
             Intent i = new Intent(NewPhotoPopUpActivity.this, PhotoOpenActivity.class);
             i.putExtra("photo_path", currentPhotoPath);
+            i.putExtra("project_id", project_id);
 
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(NewPhotoPopUpActivity.this);
             String aut = preferences.getString("user_preference", "");
@@ -192,9 +193,12 @@ public class NewPhotoPopUpActivity extends Activity {
             PhotoBDD pbdd = new PhotoBDD(NewPhotoPopUpActivity.this);
             pbdd.open();
             pbdd.insert(p);
+            Photo p1 = pbdd.getPhotoByPath(currentPhotoPath);
             pbdd.close();
 
+            i.putExtra("photo_id", p1.getPhoto_id());
             startActivity(i);
+            finish();
         }
     }
 
