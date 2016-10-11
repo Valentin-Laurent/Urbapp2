@@ -91,7 +91,7 @@ public class ProjectOpenActivity extends AppCompatActivity {
                 Intent i = new Intent(ProjectOpenActivity.this, NewPhotoPopUpActivity.class);
                 i.putExtra("project_id", project_id);
                 startActivity(i);
-                //finish();
+                finish();
             }
         });
 

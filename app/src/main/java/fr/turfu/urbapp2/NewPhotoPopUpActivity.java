@@ -4,15 +4,26 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import fr.turfu.urbapp2.db.Photo;
 import fr.turfu.urbapp2.db.PhotoBDD;
+import fr.turfu.urbapp2.tools.Utils;
 
 
 /**
@@ -88,24 +99,6 @@ public class NewPhotoPopUpActivity extends Activity {
             @Override
             public void onClick(View v) {
                 gallery(); //ouverture de la galerie
-
-                //Sauvegarde de la photo
-                if (currentPhotoPath != null) {
-                    Intent i = new Intent(NewPhotoPopUpActivity.this, PhotoOpenActivity.class);
-                    i.putExtra("photo_path", currentPhotoPath);
-
-                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(NewPhotoPopUpActivity.this);
-                    String aut = preferences.getString("user_preference", "");
-                    Photo p = new Photo(currentPhotoPath, project_id, aut);
-
-                    PhotoBDD pbdd = new PhotoBDD(NewPhotoPopUpActivity.this);
-                    pbdd.open();
-                    pbdd.insert(p);
-                    pbdd.close();
-
-                    startActivity(i);
-                }
-                finish();
             }
         });
 
@@ -113,24 +106,6 @@ public class NewPhotoPopUpActivity extends Activity {
             @Override
             public void onClick(View v) {
                 camera(); //Ouverture de l'appareil photo
-
-                //Sauvegarde de la photo
-                if (currentPhotoPath != null) {
-                    Intent i = new Intent(NewPhotoPopUpActivity.this, PhotoOpenActivity.class);
-                    i.putExtra("photo_path", currentPhotoPath);
-
-                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(NewPhotoPopUpActivity.this);
-                    String aut = preferences.getString("user_preference", "");
-                    Photo p = new Photo(currentPhotoPath, project_id, aut);
-
-                    PhotoBDD pbdd = new PhotoBDD(NewPhotoPopUpActivity.this);
-                    pbdd.open();
-                    pbdd.insert(p);
-                    pbdd.close();
-
-                    startActivity(i);
-                }
-                finish();
             }
         });
 
@@ -158,17 +133,70 @@ public class NewPhotoPopUpActivity extends Activity {
 
     /**
      * Obtention du path de la nouvelle photo lors de son ouverture
+     *
      * @param requestCode Requete : prise de photo avec la camera ou ouverture de la galerie
-     * @param resultCode Photo choisie
-     * @param data Données obtenues
+     * @param resultCode  Photo choisie
+     * @param data        Données obtenues
      */
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if ((requestCode == CAMERA_REQUEST || requestCode == GALLERY_REQUEST) && resultCode == Activity.RESULT_OK) {
+        if (resultCode == Activity.RESULT_OK) {
 
+            //Setting the directory for the save of the picture to featureapp
+            File folder = new File(Environment.getExternalStorageDirectory(), "featureapp/");
+            folder.mkdirs();
 
+            //Get the date
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+            String currentDateandTime = sdf.format(new Date());
+            String path = "featureapp/Photo_" + currentDateandTime + ".jpg";
+
+            // CAMERA
+            if (requestCode == CAMERA_REQUEST) {
+                currentPhotoPath = path;
+                Bitmap bit= (Bitmap) data.getExtras().get("data");
+                File photo = new File(Environment.getExternalStorageDirectory(), path);
+
+                try {
+                OutputStream os = new BufferedOutputStream(new FileOutputStream(photo));
+                bit.compress(Bitmap.CompressFormat.JPEG, 100, os);
+                    os.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            //GALLERY
+            if (requestCode == GALLERY_REQUEST) {
+                String url = Utils.getRealPathFromURI(NewPhotoPopUpActivity.this, data.getData());
+                File photo = new File(Environment.getExternalStorageDirectory(), path);
+                Utils.copy(new File(url), photo);
+                currentPhotoPath = path;
+            }
+
+            savePhoto();
         }
 
     }
 
+    public void savePhoto() {
+        if (currentPhotoPath != null) {
+            Intent i = new Intent(NewPhotoPopUpActivity.this, PhotoOpenActivity.class);
+            i.putExtra("photo_path", currentPhotoPath);
+
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(NewPhotoPopUpActivity.this);
+            String aut = preferences.getString("user_preference", "");
+            Photo p = new Photo(currentPhotoPath, project_id, aut);
+
+            PhotoBDD pbdd = new PhotoBDD(NewPhotoPopUpActivity.this);
+            pbdd.open();
+            pbdd.insert(p);
+            pbdd.close();
+
+            startActivity(i);
+        }
+    }
+
 }
+

@@ -20,6 +20,9 @@
     <string name="ar_rotate">Pivoter</string>
     <string name="ar_validation">Activer</string>
 
+    <!-- Resources for internet connexion-->
+    <string name="no_connexion">Veuillez activer internet et relancer l\'application... </string>
+
     <!-- Resources for project creation-->
     <string name="no_project">Aucun projet disponible. </string>
     <string name="project_creation_title">Création d\'un projet</string>
@@ -41,11 +44,18 @@
     <!-- Resources for project details-->
     <string name="project_details_description">Description : </string>
     <string name="project_details_name">Intitulé : </string>
+    <string name="projectName_taken">Le nom du projet choisi est déjà pris. La mise à jour n\'a pas pu être faite. </string>
 
     <!-- Resources for new photo -->
     <string name="new_photo_galery">Choisir une photo de la galerie </string>
     <string name="new_photo_camera">Prendre une photo </string>
     <string name="new_photo_instruction">Nouvelle photo </string>
 
+    <!-- Resources for new photo information-->
+    <string name="photo_name"> Nom </string>
+    <string name="photo_descr"> Description </string>
+    <string name="photo_adress"> Adresse</string>
+    <string name="photo_localisation_instruction"> Localiser la photo </string>
+    <string name="photo_edition_instruction"> Définir des zones sur la photo </string>
 
 </resources>

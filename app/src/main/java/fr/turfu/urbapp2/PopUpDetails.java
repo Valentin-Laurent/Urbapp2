@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import fr.turfu.urbapp2.db.Project;
 import fr.turfu.urbapp2.db.ProjectBDD;
@@ -107,7 +108,6 @@ public class PopUpDetails extends Dialog implements android.view.View.OnClickLis
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_ok:
-
                 //On récupère les changements
                 EditText et1 = (EditText) findViewById(R.id.NameValue);
                 String newName = et1.getText().toString();
@@ -118,13 +118,23 @@ public class PopUpDetails extends Dialog implements android.view.View.OnClickLis
                 ProjectBDD pbdd = new ProjectBDD(this.getContext()); //Instanciation de ProjectBdd pour manipuler les projets de la base de données
                 pbdd.open(); //Ouverture de la base de données
                 Project p = pbdd.getProjectByName(name); // Récupération du projet
-                p.setProjectName(newName);
-                p.setProjectDescription(newDescr);
-                pbdd.update(p);
+
+                //Vérification de l'unicité du nom du projet
+                Project p1 = pbdd.getProjectByName(newName);
+                if (p1 == null || p1.getProjectId() == p.getProjectId()) {
+                    p.setProjectName(newName); //Mise à jour du nom
+                } else {
+                    Toast.makeText(c, R.string.projectName_taken, Toast.LENGTH_SHORT).show();
+                }
+
+                p.setProjectDescription(newDescr); //Mise à jour de la description
+
+                pbdd.update(p); //Mise à jour
+
                 pbdd.close(); // Fermeture de la base de données
 
                 //Mise à jour de l'affichage
-                mi.setTitle("Projet : "+p.getProjectName());
+                mi.setTitle("Projet : " + p.getProjectName());
 
                 //Fermeture de la pop up
                 dismiss();
