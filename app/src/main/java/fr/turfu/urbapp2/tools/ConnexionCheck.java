@@ -1,4 +1,4 @@
-package fr.turfu.urbapp2.tools;
+package fr.turfu.urbapp2.Tools;
 
 import android.app.Activity;
 import android.net.ConnectivityManager;

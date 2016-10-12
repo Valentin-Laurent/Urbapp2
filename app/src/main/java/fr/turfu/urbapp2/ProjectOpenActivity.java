@@ -18,12 +18,14 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
-import fr.turfu.urbapp2.db.Photo;
-import fr.turfu.urbapp2.db.PhotoBDD;
-import fr.turfu.urbapp2.db.Project;
-import fr.turfu.urbapp2.db.ProjectBDD;
+import fr.turfu.urbapp2.DB.Photo;
+import fr.turfu.urbapp2.DB.PhotoBDD;
+import fr.turfu.urbapp2.DB.Project;
+import fr.turfu.urbapp2.DB.ProjectBDD;
 
 /**
  * Activité qui permet de visualiser un projet ouvert
@@ -178,8 +180,18 @@ public class ProjectOpenActivity extends AppCompatActivity {
     protected void onResume() {
 
         /* Lister les photos*/
-        List<String> lpn = getPhotoNames();
+        List<Photo> lp = getPhoto();
 
+        /*Lister les noms et les path*/
+        List<String> lpn = new ArrayList<>();
+        for (Photo ph : lp) {
+            if (ph.getPhoto_name().equals("")) {
+                lpn.add("Unnamed - " + ph.getPhoto_path());
+            } else {
+                lpn.add(ph.getPhoto_name() + " - " + ph.getPhoto_path());
+            }
+        }
+        /*Transformation de la liste */
         list_photo = new String[lpn.size()];
         for (int i = 0; i < lpn.size(); i++) {
             list_photo[i] = lpn.get(i);
@@ -197,16 +209,17 @@ public class ProjectOpenActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(ProjectOpenActivity.this, PhotoOpenActivity.class);
-                String name = (String) mListView.getItemAtPosition(position);
+                String title = (String) mListView.getItemAtPosition(position);
+                String path = getPathFromTitle(title);
 
                 PhotoBDD pbdd = new PhotoBDD(ProjectOpenActivity.this); //Instanciation de ProjectBdd pour manipuler les projets de la base de données
                 pbdd.open(); //Ouverture de la base de données
-                Photo p = pbdd.getPhotoByName(name); // Récupération de la photo
+                Photo p = pbdd.getPhotoByPath(path); // Récupération de la photo
                 pbdd.close();
 
                 intent.putExtra("project_id", project_id);
-                intent.putExtra("photo_path",p.getPhoto_path());
-                intent.putExtra("photo_id",p.getPhoto_id());
+                intent.putExtra("photo_path", p.getPhoto_path());
+                intent.putExtra("photo_id", p.getPhoto_id());
                 startActivity(intent);
                 finish();
             }
@@ -249,12 +262,29 @@ public class ProjectOpenActivity extends AppCompatActivity {
      *
      * @return Liste des photos du projet
      */
-    public List<String> getPhotoNames() {
-        ProjectBDD pbdd = new ProjectBDD(ProjectOpenActivity.this); //Instanciation de ProjectBdd pour manipuler les projets de la base de données
+    public List<Photo> getPhoto() {
+        PhotoBDD pbdd = new PhotoBDD(ProjectOpenActivity.this); //Instanciation de ProjectBdd pour manipuler les projets de la base de données
         pbdd.open(); //Ouverture de la base de données
-        List<String> lp = pbdd.getPhotos(pbdd.getProjectById(project_id));
+        List<Photo> lp = pbdd.getPhotos(project_id);
         pbdd.close(); // Fermeture de la base de données
         return lp;
+    }
+
+    /**
+     * Obtention du path d'une photo à partir de son titre. Le titre est composé de la manière suivante : nom de  la photo - path de la photo
+     *
+     * @param t Titre
+     * @return Path
+     */
+    public static String getPathFromTitle(String t) {
+        StringTokenizer st = new StringTokenizer(t, "-");
+        st.nextToken();
+        String path = "";
+        while (st.hasMoreTokens()) {
+            path = path +"-"+ st.nextToken();
+        }
+        path = path.substring(2, path.length());
+        return path;
     }
 
 }

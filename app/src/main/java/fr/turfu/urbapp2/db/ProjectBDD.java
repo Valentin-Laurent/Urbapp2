@@ -1,4 +1,4 @@
-package fr.turfu.urbapp2.db;
+package fr.turfu.urbapp2.DB;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -157,22 +157,6 @@ public class ProjectBDD {
         bdd.execSQL("UPDATE Project SET project_description= '" + p.getProjectDescription() + "' WHERE project_id =" + p.getProjectId());
     }
 
-    /**
-     * Obtenir toutes les photos d'un projet
-     *
-     * @param p Projet
-     * @return List des noms des photos du projet
-     */
 
-    public List<String> getPhotos(Project p) {
-        List<String> lp = new ArrayList<>();
-        String q = "SELECT photo_name FROM Photo WHERE project_id =" + p.getProjectId();
-        Cursor cursor = bdd.rawQuery(q, null);
-        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-            String s = cursor.getString(0);
-            lp.add(s);
-        }
-        return lp;
-    }
 
 }

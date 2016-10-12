@@ -1,4 +1,4 @@
-package fr.turfu.urbapp2.tools;
+package fr.turfu.urbapp2.Tools;
 
 /**
  * Created by Laura on 11/10/2016.

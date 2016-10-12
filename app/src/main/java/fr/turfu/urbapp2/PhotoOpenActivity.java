@@ -21,10 +21,10 @@ import android.widget.Toast;
 
 import java.io.File;
 
-import fr.turfu.urbapp2.db.Photo;
-import fr.turfu.urbapp2.db.PhotoBDD;
-import fr.turfu.urbapp2.db.Project;
-import fr.turfu.urbapp2.db.ProjectBDD;
+import fr.turfu.urbapp2.DB.Photo;
+import fr.turfu.urbapp2.DB.PhotoBDD;
+import fr.turfu.urbapp2.DB.Project;
+import fr.turfu.urbapp2.DB.ProjectBDD;
 
 /**
  * Created by Laura on 10/10/2016.

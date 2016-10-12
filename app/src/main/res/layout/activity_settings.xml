@@ -20,7 +20,7 @@
     android:foregroundTint="@color/ardoise2"> <!--Ce paramètre est indispensable pour que la barre de menu ne se superpose pas au contenu de l'activité -->
 
 
-    <fragment android:name="fr.turfu.urbapp2.fragments.SettingsFragment"
+    <fragment android:name="fr.turfu.urbapp2.Fragments.SettingsFragment"
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

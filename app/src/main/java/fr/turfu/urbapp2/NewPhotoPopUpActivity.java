@@ -13,7 +13,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 
-import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -21,9 +21,9 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import fr.turfu.urbapp2.db.Photo;
-import fr.turfu.urbapp2.db.PhotoBDD;
-import fr.turfu.urbapp2.tools.Utils;
+import fr.turfu.urbapp2.DB.Photo;
+import fr.turfu.urbapp2.DB.PhotoBDD;
+import fr.turfu.urbapp2.Tools.Utils;
 
 
 /**
@@ -150,18 +150,21 @@ public class NewPhotoPopUpActivity extends Activity {
             //Get the date
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
             String currentDateandTime = sdf.format(new Date());
-            String path = "featureapp/Photo_" + currentDateandTime + ".jpg";
+            String path = "featureapp/Photo_" + currentDateandTime;
 
             // CAMERA
             if (requestCode == CAMERA_REQUEST) {
+                path = path + ".png";
                 currentPhotoPath = path;
                 Bitmap bit = (Bitmap) data.getExtras().get("data");
                 File photo = new File(Environment.getExternalStorageDirectory(), path);
 
                 try {
-                    OutputStream os = new BufferedOutputStream(new FileOutputStream(photo));
-                    bit.compress(Bitmap.CompressFormat.JPEG, 100, os);
-                    os.close();
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    bit.compress(Bitmap.CompressFormat.PNG, 100, out);
+                    out.close();
+                    OutputStream outputStream = new FileOutputStream(photo);
+                    out.writeTo(outputStream);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -169,6 +172,7 @@ public class NewPhotoPopUpActivity extends Activity {
 
             //GALLERY
             if (requestCode == GALLERY_REQUEST) {
+                path = path + ".jpg";
                 String url = Utils.getRealPathFromURI(NewPhotoPopUpActivity.this, data.getData());
                 File photo = new File(Environment.getExternalStorageDirectory(), path);
                 Utils.copy(new File(url), photo);

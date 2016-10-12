@@ -11,10 +11,10 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import fr.turfu.urbapp2.db.Photo;
-import fr.turfu.urbapp2.db.PhotoBDD;
-import fr.turfu.urbapp2.db.Project;
-import fr.turfu.urbapp2.db.ProjectBDD;
+import fr.turfu.urbapp2.DB.Photo;
+import fr.turfu.urbapp2.DB.PhotoBDD;
+import fr.turfu.urbapp2.DB.Project;
+import fr.turfu.urbapp2.DB.ProjectBDD;
 
 
 /**

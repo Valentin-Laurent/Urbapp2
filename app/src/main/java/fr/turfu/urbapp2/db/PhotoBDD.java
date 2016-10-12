@@ -1,9 +1,12 @@
-package fr.turfu.urbapp2.db;
+package fr.turfu.urbapp2.DB;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Classe qui permet de manipuler les projets enregistrés dans la base de données locale
@@ -101,7 +104,7 @@ public class PhotoBDD {
      * @return Photo
      */
     public Photo getPhotoByPath(String n) {
-        Cursor c = bdd.query(MySQLiteHelper.TABLE_PHOTO , new String[]{MySQLiteHelper.COLUMN_PHOTOID, MySQLiteHelper.COLUMN_PHOTONAME, MySQLiteHelper.COLUMN_PHOTOPROJECTID, MySQLiteHelper.COLUMN_PHOTOAUTHOR, MySQLiteHelper.COLUMN_PHOTODESCRIPTION, MySQLiteHelper.COLUMN_PHOTOLASTMODIFICATION, MySQLiteHelper.COLUMN_PHOTOPATH}, "photo_path" + " LIKE \"" + n + "\"", null, null, null, null);
+        Cursor c = bdd.query(MySQLiteHelper.TABLE_PHOTO, new String[]{MySQLiteHelper.COLUMN_PHOTOID, MySQLiteHelper.COLUMN_PHOTONAME, MySQLiteHelper.COLUMN_PHOTOPROJECTID, MySQLiteHelper.COLUMN_PHOTOAUTHOR, MySQLiteHelper.COLUMN_PHOTODESCRIPTION, MySQLiteHelper.COLUMN_PHOTOLASTMODIFICATION, MySQLiteHelper.COLUMN_PHOTOPATH}, "photo_path" + " LIKE \"" + n + "\"", null, null, null, null);
         if (c.getCount() != 0) {
             c.moveToFirst();
         }
@@ -139,11 +142,31 @@ public class PhotoBDD {
      * @return the Photo
      */
     public Photo getPhotoById(Long i) {
-        Cursor c = bdd.query(MySQLiteHelper.TABLE_PHOTO, new String[]{MySQLiteHelper.COLUMN_PHOTOID, MySQLiteHelper.COLUMN_PHOTONAME, MySQLiteHelper.COLUMN_PHOTOPROJECTID, MySQLiteHelper.COLUMN_PHOTOAUTHOR, MySQLiteHelper.COLUMN_PHOTODESCRIPTION, MySQLiteHelper.COLUMN_PHOTOLASTMODIFICATION, MySQLiteHelper.COLUMN_PHOTOPATH}, "photo_id" + " =" + i , null, null, null, null);
+        Cursor c = bdd.query(MySQLiteHelper.TABLE_PHOTO, new String[]{MySQLiteHelper.COLUMN_PHOTOID, MySQLiteHelper.COLUMN_PHOTONAME, MySQLiteHelper.COLUMN_PHOTOPROJECTID, MySQLiteHelper.COLUMN_PHOTOAUTHOR, MySQLiteHelper.COLUMN_PHOTODESCRIPTION, MySQLiteHelper.COLUMN_PHOTOLASTMODIFICATION, MySQLiteHelper.COLUMN_PHOTOPATH}, "photo_id" + " =" + i, null, null, null, null);
         if (c.getCount() != 0) {
             c.moveToFirst();
         }
         return cursorToPhoto(c);
+    }
+
+    /**
+     * Obtenir toutes les photos d'un projet
+     *
+     * @param id Id du projet
+     * @return Liste des photos du projet
+     */
+
+    public List<Photo> getPhotos(long id) {
+        Cursor cursor = bdd.query(MySQLiteHelper.TABLE_PHOTO, new String[]{MySQLiteHelper.COLUMN_PHOTOID, MySQLiteHelper.COLUMN_PHOTONAME, MySQLiteHelper.COLUMN_PHOTOPROJECTID, MySQLiteHelper.COLUMN_PHOTOAUTHOR, MySQLiteHelper.COLUMN_PHOTODESCRIPTION, MySQLiteHelper.COLUMN_PHOTOLASTMODIFICATION, MySQLiteHelper.COLUMN_PHOTOPATH}, "project_id" + " =" +id, null, null, null, null);
+        List<Photo> lp = new ArrayList<>();
+
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            Photo ph = cursorToPhoto(cursor);
+            lp.add(ph);
+        }
+        cursor.close();
+
+        return lp;
     }
 
 }

@@ -34,9 +34,9 @@ import org.osmdroid.views.MapView;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.turfu.urbapp2.db.Project;
-import fr.turfu.urbapp2.db.ProjectBDD;
-import fr.turfu.urbapp2.tools.ConnexionCheck;
+import fr.turfu.urbapp2.DB.Project;
+import fr.turfu.urbapp2.DB.ProjectBDD;
+import fr.turfu.urbapp2.Tools.ConnexionCheck;
 
 //TODO Gérer le cycle d'activité de façon à ce qu'une seule activité Main puisse exister
 

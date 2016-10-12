@@ -10,8 +10,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import fr.turfu.urbapp2.db.Project;
-import fr.turfu.urbapp2.db.ProjectBDD;
+import fr.turfu.urbapp2.DB.Project;
+import fr.turfu.urbapp2.DB.ProjectBDD;
 
 /**
  * Pop up dans laquelle sont récapitulées toutes les information d'un projet

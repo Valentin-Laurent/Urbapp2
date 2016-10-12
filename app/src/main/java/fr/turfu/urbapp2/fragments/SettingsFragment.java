@@ -1,4 +1,4 @@
-package fr.turfu.urbapp2.fragments;
+package fr.turfu.urbapp2.Fragments;
 
 import android.os.Bundle;
 import android.preference.PreferenceFragment;

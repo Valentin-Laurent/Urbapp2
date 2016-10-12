@@ -1,4 +1,4 @@
-package fr.turfu.urbapp2.db;
+package fr.turfu.urbapp2.DB;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
