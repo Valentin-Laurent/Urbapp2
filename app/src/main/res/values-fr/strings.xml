@@ -74,4 +74,12 @@
     <string name="ungroup"> Dégrouper </string>
     <string name="summarize"> Récapitulatif </string>
 
+    <!-- Resources for help pop up-->
+    <string name="help">Aide</string>
+    <string name="instruct1"> Cliquez sur la carte pour dessiner une zone. Vous pouvez faire un linéaire de façade ou bien une surface polygonale fermée. </string>
+    <string name="instruct2"> Pour dessiner des zones sur la photo, appuyez sur le crayon à gauche puis dessinez votre surface. Attention, celle-ci doit être fermée. Réappuyez sur le crayon lorsque vous avez terminé.</string>
+    <string name="instruct3"> Pour grouper ou dégrouper plusieurs zones, sélectionnez les zones puis appuyez sur les boutons grouper / dégrouper. </string>
+    <string name="instruct4"> Pour caractériser une zone, cliquez sur celle-ci puis appuyez sur le bouton "Caractériser une surface". Vous pourrez alors renseigner les champs proposés. </string>
+    <string name="instruct5"> Le récapitulatif permet de voir quelles zones ont été renseignées et quelles zones ne le sont pas. </string>
+
 </resources>

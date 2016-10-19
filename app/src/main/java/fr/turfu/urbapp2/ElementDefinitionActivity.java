@@ -8,11 +8,15 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import java.io.File;
@@ -82,6 +86,34 @@ public class ElementDefinitionActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         mainToolbar.setTitle("");
         mainToolbar.setSubtitle("");
+
+        //Bouton aide
+        Button help = (Button) findViewById(R.id.buttonHelp);
+        help.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(ElementDefinitionActivity.this);
+
+                //Layout
+                LayoutInflater inflater = getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.help_element_pop_up,null);
+                builder.setView(dialogView);
+
+                //Bouton close
+                Button closeBtn = (Button)dialogView.findViewById(R.id.btn_close_pop);
+
+                final AlertDialog dialog = builder.create();
+
+                closeBtn .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
+            }
+        });
 
     }
 
