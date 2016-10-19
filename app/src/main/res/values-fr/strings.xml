@@ -65,5 +65,13 @@
     <string name="photoName_taken">Le nom de photo choisi est déjà pris. La mise à jour n\'a pas pu être faite. </string>
     <string name="saved">Enregistrement effectué </string>
 
+    <!-- Resources for element definition-->
+    <string name="cancel"> Annuler </string>
+    <string name="cancel_all"> Annuler tout </string>
+    <string name="zone_definition"> Définir une zone </string>
+    <string name="element_caracterisation"> Caractériser une surface </string>
+    <string name="group"> Grouper </string>
+    <string name="ungroup"> Dégrouper </string>
+    <string name="summarize"> Récapitulatif </string>
 
 </resources>

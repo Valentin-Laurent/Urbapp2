@@ -146,7 +146,7 @@ public class AugmentedRealityActivity extends Activity implements Vuforia.Update
     }
 
     /**
-     * Method called by the submit button from the camera_overlay.xml
+     * Method called by the submit button_ungroup from the camera_overlay.xml
      *
      * @param view
      */
@@ -161,7 +161,7 @@ public class AugmentedRealityActivity extends Activity implements Vuforia.Update
     }
 
     /**
-     * Method called by the rotate button from the camera_overlay.xml
+     * Method called by the rotate button_ungroup from the camera_overlay.xml
      *
      * @param view
      */

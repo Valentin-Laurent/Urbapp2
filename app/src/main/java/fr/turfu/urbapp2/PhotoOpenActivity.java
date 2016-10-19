@@ -159,6 +159,31 @@ public class PhotoOpenActivity extends AppCompatActivity {
         if (!p.getPhoto_description().equals("")) {
             et2.setText(p.getPhoto_description());
         }
+
+
+        //Bouton Définition des zones
+        Button bouton2 = (Button) findViewById(R.id.buttonEditPhoto);
+        bouton2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                Intent i = new Intent(PhotoOpenActivity.this, ElementDefinitionActivity.class);
+                i.putExtra("project_id",project_id);
+                i.putExtra("photo_id",photo_id);
+                i.putExtra("photo_path",photo_path);
+                startActivity(i);
+            }});
+
+        //Bouton Localisation photo
+        Button bouton3 = (Button) findViewById(R.id.buttonLocalisationPhoto);
+        bouton3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                Intent i = new Intent(PhotoOpenActivity.this, PhotoLocalisationActivity.class);
+                i.putExtra("project_id",project_id);
+                i.putExtra("photo_id",photo_id);
+                i.putExtra("photo_path",photo_path);
+                startActivity(i);
+            }});
     }
 
 
