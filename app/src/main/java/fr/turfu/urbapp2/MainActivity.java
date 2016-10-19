@@ -55,12 +55,12 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Liste pour les projets
      */
-    ListView mListView;
+    private ListView mListView;
 
     /**
      * Tableau pour les projets
      */
-    String[] list_projs = new String[]{};
+    private String[] list_projs = new String[]{};
 
     /**
      * Link to ask google to create a specific connexion code to check if there is no portal between android and server
@@ -80,8 +80,9 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Boolean to check if internet is on
      */
-
     public static boolean internet = true;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
         //Checking internet
         alertDialog = new AlertDialog.Builder(MainActivity.this);
         isInternetOn();
+
 
         //Handling toolbar
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
@@ -115,7 +117,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
 
         // Map
         org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants.setUserAgentValue(BuildConfig.APPLICATION_ID);
