@@ -48,6 +48,9 @@
         <activity android:name=".PhotoOpenActivity" />
         <activity android:name=".ElementDefinitionActivity" />
         <activity android:name=".PhotoLocalisationActivity" />
+        <activity
+            android:name=".ElementDefinitionPopUp"
+            android:theme="@android:style/Theme.Dialog" />
 
         <meta-data
             android:name="com.google.android.gms.version"

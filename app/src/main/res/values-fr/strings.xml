@@ -73,6 +73,12 @@
     <string name="group"> Grouper </string>
     <string name="ungroup"> Dégrouper </string>
     <string name="summarize"> Récapitulatif </string>
+    <string name="type">Type de surface :</string>
+    <string name="color">Couleur :</string>
+    <string name="materials">Matériau :</string>
+    <string name="no_back">Rien à annuler</string>
+    <string name="element_definition_instruction"> Définir une surface </string>
+    <string name="one_zone"> Veuillez selectionner une seule zone. </string>
 
     <!-- Resources for help pop up-->
     <string name="help">Aide</string>

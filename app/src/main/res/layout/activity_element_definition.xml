@@ -151,7 +151,7 @@
                         android:id="@+id/buttonPen"
                         android:layout_width="70dp"
                         android:layout_height="70dp"
-                        android:background="@drawable/button_pen_blue" />
+                        android:background="@drawable/pen" />
 
                     <TextView
                         android:id="@+id/textViewPen"
@@ -294,13 +294,16 @@
             android:background="@color/grisClair"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <ImageView
-                android:id="@+id/photo"
+
+            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/layoutBitmap"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
                 android:layout_marginTop="20dp"
                 android:layout_marginRight="40dp"
-                android:layout_marginBottom="60dp" />
+                android:layout_marginBottom="65dp"></RelativeLayout>
 
             <Button
                 android:id="@+id/buttonHelp"
