@@ -1,5 +1,6 @@
 package fr.turfu.urbapp2;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -21,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -88,6 +90,7 @@ public class ElementDefinitionActivity extends AppCompatActivity {
      */
     public static ArrayList<Element> elements;
 
+    public static Context context;
 
     /**
      * Listes des ajouts non enregistrés:
@@ -130,6 +133,7 @@ public class ElementDefinitionActivity extends AppCompatActivity {
         elements = ebdd.getElement(photo_id);
         polygones = ebdd.getPixelGeom(elements);
         ebdd.close();
+        context = ElementDefinitionActivity.this;
 
         //Photo
         File imgFile = new File(Environment.getExternalStorageDirectory(), photo_path);
@@ -207,28 +211,225 @@ public class ElementDefinitionActivity extends AppCompatActivity {
                 int cpt = 0;
                 PixelGeom select = null;
 
-                for(PixelGeom p:polygones){
-                    if(p.selected){
-                        cpt++;select = p;
+                for (PixelGeom p : polygones) {
+                    if (p.selected) {
+                        cpt++;
+                        select = p;
                     }
                 }
-                for(PixelGeom p:newPolygones){
-                    if(p.selected){
-                        cpt++; select = p;
+                for (PixelGeom p : newPolygones) {
+                    if (p.selected) {
+                        cpt++;
+                        select = p;
                     }
                 }
 
                 // Si 0 ou plus de une zone sont selectionnées, on affiche une erreur, sinon, on lance la pop-up
-                if(cpt==0 || cpt>1){
+                if (cpt == 0 || cpt > 1) {
                     Toast.makeText(ElementDefinitionActivity.this, R.string.one_zone, Toast.LENGTH_SHORT).show();
-                }else{
+                } else {
                     Intent intent = new Intent(ElementDefinitionActivity.this, ElementDefinitionPopUp.class);
-                    intent.putExtra("photo_id",photo_id);
-                    intent.putExtra("pixelGeom_id",select.getPixelGeomId());
+                    intent.putExtra("photo_id", photo_id);
+                    intent.putExtra("pixelGeom_id", select.getPixelGeomId());
                     actions.add("ELEMENT");
                     startActivity(intent);
                 }
 
+            }
+        });
+
+
+        //Bouton Annuler tout
+        Button cancelAll = (Button) findViewById(R.id.buttonCancelAll);
+        cancelAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+
+                if (actions.size() == 0) {
+                    Toast.makeText(ElementDefinitionActivity.this, R.string.nothing_to_cancel, Toast.LENGTH_SHORT).show();
+                } else {
+                    v.cancelAll();
+                    Toast.makeText(ElementDefinitionActivity.this, R.string.cancel_all_success, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
+        //Bouton Annuler
+        Button cancel = (Button) findViewById(R.id.buttonCancel);
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+
+                if (actions.size() == 0) {
+                    Toast.makeText(ElementDefinitionActivity.this, R.string.nothing_to_cancel, Toast.LENGTH_SHORT).show();
+                } else {
+                    v.cancelLast();
+                    Toast.makeText(ElementDefinitionActivity.this, R.string.cancel_all_success, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
+        //Bouton Grouper
+        Button group = (Button) findViewById(R.id.buttonGroup);
+        group.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+
+                ArrayList<PixelGeom> selectedPix = new ArrayList<PixelGeom>();
+                for (PixelGeom p : polygones) {
+                    if (p.isSelected()) {
+                        selectedPix.add(p);
+                    }
+                }
+                for (PixelGeom p : newPolygones) {
+                    if (p.isSelected()) {
+                        selectedPix.add(p);
+                    }
+                }
+
+                if (selectedPix.size() <= 1) {
+                    Toast.makeText(ElementDefinitionActivity.this, R.string.group_error, Toast.LENGTH_SHORT).show();
+                } else {
+                    v.group(selectedPix);
+                    //On ajoute l'action
+                    ElementDefinitionActivity.actions.add("GROUP");
+                    Toast.makeText(ElementDefinitionActivity.this, R.string.group_success, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        //Bouton Degrouper
+        Button degroup = (Button) findViewById(R.id.buttonUngroup);
+        degroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+
+                ArrayList<PixelGeom> selectedPix = new ArrayList<PixelGeom>();
+                for (PixelGeom p : polygones) {
+                    if (p.isSelected()) {
+                        selectedPix.add(p);
+                    }
+                }
+                for (PixelGeom p : newPolygones) {
+                    if (p.isSelected()) {
+                        selectedPix.add(p);
+                    }
+                }
+
+                if (selectedPix.size() != 1) {
+                    Toast.makeText(ElementDefinitionActivity.this, R.string.one_zone, Toast.LENGTH_SHORT).show();
+                } else {
+                    int n = v.degroup(selectedPix.get(0));
+                    //On ajoute l'action
+                    ElementDefinitionActivity.actions.add("DEGROUP#" + n);
+                    Toast.makeText(ElementDefinitionActivity.this, R.string.ungroup_success, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        //Bouton Récapitulatif
+        Button recap = (Button) findViewById(R.id.buttonRecap);
+        recap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(ElementDefinitionActivity.this);
+
+                //Layout
+                LayoutInflater inflater = getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.recap_pop_up, null);
+                builder.setView(dialogView);
+
+                //Récapitulatif
+                TextView txt = (TextView) dialogView.findViewById(R.id.recap);
+                int a = elements.size() + newElements.size();
+                int b = polygones.size() + newPolygones.size();
+                String s = getString(R.string.recap_txt);
+                txt.setText(a + "/" + b + " " + s);
+
+                //Bouton close
+                Button closeBtn = (Button) dialogView.findViewById(R.id.btn_close_pop);
+
+                final AlertDialog dialog = builder.create();
+
+                closeBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
+
+            }
+        });
+
+
+        //Bouton Sauvegarde
+        Button save = (Button) findViewById(R.id.buttonSave);
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                save();
+            }
+        });
+
+        //Bouton back
+        Button back = (Button) findViewById(R.id.buttonBack);
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(ElementDefinitionActivity.this);
+
+                //Layout
+                LayoutInflater inflater = getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.save_pop_up, null);
+                builder.setView(dialogView);
+                final AlertDialog dialog = builder.create();
+
+                //Bouton close
+                Button closeBtn = (Button) dialogView.findViewById(R.id.btn_close_pop);
+                closeBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View w) {
+                        dialog.dismiss();
+                    }
+                });
+
+                //Bouton cancel
+                Button cancel = (Button) dialogView.findViewById(R.id.btn_cancel_change);
+                cancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View w) {
+                        v.cancelAll();
+                        Intent i = new Intent(ElementDefinitionActivity.this, PhotoOpenActivity.class);
+                        i.putExtra("photo_path", photo_path);
+                        i.putExtra("photo_id", photo_id);
+                        i.putExtra("project_id", project_id);
+                        startActivity(i);
+                        finish();
+                        dialog.dismiss();
+                    }
+                });
+
+                //Bouton save
+                Button save = (Button) dialogView.findViewById(R.id.btn_save_change);
+                save.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        save();
+                        Intent i = new Intent(ElementDefinitionActivity.this, PhotoOpenActivity.class);
+                        i.putExtra("photo_path", photo_path);
+                        i.putExtra("photo_id", photo_id);
+                        i.putExtra("project_id", project_id);
+                        startActivity(i);
+                        finish();
+                        dialog.dismiss();
+                    }
+                });
+
+                dialog.show();
             }
         });
 
@@ -246,9 +447,99 @@ public class ElementDefinitionActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
             case R.id.home:
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(ElementDefinitionActivity.this);
+
+                //Layout
+                LayoutInflater inflater = getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.save_pop_up, null);
+                builder.setView(dialogView);
+                final AlertDialog dialog = builder.create();
+
+                //Bouton close
+                Button closeBtn = (Button) dialogView.findViewById(R.id.btn_close_pop);
+                closeBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View w) {
+                        dialog.dismiss();
+                    }
+                });
+
+                //Bouton cancel
+                Button cancel = (Button) dialogView.findViewById(R.id.btn_cancel_change);
+                cancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View w) {
+                        v.cancelAll();
+                        Intent i = new Intent(ElementDefinitionActivity.this, MainActivity.class);
+                        startActivity(i);
+                        finish();
+                        dialog.dismiss();
+                    }
+                });
+
+                //Bouton save
+                Button save = (Button) dialogView.findViewById(R.id.btn_save_change);
+                save.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        save();
+                        Intent i = new Intent(ElementDefinitionActivity.this, MainActivity.class);
+                        startActivity(i);
+                        finish();
+                        dialog.dismiss();
+                    }
+                });
+
+                dialog.show();
                 return true;
 
             case R.id.settings:
+
+                AlertDialog.Builder builder1 = new AlertDialog.Builder(ElementDefinitionActivity.this);
+
+                //Layout
+                LayoutInflater inflater1 = getLayoutInflater();
+                View dialogView1 = inflater1.inflate(R.layout.save_pop_up, null);
+                builder1.setView(dialogView1);
+                final AlertDialog dialog1 = builder1.create();
+
+                //Bouton close
+                Button closeBtn1 = (Button) dialogView1.findViewById(R.id.btn_close_pop);
+                closeBtn1.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View w) {
+                        dialog1.dismiss();
+                    }
+                });
+
+                //Bouton cancel
+                Button cancel1 = (Button) dialogView1.findViewById(R.id.btn_cancel_change);
+                cancel1.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View w) {
+                        v.cancelAll();
+                        Intent i = new Intent(ElementDefinitionActivity.this, SettingsActivity.class);
+                        startActivity(i);
+                        finish();
+                        dialog1.dismiss();
+                    }
+                });
+
+                //Bouton save
+                Button save1 = (Button) dialogView1.findViewById(R.id.btn_save_change);
+                save1.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        save();
+                        Intent i = new Intent(ElementDefinitionActivity.this, SettingsActivity.class);
+                        startActivity(i);
+                        finish();
+                        dialog1.dismiss();
+                    }
+                });
+
+                dialog1.show();
                 return true;
 
             case R.id.seeDetails:
@@ -321,5 +612,36 @@ public class ElementDefinitionActivity extends AppCompatActivity {
         return p;
     }
 
+    public void save() {
+        ElementBDD ebdd = new ElementBDD(ElementDefinitionActivity.this);
+        ebdd.open();
+
+        //On supprime les anciens éléments de la photo
+        ebdd.deleteElement(photo_id);
+
+        //On ajoute les nouveaux
+        for (Element e : newElements) {
+            elements.add(e);
+        }
+        for (PixelGeom p : newPolygones) {
+            polygones.add(p);
+        }
+
+        for (PixelGeom p : polygones) {
+            ebdd.insertPixelGeom(p);
+        }
+        for (Element e : elements) {
+            ebdd.insertElement(e);
+        }
+
+        //On vide les tableaux
+        newPoints.clear();
+        actions.clear();
+        newElements.clear();
+        newPolygones.clear();
+
+        ebdd.close();
+        Toast.makeText(ElementDefinitionActivity.this, R.string.saved, Toast.LENGTH_SHORT).show();
+    }
 
 }

@@ -53,6 +53,7 @@
             android:background="@drawable/button_validation"
             android:clickable="true"
             android:text="@string/save"
+            android:textSize="12dp"
             android:textColor="#ffffff" />
 
         <Button
@@ -67,6 +68,7 @@
             android:background="@drawable/button_cancel"
             android:clickable="true"
             android:text="@string/cancel_modif"
+            android:textSize="12dp"
             android:textColor="#ffffff" />
     </LinearLayout>
 

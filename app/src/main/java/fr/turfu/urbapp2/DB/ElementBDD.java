@@ -80,15 +80,29 @@ public class ElementBDD {
      * @param e Element
      * @return id de l'élément
      */
-    public long insert(Element e) {
+    public long insertElement(Element e) {
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.COLUMN_PHOTOID, e.getPhoto_id());
         values.put(MySQLiteHelper.COLUMN_MATERIALID, e.getMaterial_id());
-        values.put(MySQLiteHelper.COLUMN_ELEMENTTYPEID, e.getElement_id());
+        values.put(MySQLiteHelper.COLUMN_ELEMENTTYPEID, e.getElementType_id());
         values.put(MySQLiteHelper.COLUMN_ELEMENTCOLOR, e.getElement_color());
         values.put(MySQLiteHelper.COLUMN_PIXELGEOMID, e.getPixelGeom_id());
 
         return bdd.insert(MySQLiteHelper.TABLE_ELEMENT, null, values);
+    }
+
+    /**
+     * Ajout d'un pixelgeom à la base de données
+     *
+     * @param p pixelGeom
+     * @return id de l'élément
+     */
+    public long insertPixelGeom(PixelGeom p) {
+        ContentValues values = new ContentValues();
+        values.put(MySQLiteHelper.COLUMN_PIXELGEOMID, p.getPixelGeomId());
+        values.put(MySQLiteHelper.COLUMN_PIXELGEOMCOORD, p.getPixelGeom_the_geom());
+
+        return bdd.insert(MySQLiteHelper.TABLE_PIXELGEOM, null, values);
     }
 
 
@@ -176,5 +190,115 @@ public class ElementBDD {
         }
     }
 
+
+    public long getMaxPixelGeomId() {
+        Cursor c = bdd.rawQuery("SELECT MAX(pixelGeom_id) FROM PixelGeom", new String[]{});
+        if (c.getCount() != 0) {
+            c.moveToFirst();
+            return c.getLong(0);
+        } else {
+            return 0;
+        }
+    }
+
+    public long getMaxElementId() {
+        Cursor c = bdd.rawQuery("SELECT MAX(element_id) FROM Element", new String[]{});
+        if (c.getCount() != 0) {
+            c.moveToFirst();
+            return c.getLong(0);
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Suppression de tous les éléments d'une photo et de leurs pixelgeoms
+     *
+     * @param photoid Id de la photo
+     */
+    public void deleteElement(long photoid) {
+        ArrayList<Element> elem = getElement(photoid);
+        ArrayList<PixelGeom> pixel = getPixelGeom(elem);
+        for (Element e : elem) {
+            bdd.execSQL("DELETE FROM Element WHERE element_id =" + e.getElement_id());
+        }
+        for (PixelGeom p : pixel) {
+            bdd.execSQL("DELETE FROM PixelGeom WHERE pixelGeom_id =" + p.getPixelGeomId());
+        }
+    }
+
+    /**
+     * Récupérer tous les matériaux de la base de données
+     *
+     * @return Liste de matériaux
+     */
+    public ArrayList<String> getMaterials() {
+        ArrayList<String> mater = new ArrayList<>();
+        Cursor c = bdd.query(MySQLiteHelper.TABLE_MATERIAL, new String[]{MySQLiteHelper.COLUMN_MATERIALNAME}, null, null, null, null, null);
+        for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+            mater.add(c.getString(0));
+        }
+
+        if (mater.isEmpty()) {
+            insertMater();
+            mater = getMaterials();
+        }
+
+        return mater;
+    }
+
+    /**
+     * Récupérer tous les types d'éléments de la base de données
+     *
+     * @return liste des types
+     */
+    public ArrayList<String> getTypes() {
+        ArrayList<String> types = new ArrayList<>();
+        Cursor c = bdd.query(MySQLiteHelper.TABLE_ELEMENTTYPE, new String[]{MySQLiteHelper.COLUMN_ELEMENTTYPENAME}, null, null, null, null, null);
+        for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+            types.add(c.getString(0));
+        }
+
+        if (types.isEmpty()) {
+            insertTypes();
+            types = getTypes();
+        }
+
+        return types;
+    }
+
+    public void insertTypes() {
+        ContentValues values = new ContentValues();
+        values.put(MySQLiteHelper.COLUMN_ELEMENTTYPEID, 1);
+        values.put(MySQLiteHelper.COLUMN_ELEMENTTYPENAME, "Mur");
+        bdd.insert(MySQLiteHelper.TABLE_ELEMENTTYPE, null, values);
+
+        ContentValues values1 = new ContentValues();
+        values1.put(MySQLiteHelper.COLUMN_ELEMENTTYPEID, 2);
+        values1.put(MySQLiteHelper.COLUMN_ELEMENTTYPENAME, "Sol");
+        bdd.insert(MySQLiteHelper.TABLE_ELEMENTTYPE, null, values1);
+
+        ContentValues values2 = new ContentValues();
+        values2.put(MySQLiteHelper.COLUMN_ELEMENTTYPEID, 3);
+        values2.put(MySQLiteHelper.COLUMN_ELEMENTTYPENAME, "Toit");
+        bdd.insert(MySQLiteHelper.TABLE_ELEMENTTYPE, null, values2);
+    }
+
+    public void insertMater() {
+        ContentValues values = new ContentValues();
+        values.put(MySQLiteHelper.COLUMN_MATERIALID, 1);
+        values.put(MySQLiteHelper.COLUMN_MATERIALNAME, "Bois");
+        bdd.insert(MySQLiteHelper.TABLE_MATERIAL, null, values);
+
+        ContentValues values1 = new ContentValues();
+        values1.put(MySQLiteHelper.COLUMN_MATERIALID, 2);
+        values1.put(MySQLiteHelper.COLUMN_MATERIALNAME, "Verre");
+        bdd.insert(MySQLiteHelper.TABLE_MATERIAL, null, values1);
+
+        ContentValues values2 = new ContentValues();
+        values2.put(MySQLiteHelper.COLUMN_MATERIALID, 3);
+        values2.put(MySQLiteHelper.COLUMN_MATERIALNAME, "Béton");
+        bdd.insert(MySQLiteHelper.TABLE_MATERIAL, null, values2);
+    }
 
 }

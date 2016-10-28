@@ -78,7 +78,13 @@
     <string name="materials">Matériau :</string>
     <string name="no_back">Rien à annuler</string>
     <string name="element_definition_instruction"> Définir une surface </string>
-    <string name="one_zone"> Veuillez selectionner une seule zone. </string>
+    <string name="one_zone"> Veuillez sélectionner une seule zone. </string>
+    <string name="nothing_to_cancel"> Rien à annuler. </string>
+    <string name="cancel_all_success"> Suppression réussie. </string>
+    <string name="group_error"> Veuillez sélectionner au moins deux zones. </string>
+    <string name="group_success"> Sélection groupée. </string>
+    <string name="ungroup_success"> Sélection dégroupée. </string>
+    <string name="recap_txt"> éléments caractérisés. </string>
 
     <!-- Resources for help pop up-->
     <string name="help">Aide</string>

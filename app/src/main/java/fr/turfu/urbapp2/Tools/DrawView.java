@@ -18,6 +18,12 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.StringTokenizer;
+
+import fr.turfu.urbapp2.DB.Element;
+import fr.turfu.urbapp2.DB.ElementBDD;
 import fr.turfu.urbapp2.DB.PixelGeom;
 import fr.turfu.urbapp2.ElementDefinitionActivity;
 
@@ -147,7 +153,18 @@ public class DrawView extends View {
                 String pix = polygoneToString(n);
                 PixelGeom pixel = new PixelGeom();
                 pixel.setPixelGeom_the_geom(pix);
-                pixel.setPixelGeomId(ElementDefinitionActivity.polygones.size() + ElementDefinitionActivity.newPolygones.size() + 1);
+
+                ElementBDD ebdd = new ElementBDD(ElementDefinitionActivity.context);
+                ebdd.open();
+                long id = ebdd.getMaxPixelGeomId() + 1;
+                ebdd.close();
+
+                if (ElementDefinitionActivity.newPolygones.isEmpty()) {
+                    id = id + 1;
+                } else {
+                    id = ElementDefinitionActivity.newPolygones.get(ElementDefinitionActivity.newPolygones.size() - 1).getPixelGeomId() + 1;
+                }
+                pixel.setPixelGeomId(id);
                 ElementDefinitionActivity.newPolygones.add(pixel);
             }
         }
@@ -224,12 +241,12 @@ public class DrawView extends View {
     /**
      * Méthode pour remplir un polygone
      *
-     * @param n Entiercorrespondant à l'index du premier point du polygone (en partant de la fin de la liste) dans la liste des points
+     * @param n Entier correspondant à l'index du premier point du polygone (en partant de la fin de la liste) dans la liste des points
      */
     public void fillPolygone(int n) {
         canvasPaint.setStyle(Paint.Style.FILL);
 
-        canvasPaint.setARGB(80, 255, 255, 255);
+        canvasPaint.setARGB(80, 255, 215, 215);
 
 
         Path path = new Path();
@@ -244,7 +261,7 @@ public class DrawView extends View {
         }
         drawCanvas.drawPath(path, canvasPaint);
         canvasPaint.setStyle(Paint.Style.STROKE);
-        canvasPaint.setColor(0xFF990000);
+        canvasPaint.setColor(paintColor);
     }
 
     /**
@@ -280,105 +297,6 @@ public class DrawView extends View {
         return s;
     }
 
-/*
-    public boolean isValidPolygon(int n) {
-        //Sommets du polygone
-        ArrayList<Point> pt = new ArrayList<>();
-        for (int i = 1; i <= n; i++) {
-            pt.add(newPoints.get(newPoints.size() - i));
-        }
-
-        //Verification : est ce que les segments se croisent
-        int croisements = 0;
-        for (int i = 0; i < pt.size() - 2; i++) {
-            for (int j = i + 1; j < pt.size() - 1; j++) {
-                if (intersect(pt.get(i), pt.get(i + 1), pt.get(j), pt.get(j + 1))) {
-                    croisements++;
-                }
-            }
-
-        }
-        return croisements == 0;
-    }
-*/
-
-    /**
-     * Methode pour déterminer si les segment AB et CD se coupent
-     *
-     * @param a
-     * @param b
-     * @param c
-     * @param d
-     * @return
-     */
-  /*  public boolean intersect(Point a, Point b, Point c, Point d) {
-
-        //Calcul des droites
-        float a1 = (a.x == b.x) ? 0 : (a.y - b.y) / (a.x - b.x);
-        float b1 = a.y - a1 * a.x;
-
-        float a2 = (c.x == d.x) ? 0 : (c.y - d.y) / (c.x - d.x);
-        float b2 = c.y - a2 * c.x;
-
-        //Abscisse de l'intersection
-        Log.v("ax", a.x + "");
-        Log.v("ay", a.y + "");
-        Log.v("bx", b.x + "");
-        Log.v("by", b.y + "");
-        Log.v("cx", c.x + "");
-        Log.v("cy", c.y + "");
-        Log.v("dx", d.x + "");
-        Log.v("dy", d.y + "");
-        if (a1 == a2) {
-            return false;
-        } else {
-            float x = (b1 - b2) / (a2 - a1);
-            Log.v("x", x + "");
-            float max1 = a.x > b.x ? a.x : b.x;
-            float min1 = a.x < b.x ? a.x : b.x;
-            float max2 = c.x > d.x ? c.x : d.x;
-            float min2 = c.x < d.x ? c.x : d.x;
-            return (max1 > x && x > min1) || (max2 > x && min2 < x);
-        }
-
-    }
-
-
-    public void cancelPolygon(int n) {
-
-        //Suppression des points
-        int k = n;
-        ArrayList<Point> pt = new ArrayList<>();
-        while (k > 0) {
-            pt.add(newPoints.get(newPoints.size() - 1));
-            newPoints.remove(newPoints.size() - 1);
-            k--;
-        }
-        Log.v("taille", newPoints.size() + "");
-
-        //Suppression des actions
-        k = n;
-        int i = actions.size() - 1;
-        while (k > 0) {
-            if (actions.get(i).equals("POINT")) {
-                actions.remove(i);
-                i--;
-                k--;
-            } else {
-                i--;
-            }
-        }
-
-        //On efface les erreurs
-        drawCanvas.drawColor(Color.TRANSPARENT);
-        for (int z = 0; z < pt.size(); z++) {
-            drawCanvas.drawCircle(pt.get(z).x, pt.get(z).y, 7, drawPaint);
-
-            if (z < pt.size() - 1) {
-                drawCanvas.drawLine(pt.get(z).x, pt.get(z).y, pt.get(z + 1).x, pt.get(z + 1).y, drawPaint);
-            }
-        }
-    }*/
 
     /**
      * Tester si un point est dans une géométrie
@@ -390,19 +308,19 @@ public class DrawView extends View {
     public boolean isInside(PixelGeom pg, Point p) {
 
         boolean b = false;
-        try {
-            //Obtention du polygone
-            Geometry poly = wktr.read(pg.getPixelGeom_the_geom());
 
-            //Transformation du point en géométrie
-            Coordinate coord = new Coordinate(p.x, p.y);
-            com.vividsolutions.jts.geom.Point geomPoint = gf.createPoint(coord);
+        //Obtention du polygone
+        ArrayList<Geometry> geoms = getPolygones(pg);
 
-            b = poly.contains(geomPoint);
-            Log.v("b", b + "");
-        } catch (ParseException e) {
-            e.printStackTrace();
+        //Transformation du point en géométrie
+        Coordinate coord = new Coordinate(p.x, p.y);
+        com.vividsolutions.jts.geom.Point geomPoint = gf.createPoint(coord);
+
+        //On regarde si le point est dans une géométrie
+        for (Geometry g : geoms) {
+            b = b || g.contains(geomPoint);
         }
+
         return b;
     }
 
@@ -412,74 +330,59 @@ public class DrawView extends View {
      * @param p
      */
     public void select(Point p) {
-        double area = 0;
-        int index = -1;
+        PixelGeom pix = null;
         int tab = 0;
 
-        try {
-            for (PixelGeom pg : ElementDefinitionActivity.polygones) {
+        for (PixelGeom pg : ElementDefinitionActivity.polygones) {
 
-                if (isInside(pg, p) && (index == -1 || wktr.read(pg.getPixelGeom_the_geom()).getArea() < area)) {
-                    area = wktr.read(pg.getPixelGeom_the_geom()).getArea();
-                    tab = 1;
-                    index = ElementDefinitionActivity.polygones.indexOf(pg);
-                    Log.v("SELECT", pg.selected + "");
-                }
-
-            }
-            for (PixelGeom pg : ElementDefinitionActivity.newPolygones) {
-                Log.v("px", p.x + "");
-                Log.v("py", p.y + "");
-                Log.v("poly", pg.getPixelGeom_the_geom());
-
-                if (isInside(pg, p) && (index == -1 || wktr.read(pg.getPixelGeom_the_geom()).getArea() < area)) {
-                    area = wktr.read(pg.getPixelGeom_the_geom()).getArea();
-                    tab = 2;
-                    index = ElementDefinitionActivity.newPolygones.indexOf(pg);
-                    Log.v("SELECT", pg.selected + "");
-                }
+            if (isInside(pg, p)) {
+                pix = pg;
+                tab = 1;
+                Log.v("SELECT", pg.selected + "");
             }
 
-            if (index >= 0) {
-                PixelGeom thePixel = null;
-                if (tab == 1) {
-                    ElementDefinitionActivity.polygones.get(index).selected = !ElementDefinitionActivity.polygones.get(index).selected;
-                    thePixel = ElementDefinitionActivity.polygones.get(index);
-                } else {
-                    ElementDefinitionActivity.newPolygones.get(index).selected = !ElementDefinitionActivity.newPolygones.get(index).selected;
-                    thePixel = ElementDefinitionActivity.newPolygones.get(index);
-                }
-
-                if (thePixel.selected) {
-                    drawFilledPolygone(thePixel);
-                } else {
-                    erase();
-                    refresh();
-                }
-            }
-
-
-        } catch (ParseException e) {
-            e.printStackTrace();
         }
+        for (PixelGeom pg : ElementDefinitionActivity.newPolygones) {
+            if (isInside(pg, p)) {
+                pix = pg;
+                tab = 2;
+                Log.v("SELECT", pg.selected + "");
+            }
+        }
+
+        if (pix != null) {
+            int index = 0;
+            if (tab == 1) {
+                index = ElementDefinitionActivity.polygones.indexOf(pix);
+                pix.selected = !pix.selected;
+                ElementDefinitionActivity.polygones.set(index, pix);
+            } else {
+                index = ElementDefinitionActivity.newPolygones.indexOf(pix);
+                pix.selected = !pix.selected;
+                ElementDefinitionActivity.newPolygones.set(index, pix);
+            }
+            erase();
+            refresh();
+
+        }
+
     }
 
 
     public void drawFilledPolygone(PixelGeom pg) {
-        try {
-            if (pg.selected) {
-                canvasPaint.setStyle(Paint.Style.FILL);
-                canvasPaint.setARGB(80, 252, 217, 217);
-            } else {
-                canvasPaint.setStyle(Paint.Style.FILL);
-                canvasPaint.setARGB(80, 255, 215, 215);
-            }
 
-            Path path = new Path();
+        if (pg.selected) {
+            canvasPaint.setStyle(Paint.Style.FILL);
+            canvasPaint.setARGB(80, 230, 0, 0);
+        } else {
+            canvasPaint.setStyle(Paint.Style.FILL);
+            canvasPaint.setARGB(80, 255, 215, 215);
+        }
 
+        Path path = new Path();
 
-            Geometry geom = wktr.read(pg.getPixelGeom_the_geom());
-            Coordinate[] coord = geom.getCoordinates();
+        for (Geometry g : getPolygones(pg)) {
+            Coordinate[] coord = g.getCoordinates();
 
             for (int i = 0; i < coord.length; i++) {
                 float x = (float) coord[i].x;
@@ -491,30 +394,28 @@ public class DrawView extends View {
                 }
             }
             drawCanvas.drawPath(path, canvasPaint);
-            canvasPaint.setStyle(Paint.Style.STROKE);
-            canvasPaint.setColor(0xFF990000);
-
-        } catch (ParseException e) {
-            e.printStackTrace();
         }
+
+        canvasPaint.setStyle(Paint.Style.STROKE);
+        canvasPaint.setColor(paintColor);
+
+
     }
 
 
     public void refresh() {
-
         //Tracé des points et des lignes
         Point temp = null;
         boolean init = true;
-        for (Point p : ElementDefinitionActivity.newPoints) {
+        for (int i = 0; i < ElementDefinitionActivity.newPoints.size(); i++) {
+            Point p = ElementDefinitionActivity.newPoints.get(i);
             drawCanvas.drawCircle(p.x, p.y, 7, drawPaint);
             if (init) {
                 temp = p;
                 init = false;
             } else {
-
-                int k = ElementDefinitionActivity.newPoints.indexOf(p);
-                if (k < ElementDefinitionActivity.newPoints.size() - 1) {
-                    Point q = ElementDefinitionActivity.newPoints.get(k + 1);
+                if (i > 0) {
+                    Point q = ElementDefinitionActivity.newPoints.get(i - 1);
                     drawCanvas.drawLine(p.x, p.y, q.x, q.y, drawPaint);
                 }
                 if (temp == p) {
@@ -526,6 +427,7 @@ public class DrawView extends View {
         //Tracé des polygones sauvegardés
         for (PixelGeom pg : ElementDefinitionActivity.polygones) {
             drawFilledPolygone(pg);
+            drawBorder(pg);
         }
 
         //Tracé des polygones non sauvegardés
@@ -534,6 +436,35 @@ public class DrawView extends View {
         }
     }
 
+    /**
+     * Tracé de la bordure et des sommet d'un polygone
+     * @param pg Polygone
+     */
+    public void drawBorder(PixelGeom pg) {
+        Path path = new Path();
+
+        for (Geometry g : getPolygones(pg)) {
+            Coordinate[] coord = g.getCoordinates();
+            for (int i = 0; i < coord.length; i++) {
+                float x = (float) coord[i].x;
+                float y = (float) coord[i].y;
+
+                drawCanvas.drawCircle(x, y, 7, drawPaint);
+
+                if (i == 0) {
+                    path.moveTo(x, y);
+                } else {
+                    path.lineTo(x, y);
+                }
+            }
+            drawCanvas.drawPath(path, canvasPaint);
+        }
+    }
+
+
+    /**
+     * Méthode pour effacer tous les tracés de la vue
+     */
     public void erase() {
         drawCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.MULTIPLY);
         canvasPaint.setColor(Color.TRANSPARENT);
@@ -545,6 +476,281 @@ public class DrawView extends View {
         drawPaint.setColor(paintColor);
         canvasPaint = new Paint(Paint.DITHER_FLAG);
         drawCanvas = new Canvas(canvasBitmap);
+        invalidate();
+    }
+
+    /**
+     * Méthode pour annuler toutes les modifications non enregistrées
+     */
+    public void cancelAll() {
+        //On vide les listes
+        ElementDefinitionActivity.newElements.clear();
+        ElementDefinitionActivity.newPoints.clear();
+        ElementDefinitionActivity.newPolygones.clear();
+        ElementDefinitionActivity.actions.clear();
+
+        //On nettoie le vue
+        erase();
+
+        //On retrace ce qui a été sauvegardé
+        refresh();
+    }
+
+    /**
+     * Méthode pour annuler la dernière action
+     */
+    public void cancelLast() {
+        String lastAct = ElementDefinitionActivity.actions.get(ElementDefinitionActivity.actions.size() - 1);
+
+        //On supprime la dernière action
+        ElementDefinitionActivity.actions.remove(ElementDefinitionActivity.actions.size() - 1);
+
+        switch (lastAct) {
+            case "POINT":
+                ElementDefinitionActivity.newPoints.remove(ElementDefinitionActivity.newPoints.size() - 1);
+                break;
+            case "POLYGONE":
+                ElementDefinitionActivity.newPoints.remove(ElementDefinitionActivity.newPoints.size() - 1);
+                ElementDefinitionActivity.newPolygones.remove(ElementDefinitionActivity.newPolygones.size() - 1);
+                break;
+            case "ELEMENT":
+                ElementDefinitionActivity.newElements.remove(ElementDefinitionActivity.newElements.size() - 1);
+                break;
+            case "GROUP":
+                PixelGeom last = ElementDefinitionActivity.newPolygones.get(ElementDefinitionActivity.newPolygones.size() - 1);
+                degroup(last);
+                break;
+            default:
+                //On récupère le nombre de polygones composant le multi
+                StringTokenizer st = new StringTokenizer(lastAct, "#");
+                st.nextToken();
+                int n = Integer.parseInt(st.nextToken());
+
+                //Liste des polygones
+                ArrayList<PixelGeom> polys = new ArrayList<>();
+                for (int i = 1; i <= n; i++) {
+                    polys.add(ElementDefinitionActivity.newPolygones.get(ElementDefinitionActivity.newPolygones.size() - i));
+                }
+
+                //Group
+                group(polys);
+
+
+                break;
+        }
+
+
+        //On nettoie le vue
+        erase();
+
+        //On retrace
+        refresh();
+
+    }
+
+    /**
+     * Groupement de plusieurs polygones
+     *
+     * @param selectedGeom liste des polygones à grouper
+     */
+
+    public void group(ArrayList<PixelGeom> selectedGeom) {
+
+        //On supprime les polygones en questions
+        Iterator<PixelGeom> iterator = ElementDefinitionActivity.polygones.iterator();
+        while (iterator.hasNext()) {
+            PixelGeom p = iterator.next();
+            for (PixelGeom pi : selectedGeom) {
+                if (p.getPixelGeomId() == pi.getPixelGeomId()) {
+                    iterator.remove();
+                }
+            }
+        }
+        Iterator<PixelGeom> iterator1 = ElementDefinitionActivity.newPolygones.iterator();
+        ArrayList<Integer> toerase = new ArrayList<>();
+        int j = -1;
+        while (iterator1.hasNext()) {
+            PixelGeom p = iterator1.next();
+            j++;
+            long id = p.getPixelGeomId();
+            boolean del = false;
+            for (PixelGeom pi : selectedGeom) {
+                if (!del && id == pi.getPixelGeomId()) {
+                    toerase.add(j);
+                    iterator1.remove();
+                    del = true;
+                }
+            }
+        }
+
+        //On supprime les actions corespondant à la création de ces polygones
+        Iterator<String> it = ElementDefinitionActivity.actions.iterator();
+        int k = -1;
+        while (it.hasNext()) {
+            String s = it.next();
+            if (s.equals("POLYGON")) {
+                k++;
+                for (int a : toerase) {
+                    if (k == a) {
+                        it.remove();
+                    }
+                }
+            }
+        }
+
+        //On supprime les éléments qui ont des pixelgeom à grouper
+        Iterator<Element> iterator3 = ElementDefinitionActivity.newElements.iterator();
+        toerase.clear();
+        while (iterator3.hasNext()) {
+            Element e = iterator3.next();
+            j++;
+            long id = e.getPixelGeom_id();
+            boolean del = false;
+            for (PixelGeom pi : selectedGeom) {
+                if (!del && id == pi.getPixelGeomId()) {
+                    toerase.add(j);
+                    iterator3.remove();
+                    del = true;
+                }
+            }
+        }
+
+        Iterator<Element> iterator4 = ElementDefinitionActivity.newElements.iterator();
+        while (iterator4.hasNext()) {
+            Element e = iterator4.next();
+            for (PixelGeom pi : selectedGeom) {
+                if (e.getPixelGeom_id() == pi.getPixelGeomId()) {
+                    iterator4.remove();
+                }
+            }
+        }
+
+        //On supprime les actions corespondant à la création de ces  element
+        Iterator<String> it2 = ElementDefinitionActivity.actions.iterator();
+        k = -1;
+        while (it2.hasNext()) {
+            String s = it2.next();
+            if (s.equals("ELEMENT")) {
+                k++;
+                for (int a : toerase) {
+                    if (k == a) {
+                        it2.remove();
+                    }
+                }
+            }
+        }
+
+        //On ajoute un multipolygone
+        ArrayList<String> selectedGeomConvert = new ArrayList<>();
+        for (PixelGeom pg : selectedGeom) {
+            if (pg.getPixelGeom_the_geom().charAt(0) == 'P') {
+                selectedGeomConvert.add(pg.getPixelGeom_the_geom());
+            } else {//C'est une collection de polygones, il faut les récupérer un par un
+                String geom = pg.getPixelGeom_the_geom();
+                geom = geom.substring(13, geom.length() - 1);
+                StringTokenizer st = new StringTokenizer(geom, "(");
+                while (st.hasMoreTokens()) {
+                    String poly = st.nextToken();
+                    poly = poly.substring(0, poly.length() - 2);
+                    poly = "POLYGON((" + poly + "))";
+                    selectedGeomConvert.add(poly);
+                }
+            }
+        }
+
+        String s = "MULTIPOLYGON (";
+        for (int i = 0; i < selectedGeomConvert.size(); i++) {
+            String poly = selectedGeomConvert.get(i).substring(8, selectedGeomConvert.get(i).length() - 1);
+            s = s + poly;
+            if (i != selectedGeomConvert.size() - 1) {
+                s = s + ",";
+            }
+        }
+        s = s + ")";
+
+        PixelGeom mult = new PixelGeom();
+        mult.setPixelGeom_the_geom(s);
+        mult.setSelected(true);
+
+        ElementBDD ebdd = new ElementBDD(ElementDefinitionActivity.context);
+        ebdd.open();
+        long id = ebdd.getMaxPixelGeomId() + 1;
+        ebdd.close();
+        if (ElementDefinitionActivity.newPolygones.isEmpty()) {
+            id = id + 1;
+        } else {
+            id = ElementDefinitionActivity.newPolygones.get(ElementDefinitionActivity.newPolygones.size() - 1).getPixelGeomId() + 1;
+        }
+        mult.setPixelGeomId(id);
+        ElementDefinitionActivity.newPolygones.add(mult);
+    }
+
+
+    public ArrayList<Geometry> getPolygones(PixelGeom pg) {
+        ArrayList<Geometry> list = new ArrayList<>();
+        String geom = pg.getPixelGeom_the_geom();
+        try {
+            if (geom.charAt(0) == 'P') { //C'est juste un polygone, il suffit de le convertir en géométrie
+                Log.v("geom", geom);
+                Geometry poly = wktr.read(geom);
+                list.add(poly);
+            } else { //C'est une collection de polygones, il faut les récupérer un par un
+                geom = geom.substring(13, geom.length() - 1);
+                StringTokenizer st = new StringTokenizer(geom, "(");
+
+                while (st.hasMoreTokens()) {
+                    String poly = st.nextToken();
+                    if (poly.substring(poly.length() - 2, poly.length()).equals("),")) {
+                        poly = poly.substring(0, poly.length() - 2);
+                    } else {
+                        poly = poly.substring(0, poly.length() - 1);
+                    }
+                    poly = "POLYGON((" + poly + "))";
+                    Log.v("geom", poly);
+                    Geometry geopoly = wktr.read(poly);
+                    list.add(geopoly);
+                }
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public int degroup(PixelGeom pix) {
+        //Suppression du multipolygone
+        ElementDefinitionActivity.newPolygones.remove(ElementDefinitionActivity.newPolygones.size() - 1);
+
+        //Ajout des polygones composants le multipolygone
+        String mult = pix.getPixelGeom_the_geom();
+        mult = mult.substring(13, mult.length() - 1);
+        StringTokenizer st = new StringTokenizer(mult, "(");
+        int nbPoly = 0;
+        while (st.hasMoreTokens()) {
+            nbPoly++;
+            String poly = st.nextToken();
+            poly = poly.substring(0, poly.length() - 2);
+            poly = "POLYGON((" + poly + "))";
+            PixelGeom pg = new PixelGeom();
+            pg.selected = true;
+            pg.setPixelGeom_the_geom(poly);
+
+            ElementBDD ebdd = new ElementBDD(ElementDefinitionActivity.context);
+            ebdd.open();
+            long id = ebdd.getMaxPixelGeomId() + 1;
+            ebdd.close();
+            if (ElementDefinitionActivity.newPolygones.isEmpty()) {
+                id = id + 1;
+            } else {
+                id = ElementDefinitionActivity.newPolygones.get(ElementDefinitionActivity.newPolygones.size() - 1).getPixelGeomId() + 1;
+            }
+            pg.setPixelGeomId(id);
+
+            ElementDefinitionActivity.newPolygones.add(pg);
+        }
+
+        return nbPoly;
     }
 
 }

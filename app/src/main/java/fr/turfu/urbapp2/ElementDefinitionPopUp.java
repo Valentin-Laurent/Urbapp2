@@ -3,6 +3,7 @@ package fr.turfu.urbapp2;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.ArrayAdapter;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.turfu.urbapp2.DB.Element;
+import fr.turfu.urbapp2.DB.ElementBDD;
 import fr.turfu.urbapp2.Tools.ColorPicker;
 
 /**
@@ -60,10 +62,13 @@ public class ElementDefinitionPopUp extends Activity {
         pixelGeom_id = intent.getLongExtra("pixelGeom_id", 0);
 
         //Ajout de la liste des matériaux et de la liste des types d'éléments
-        List mat = new ArrayList();
-        mat.add("Bois");
+        ElementBDD ebdd = new ElementBDD(ElementDefinitionPopUp.this);
+        ebdd.open();
+
+        List mat = ebdd.getMaterials();
+        /*mat.add("Bois");
         mat.add("Béton");
-        mat.add("Verre");
+        mat.add("Verre");*/
 
         ArrayAdapter adapter = new ArrayAdapter(
                 this,
@@ -74,10 +79,11 @@ public class ElementDefinitionPopUp extends Activity {
         Spinner spin = (Spinner) findViewById(R.id.MaterialValue);
         spin.setAdapter(adapter);
 
-        List<String> elemType = new ArrayList();
-        elemType.add("Sol");
+        ArrayList<String> elemType = ebdd.getTypes();
+        ebdd.close();
+        /*elemType.add("Sol");
         elemType.add("Mur");
-        elemType.add("Toit");
+        elemType.add("Toit");*/
 
         ArrayAdapter adapter1 = new ArrayAdapter(
                 this,
@@ -106,9 +112,11 @@ public class ElementDefinitionPopUp extends Activity {
 
         if (e != null) {
             //Affichage du type de surface
-            spin1.setSelection((int) (e.getElementType_id() ));
+            spin1.setSelection((int) (e.getElementType_id()));
+            Log.v("type", e.getElementType_id() + "");
             //Affichage du matériau
             spin.setSelection((int) e.getMaterial_id());
+            Log.v("mat", e.getMaterial_id() + "");
             //Affichage de la couleur
             ColorPicker colorPicker = (ColorPicker) findViewById(R.id.colorPicker);
             colorPicker.setColor(Integer.parseInt(e.getElement_color()));
@@ -130,17 +138,27 @@ public class ElementDefinitionPopUp extends Activity {
             public void onClick(View arg0) {
                 Element e = null;
 
+                int index = -1;
                 for (Element el : ElementDefinitionActivity.elements) {
                     if (el.getPixelGeom_id() == pixelGeom_id) {
                         e = el;
-                        ElementDefinitionActivity.elements.remove(e);
+                        index = ElementDefinitionActivity.elements.indexOf(el);
                     }
                 }
+
+                if (index >= 0) {
+                    ElementDefinitionActivity.elements.remove(index);
+                }
+
+                index = -1;
                 for (Element el : ElementDefinitionActivity.newElements) {
                     if (el.getPixelGeom_id() == pixelGeom_id) {
                         e = el;
-                        ElementDefinitionActivity.newElements.remove(e);
+                        index = ElementDefinitionActivity.newElements.indexOf(el);
                     }
+                }
+                if (index >= 0) {
+                    ElementDefinitionActivity.newElements.remove(index);
                 }
 
                 if (e != null) {
@@ -166,7 +184,17 @@ public class ElementDefinitionPopUp extends Activity {
 
                     e.setPixelGeom_id(pixelGeom_id);
                     e.setPhoto_id(photo_id);
-                    e.setElement_id(1 + ElementDefinitionActivity.elements.size() + ElementDefinitionActivity.newElements.size());
+
+                    ElementBDD ebdd = new ElementBDD(ElementDefinitionPopUp.this);
+                    ebdd.open();
+                    long id = ebdd.getMaxElementId();
+                    ebdd.close();
+                    if (ElementDefinitionActivity.newElements.isEmpty()) {
+                        id = id + 1;
+                    } else {
+                        id = ElementDefinitionActivity.newElements.get(ElementDefinitionActivity.newElements.size() - 1).getPixelGeom_id() + 1;
+                    }
+                    e.setElement_id(id);
                 }
 
                 ElementDefinitionActivity.newElements.add(e);
