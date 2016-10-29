@@ -26,7 +26,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     /*
      * NB : upgrading the version force the database to be deleted and recreated
      */
-    public static final int DATABASE_VERSION = 6;
+    public static final int DATABASE_VERSION = 7;
 
     /************************************************
      * Declaration of tables

@@ -88,7 +88,7 @@ public class ProjectOpenActivity extends AppCompatActivity implements MapEventsR
      * Map controller
      */
     private IMapController mapController;
-    
+
     /**
      * Création de l'activité
      *
