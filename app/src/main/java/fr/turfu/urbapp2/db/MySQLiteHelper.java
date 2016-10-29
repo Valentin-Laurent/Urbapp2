@@ -117,7 +117,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_PROJECTDESCRIPTION = "project_description";
     public static final String COLUMN_PROJECTVERSION = "project_version";
     public static final String COLUMN_PROJECTISAVAILABLE = "project_isavailable";
-    //PROJECTGPSGEOM refers to GPSGEOM
 
     //-------------------------- Table GpsGeom----------------------------
     public static final String COLUMN_GPSGEOMID = "gpsGeom_id";
@@ -135,7 +134,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_PHOTOPATH = "photo_path";
     public static final String COLUMN_PHOTOLASTMODIFICATION = "photo_last_modification";
     public static final String COLUMN_PHOTOPROJECTID = "project_id";
-    //PHOTOGPSGEOM refers to GPSGEOM
 
     //-------------------------- Table Material----------------------------
     public static final String COLUMN_MATERIALID = "material_id";

@@ -94,4 +94,8 @@
     <string name="instruct4"> Pour caractériser une zone, cliquez sur celle-ci puis appuyez sur le bouton "Caractériser une surface". Vous pourrez alors renseigner les champs proposés. </string>
     <string name="instruct5"> Le récapitulatif permet de voir quelles zones ont été renseignées et quelles zones ne le sont pas. </string>
 
+    <!-- Resources for photo localisation-->
+    <string name="photo_localisation_locked"> Le tracé délimite une zone fermée. vous ne pouvez plus ajouter de points. Pour modifier, annulez ou supprimez le tracé. </string>
+    <string name="erase"> Tout effacer</string>
+
 </resources>

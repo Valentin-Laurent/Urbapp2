@@ -26,6 +26,28 @@
             android:layout_marginLeft="20dp"
             android:background="@drawable/button_back" />
 
+        <Button
+            android:id="@+id/buttonErase"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="100dp"
+            android:background="@drawable/button_erase" />
+
+        <TextView
+            android:id="@+id/textViewErase"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:gravity="left|center_vertical"
+            android:text="@string/erase"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/ardoise1"
+            android:textSize="20dp" />
+
         <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/layout3"
@@ -127,29 +149,35 @@
             android:id="@+id/layoutContainer4"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        >
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
             <!-- CARTE -->
 
             <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/map"
+                android:id="@+id/mapContent"
                 android:layout_width="900dp"
                 android:layout_height="500dp"
-                android:layout_gravity="center_horizontal"
-                android:background="@color/grisFonce"
                 android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"></RelativeLayout>
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center_horizontal"
+                android:background="@color/grisFonce">
+
+                <org.osmdroid.views.MapView
+                    android:id="@+id/map"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+                
+            </RelativeLayout>
 
             <Button
                 android:id="@+id/buttonHelp"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
                 android:layout_gravity="bottom|right"
                 android:layout_marginBottom="20dp"
                 android:layout_marginRight="20dp"
-                android:background="@drawable/help"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true" />
+                android:background="@drawable/help" />
         </RelativeLayout>
     </LinearLayout>
 

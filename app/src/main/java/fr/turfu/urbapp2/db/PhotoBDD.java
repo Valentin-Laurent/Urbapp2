@@ -157,7 +157,7 @@ public class PhotoBDD {
      */
 
     public List<Photo> getPhotos(long id) {
-        Cursor cursor = bdd.query(MySQLiteHelper.TABLE_PHOTO, new String[]{MySQLiteHelper.COLUMN_PHOTOID, MySQLiteHelper.COLUMN_PHOTONAME, MySQLiteHelper.COLUMN_PHOTOPROJECTID, MySQLiteHelper.COLUMN_PHOTOAUTHOR, MySQLiteHelper.COLUMN_PHOTODESCRIPTION, MySQLiteHelper.COLUMN_PHOTOLASTMODIFICATION, MySQLiteHelper.COLUMN_PHOTOPATH}, "project_id" + " =" +id, null, null, null, null);
+        Cursor cursor = bdd.query(MySQLiteHelper.TABLE_PHOTO, new String[]{MySQLiteHelper.COLUMN_PHOTOID, MySQLiteHelper.COLUMN_PHOTONAME, MySQLiteHelper.COLUMN_PHOTOPROJECTID, MySQLiteHelper.COLUMN_PHOTOAUTHOR, MySQLiteHelper.COLUMN_PHOTODESCRIPTION, MySQLiteHelper.COLUMN_PHOTOLASTMODIFICATION, MySQLiteHelper.COLUMN_PHOTOPATH}, "project_id" + " =" + id, null, null, null, null);
         List<Photo> lp = new ArrayList<>();
 
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
@@ -167,6 +167,46 @@ public class PhotoBDD {
         cursor.close();
 
         return lp;
+    }
+
+    /**
+     * Mise à jour d'un gpsgeom
+     *
+     * @param g
+     */
+    public void updateGpsGeom(GpsGeom g) {
+        bdd.execSQL("UPDATE GpsGeom SET gpsGeom_thegeom='" + g.getGpsGeomCoord() + "' WHERE gpsGeom_id =" + g.getGpsGeomsId());
+    }
+
+
+    public GpsGeom getGpsGeomOfPhoto(long photoId) {
+        GpsGeom gps = new GpsGeom();
+
+        Cursor c = bdd.query(MySQLiteHelper.TABLE_PHOTO, new String[]{MySQLiteHelper.COLUMN_GPSGEOMID}, "photo_id" + " =" + photoId, null, null, null, null);
+        c.moveToFirst();
+        long id = c.getLong(0);
+
+        if (id != 0) {
+            //On récupère le GpsGeom
+            Cursor cursor = bdd.query(MySQLiteHelper.TABLE_GPSGEOM, new String[]{MySQLiteHelper.COLUMN_GPSGEOMCOORD, MySQLiteHelper.COLUMN_GPSGEOMID}, "gpsGeom_id" + " =" + id, null, null, null, null);
+            cursor.moveToFirst();
+            gps.setGpsGeomCoord(cursor.getString(0));
+            gps.setGpsGeomId(cursor.getLong(1));
+
+        } else {
+            //Insertion d'un nouveau gpsgeom
+            ContentValues values = new ContentValues();
+            values.put(MySQLiteHelper.COLUMN_GPSGEOMCOORD, "");
+            long gid = bdd.insert(MySQLiteHelper.TABLE_GPSGEOM, null, values);
+
+            //On récupère le nouveau gpsgeom
+            gps.setGpsGeomId(gid);
+
+            //On update la photo
+            bdd.execSQL("UPDATE Photo SET gpsGeom_id='" + gid + "' WHERE photo_id =" + photoId);
+        }
+
+        return gps;
     }
 
 }
