@@ -90,15 +90,15 @@
                 android:id="@+id/textViewNoPhoto"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignTop="@+id/listViewPhoto"
                 android:gravity="center_vertical|center_horizontal"
-                android:visibility="invisible"
                 android:text="@string/no_photo"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@color/ardoise1"
                 android:textStyle="italic"
-                android:layout_alignTop="@+id/listViewPhoto"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
+                android:visibility="invisible" />
 
             <ListView
                 android:id="@+id/listViewPhoto"
@@ -114,16 +114,12 @@
 
         </RelativeLayout>
 
-        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
+        <org.osmdroid.views.MapView
+            android:id="@+id/map"
             android:layout_width="0dip"
             android:layout_height="match_parent"
-            android:layout_weight=".60"
-            android:background="@color/grisFonce"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            android:layout_weight=".60" />
 
-        </RelativeLayout>
 
     </LinearLayout>
 

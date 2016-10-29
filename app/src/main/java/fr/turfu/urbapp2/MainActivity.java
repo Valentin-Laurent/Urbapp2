@@ -27,9 +27,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.MapEventsOverlay;
+import org.osmdroid.views.overlay.Polygon;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +43,7 @@ import fr.turfu.urbapp2.Tools.ConnexionCheck;
 
 //TODO Gérer le cycle d'activité de façon à ce qu'une seule activité Main puisse exister
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MapEventsReceiver {
 
     /**
      * Permet d'obtenir la position de l'utilisateur
@@ -82,7 +85,10 @@ public class MainActivity extends AppCompatActivity {
      */
     public static boolean internet = true;
 
-
+    /**
+     * Vue pour la carte
+     */
+    private MapView map;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Map
         org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants.setUserAgentValue(BuildConfig.APPLICATION_ID);
-        MapView map = (MapView) findViewById(R.id.map);
+        map = (MapView) findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
@@ -128,6 +134,10 @@ public class MainActivity extends AppCompatActivity {
 
         IMapController mapController = map.getController();
         mapController.setZoom(16);
+
+        MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, this);
+        map.getOverlays().add(0, mapEventsOverlay);
+
 
         //The following code is to get the location of the user
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -145,12 +155,12 @@ public class MainActivity extends AppCompatActivity {
         GeoPoint startPoint;
         if (lastLocation != null) {
             startPoint = new GeoPoint(lastLocation);
-
         } else {
             //These are the coordinate of the center of Nantes city
             startPoint = new GeoPoint(47.2172500, -1.5533600);
         }
         mapController.setCenter(startPoint);
+        drawPoint(startPoint);
     }
 
 
@@ -248,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
         //Ajouter les listeners
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(MainActivity.this, ProjectOpenActivity.class);
                 String name = (String) mListView.getItemAtPosition(position);
                 intent.putExtra("projectName", name);
@@ -257,7 +267,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //Si il n'y a pas de projets, affichage d'un message
-        if(lpn.size()==0) {
+        if (lpn.size() == 0) {
             TextView tv = (TextView) findViewById(R.id.textViewNoProject);
             tv.setVisibility(View.VISIBLE);
         }
@@ -291,5 +301,30 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.setTitle("");
         alertDialog.setView(R.layout.error_pop_up);
         alertDialog.show();
+    }
+
+    /**
+     * Tracé d'un point p
+     *
+     * @param p Point à tracer
+     */
+    public void drawPoint(GeoPoint p) {
+        Polygon circle = new Polygon(this);
+        circle.setPoints(Polygon.pointsAsCircle(p, 18));
+        circle.setFillColor(Color.YELLOW);
+        circle.setStrokeColor(Color.RED);
+        circle.setStrokeWidth(5);
+        map.getOverlays().add(circle);
+        map.invalidate();
+    }
+
+    @Override
+    public boolean singleTapConfirmedHelper(GeoPoint geoPoint) {
+        return false;
+    }
+
+    @Override
+    public boolean longPressHelper(GeoPoint geoPoint) {
+        return false;
     }
 }

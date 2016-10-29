@@ -12,14 +12,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="20dp"
         android:text="@string/project_creation_location_instruction"
         android:textColor="@color/ardoise2"
         android:textSize="20dp"
-        android:textStyle="bold"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginBottom="10dp" />
+        android:textStyle="bold" />
 
 
     <!-- carte avec la localisation du projet-->
@@ -28,9 +28,15 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="fill_parent"
         android:layout_height="250dp"
+        android:layout_margin="10dp"
         android:background="@color/grisFonce"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:layout_margin="10dp"></RelativeLayout>
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <org.osmdroid.views.MapView
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="fill_parent"

@@ -702,7 +702,7 @@ public class PhotoLocalisationActivity extends AppCompatActivity implements MapE
         ArrayList<GeoPoint> pts = new ArrayList<>();
 
         if (!oldpoints.isEmpty()) {
-            if (dist(oldpoints.get(0), points.get(0)) < dist(oldpoints.get(oldpoints.size() - 1), points.get(0))) {
+            if (!points.isEmpty()&&dist(oldpoints.get(0), points.get(0)) < dist(oldpoints.get(oldpoints.size() - 1), points.get(0))) {
                 for (int i = points.size() - 1; i >= 0; i--) {
                     pts.add(points.get(i));
                 }
@@ -746,7 +746,7 @@ public class PhotoLocalisationActivity extends AppCompatActivity implements MapE
                 thegeom = thegeom + p.getLatitude() + " " + p.getLongitude() + ", ";
             }
             //Fermeture
-            thegeom = thegeom.substring(0, thegeom.length() - 1);
+            thegeom = thegeom.substring(0, thegeom.length() - 2);
             thegeom = thegeom + ")";
 
         }

@@ -27,30 +27,30 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/grisClair"
-        android:orientation="horizontal"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:layout_marginTop="15dp"
+        android:background="@color/grisClair"
         android:descendantFocusability="beforeDescendants"
-        android:focusableInTouchMode="true">
+        android:focusableInTouchMode="true"
+        android:orientation="horizontal"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <TextView
             android:id="@+id/textViewName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
             android:text="@string/project_details_name"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/ardoise2"
-            android:layout_marginLeft="10dp" />
+            android:textColor="@color/ardoise2" />
 
         <EditText
             android:id="@+id/NameValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
             android:text="..."
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/ardoise2"
-            android:layout_marginLeft="10dp" />
+            android:textColor="@color/ardoise2" />
 
     </LinearLayout>
 
@@ -58,12 +58,12 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/grisClair"
-        android:orientation="horizontal"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:layout_marginTop="10dp"
+        android:background="@color/grisClair"
         android:descendantFocusability="beforeDescendants"
-        android:focusableInTouchMode="true">
+        android:focusableInTouchMode="true"
+        android:orientation="horizontal"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <TextView
             android:id="@+id/textViewDescr"
@@ -81,19 +81,24 @@
             android:layout_marginLeft="10dp"
             android:text="..."
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/ardoise2"
-             />
+            android:textColor="@color/ardoise2" />
 
     </LinearLayout>
 
-    <!--MAP-->
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="fill_parent"
         android:layout_height="400dp"
         android:layout_margin="10dp"
         android:background="@color/grisFonce"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"></RelativeLayout>
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <org.osmdroid.views.MapView
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="fill_parent"

@@ -1,9 +1,16 @@
 package fr.turfu.urbapp2;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -14,13 +21,28 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.osmdroid.api.IMapController;
+import org.osmdroid.events.MapEventsReceiver;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.MapEventsOverlay;
+import org.osmdroid.views.overlay.Polygon;
+
 import fr.turfu.urbapp2.DB.Project;
 import fr.turfu.urbapp2.DB.ProjectBDD;
 
 /**
  * Activité pour la création d'un nouveau projet
  */
-public class NewProjectActivity extends AppCompatActivity {
+public class NewProjectActivity extends AppCompatActivity implements MapEventsReceiver {
+
+    /**
+     * Vue pour la carte
+     */
+    private MapView map;
+
+    public static GeoPoint point=null;
 
     /**
      * Création de l'activité
@@ -62,15 +84,50 @@ public class NewProjectActivity extends AppCompatActivity {
                 EditText et2 = (EditText) findViewById(R.id.EditTextDescr);
                 String descr = et2.getText().toString();
 
-                if(control(name)) {
+                if (control(name)) {
                     save(name, descr);
-                    Intent intent = new Intent(NewProjectActivity.this, ProjectOpenActivity.class);
-                    intent.putExtra("projectName", name);
-                    startActivity(intent);
-                    finish();
+
                 }
             }
         });
+
+        // Map
+        org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants.setUserAgentValue(BuildConfig.APPLICATION_ID);
+        map = (MapView) findViewById(R.id.map);
+        map.setTileSource(TileSourceFactory.MAPNIK);
+        map.setBuiltInZoomControls(true);
+        map.setMultiTouchControls(true);
+        map.setMaxZoomLevel(19);
+
+        IMapController mapController = map.getController();
+        mapController.setZoom(16);
+
+        MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, this);
+        map.getOverlays().add(0, mapEventsOverlay);
+
+
+        //The following code is to get the location of the user
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        //Even of the following code is useless, it is necessary or Android Studio won't compile the code
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+        }
+        Location lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        GeoPoint startPoint;
+        if (lastLocation != null) {
+            startPoint = new GeoPoint(lastLocation);
+        } else {
+            //These are the coordinate of the center of Nantes city
+            startPoint = new GeoPoint(47.2172500, -1.5533600);
+        }
+        mapController.setCenter(startPoint);
+        drawPoint(startPoint);
     }
 
 
@@ -136,41 +193,45 @@ public class NewProjectActivity extends AppCompatActivity {
      * Sauvegarde d'un nouveau projet
      */
 
-    // TODO : prendre en compte la géolocalisation
     public void save(String name, String descr) {
 
-        ProjectBDD pbdd = new ProjectBDD(NewProjectActivity.this);
+        long gpsgeomId = saveLocalisation();
 
-        pbdd.open();
+        if (gpsgeomId > 0) {
+            ProjectBDD pbdd = new ProjectBDD(NewProjectActivity.this);
 
-        Project p = pbdd.getProjectByName(name);
-        long id = 0;
+            pbdd.open();
 
-        if (p == null) {
-            Project p1 = new Project(name, descr,1);
-            pbdd.insert(p1);
-            id = p1.getProjectId();
+            Project p = pbdd.getProjectByName(name);
+            long id = 0;
 
-            Intent intent = new Intent(NewProjectActivity.this, ProjectOpenActivity.class);
-            intent.putExtra("projectName", p1.getProjectName());
-            startActivity(intent);
-            finish();
+            if (p == null) {
+                Project p1 = new Project(name, descr, gpsgeomId);
+                pbdd.insert(p1);
 
+                Intent intent = new Intent(NewProjectActivity.this, ProjectOpenActivity.class);
+                intent.putExtra("projectName", p1.getProjectName());
+                startActivity(intent);
+                finish();
+
+            } else {
+                Toast.makeText(this, R.string.project_already_created, Toast.LENGTH_SHORT).show();
+            }
+            pbdd.close();
         } else {
-            id = p.getProjectId();
-            Toast.makeText(this, R.string.project_already_created, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.project_to_locate, Toast.LENGTH_SHORT).show();
         }
-        pbdd.close();
     }
 
 
     /**
      * Méthode pour verifier que les champs du formulaire sont bien remplis : project_name non vide et géolocalisation effectuée
+     *
      * @param n Project_name
      * @return Boolean
      */
     // TODO : Prendre en compte la géolocalisation
-    public boolean control(String n){
+    public boolean control(String n) {
         if (n.matches("")) {
             Toast.makeText(this, R.string.empty_project_name, Toast.LENGTH_SHORT).show();
             return false;
@@ -179,8 +240,43 @@ public class NewProjectActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Tracé d'un point p
+     *
+     * @param p Point à tracer
+     */
+    public void drawPoint(GeoPoint p) {
+        Polygon circle = new Polygon(this);
+        circle.setPoints(Polygon.pointsAsCircle(p, 18));
+        circle.setFillColor(Color.YELLOW);
+        circle.setStrokeColor(Color.RED);
+        circle.setStrokeWidth(5);
+        map.getOverlays().add(circle);
+        map.invalidate();
+    }
 
+    @Override
+    public boolean singleTapConfirmedHelper(GeoPoint geoPoint) {
+        return false;
+    }
 
+    @Override
+    public boolean longPressHelper(GeoPoint geoPoint) {
+        return false;
+    }
+
+    public long saveLocalisation() {
+        if(point==null){
+            return 0;
+        }else{
+        String thegeom = "POINT(" + point.getLatitude() + " " + point.getLongitude() + ")";
+        ProjectBDD pbdd = new ProjectBDD(this);
+        pbdd.open();
+        long id = pbdd.insertGpsgeom(thegeom);
+        pbdd.close();
+        return id;
+        }
+    }
 
 }
 

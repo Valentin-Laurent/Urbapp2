@@ -1,8 +1,16 @@
 package fr.turfu.urbapp2;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -10,13 +18,28 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.io.WKTReader;
+
+import org.osmdroid.api.IMapController;
+import org.osmdroid.events.MapEventsReceiver;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.MapEventsOverlay;
+import org.osmdroid.views.overlay.Polygon;
+
+import fr.turfu.urbapp2.DB.GpsGeom;
 import fr.turfu.urbapp2.DB.Project;
 import fr.turfu.urbapp2.DB.ProjectBDD;
 
 /**
  * Pop up dans laquelle sont récapitulées toutes les information d'un projet
  */
-public class PopUpDetails extends Dialog implements android.view.View.OnClickListener {
+public class PopUpDetails extends Dialog implements MapEventsReceiver, android.view.View.OnClickListener {
 
     /**
      * Activité dans laquelle on affiche la pop up
@@ -44,10 +67,19 @@ public class PopUpDetails extends Dialog implements android.view.View.OnClickLis
     private String descr;
 
     /**
+     * Localisation du projet
+     */
+    private GeoPoint point;
+    /**
      * Menu Item of the activity
      */
     private MenuItem mi;
 
+    /**
+     * Carte
+     */
+    private MapView map;
+    private IMapController mapController;
 
     /**
      * Constructeur
@@ -94,6 +126,59 @@ public class PopUpDetails extends Dialog implements android.view.View.OnClickLis
         yes.setOnClickListener(this);
         no.setOnClickListener(this);
 
+
+        //Carte
+        org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants.setUserAgentValue(BuildConfig.APPLICATION_ID);
+        map = (MapView) findViewById(R.id.map);
+        map.setTileSource(TileSourceFactory.MAPNIK);
+        map.setBuiltInZoomControls(true);
+        map.setMultiTouchControls(true);
+        map.setMaxZoomLevel(19);
+
+        mapController = map.getController();
+        mapController.setZoom(16);
+
+        //The following code is to get the location of the user
+        LocationManager locationManager = (LocationManager) c.getSystemService(Context.LOCATION_SERVICE);
+        //Even of the following code is useless, it is necessary or Android Studio won't compile the code
+        if (ActivityCompat.checkSelfPermission(c, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(c, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+        }
+        Location lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+
+        MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(c, this);
+        map.getOverlays().add(0, mapEventsOverlay);
+
+        //Initialisation de la localisation
+        ProjectBDD pbdd = new ProjectBDD(c);
+        pbdd.open();
+        GpsGeom gp = pbdd.getGpsGeom(pbdd.getProjectByName(name).getProjectId());
+
+        //On en extrait le polygone et ses sommets
+        GeometryFactory gf = new GeometryFactory();
+        WKTReader wktr = new WKTReader(gf);
+        String thegeom = gp.getGpsGeomCoord();
+        Log.v("GEO", thegeom);
+        thegeom = thegeom.substring(10, thegeom.length());
+        Geometry geom = null;
+        try {
+            geom = wktr.read(thegeom);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Coordinate[] coord = geom.getCoordinates();
+        point = new GeoPoint(coord[0].x, coord[0].y);
+        pbdd.close();
+
+        refresh();
+
     }
 
     /**
@@ -131,6 +216,10 @@ public class PopUpDetails extends Dialog implements android.view.View.OnClickLis
 
                 pbdd.update(p); //Mise à jour
 
+                //Mise à jour de la position gps
+                String thegeom = "POINT(" + point.getLatitude() + " " + point.getLongitude() + ")";
+                pbdd.updateGpsgeom(p.getGpsGeom_id(), thegeom);
+
                 pbdd.close(); // Fermeture de la base de données
 
                 //Mise à jour de l'affichage
@@ -149,4 +238,47 @@ public class PopUpDetails extends Dialog implements android.view.View.OnClickLis
     }
 
 
+    @Override
+    public boolean singleTapConfirmedHelper(GeoPoint geoPoint) {
+        return false;
+    }
+
+    @Override
+    public boolean longPressHelper(GeoPoint geoPoint) {
+        point = geoPoint;
+        clear();
+        refresh();
+        return false;
+    }
+
+    /**
+     * Tracé d'un point p
+     *
+     * @param p Point à tracer
+     */
+    public void drawPoint(GeoPoint p) {
+        Polygon circle = new Polygon(c);
+        circle.setPoints(Polygon.pointsAsCircle(p, 15));
+        circle.setFillColor(Color.RED);
+        circle.setStrokeColor(Color.RED);
+        circle.setStrokeWidth(3);
+        map.getOverlays().add(circle);
+        map.invalidate();
+    }
+
+    /**
+     * Suppression du point
+     */
+    public void clear() {
+        map.getOverlays().clear();
+        MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(c, this);
+        map.getOverlays().add(0, mapEventsOverlay);
+    }
+
+
+    public void refresh() {
+        drawPoint(point);
+        mapController.setCenter(point);
+        map.invalidate();
+    }
 }

@@ -1,13 +1,20 @@
 package fr.turfu.urbapp2;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -18,10 +25,25 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.io.WKTReader;
+
+import org.osmdroid.api.IMapController;
+import org.osmdroid.events.MapEventsReceiver;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.MapEventsOverlay;
+import org.osmdroid.views.overlay.Polygon;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import fr.turfu.urbapp2.DB.GpsGeom;
 import fr.turfu.urbapp2.DB.Photo;
 import fr.turfu.urbapp2.DB.PhotoBDD;
 import fr.turfu.urbapp2.DB.Project;
@@ -30,7 +52,7 @@ import fr.turfu.urbapp2.DB.ProjectBDD;
 /**
  * Activité qui permet de visualiser un projet ouvert
  */
-public class ProjectOpenActivity extends AppCompatActivity {
+public class ProjectOpenActivity extends AppCompatActivity implements MapEventsReceiver {
 
     /**
      * Bouton pour ajouter une nouvelle photo
@@ -57,6 +79,16 @@ public class ProjectOpenActivity extends AppCompatActivity {
      */
     private MenuItem mi;
 
+    /**
+     * Vue pour la carte
+     */
+    private MapView map;
+
+    /**
+     * Map controller
+     */
+    private IMapController mapController;
+    
     /**
      * Création de l'activité
      *
@@ -100,6 +132,37 @@ public class ProjectOpenActivity extends AppCompatActivity {
             }
         });
 
+
+        // Map
+        org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants.setUserAgentValue(BuildConfig.APPLICATION_ID);
+        map = (MapView) findViewById(R.id.map);
+        map.setTileSource(TileSourceFactory.MAPNIK);
+        map.setBuiltInZoomControls(true);
+        map.setMultiTouchControls(true);
+        map.setMaxZoomLevel(19);
+
+        mapController = map.getController();
+        mapController.setZoom(16);
+
+        //The following code is to get the location of the user
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        //Even of the following code is useless, it is necessary or Android Studio won't compile the code
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+        }
+        Location lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+
+        MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, this);
+        map.getOverlays().add(0, mapEventsOverlay);
+
+        drawZone();
     }
 
 
@@ -232,6 +295,13 @@ public class ProjectOpenActivity extends AppCompatActivity {
             tv.setVisibility(View.VISIBLE);
         }
 
+
+        /*On rafraîchit la localisation*/
+        map.getOverlays().clear();
+        MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, this);
+        map.getOverlays().add(0, mapEventsOverlay);
+        drawZone();
+
         super.onResume();
     }
 
@@ -281,10 +351,76 @@ public class ProjectOpenActivity extends AppCompatActivity {
         st.nextToken();
         String path = "";
         while (st.hasMoreTokens()) {
-            path = path +"-"+ st.nextToken();
+            path = path + "-" + st.nextToken();
         }
         path = path.substring(2, path.length());
         return path;
     }
+
+
+    /**
+     * Méthode pour tracer la zone du projet
+     */
+    public void drawZone() {
+        try {
+            //On récupère le GpsGeom du projet
+            ProjectBDD pbdd = new ProjectBDD(this);
+            pbdd.open();
+            GpsGeom gp = pbdd.getGpsGeom(project_id);
+            pbdd.close();
+
+            //On en extrait le polygone et ses sommets
+            GeometryFactory gf = new GeometryFactory();
+            WKTReader wktr = new WKTReader(gf);
+            String thegeom = gp.getGpsGeomCoord();
+            Log.v("GEO", thegeom);
+            thegeom = thegeom.substring(10, thegeom.length());
+            Geometry geom = wktr.read(thegeom);
+            Coordinate[] coord = geom.getCoordinates();
+            GeoPoint geo = new GeoPoint(coord[0].x, coord[0].y);
+            drawPoint(geo);
+            center(geo);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     * Tracé d'un point p
+     *
+     * @param p Point à tracer
+     */
+    public void drawPoint(GeoPoint p) {
+        Polygon circle = new Polygon(this);
+        circle.setPoints(Polygon.pointsAsCircle(p, 20));
+        circle.setFillColor(Color.RED);
+        circle.setStrokeColor(Color.RED);
+        circle.setStrokeWidth(3);
+        map.getOverlays().add(circle);
+        map.invalidate();
+    }
+
+
+    /**
+     * Méthode pour centrer la carte sur le point p
+     *
+     * @param p
+     */
+    public void center(GeoPoint p) {
+        mapController.setCenter(p);
+    }
+
+    @Override
+    public boolean singleTapConfirmedHelper(GeoPoint geoPoint) {
+        return false;
+    }
+
+    @Override
+    public boolean longPressHelper(GeoPoint geoPoint) {
+        return false;
+    }
+
 
 }

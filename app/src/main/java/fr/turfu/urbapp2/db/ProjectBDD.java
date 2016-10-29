@@ -158,5 +158,44 @@ public class ProjectBDD {
     }
 
 
+    /**
+     * Récupérer le gpsgeom d'un projet
+     *
+     * @param id
+     * @return
+     */
+    public GpsGeom getGpsGeom(long id) {
+        Project p = getProjectById(id);
+        long gpid = p.getGpsGeom_id();
 
+        Cursor cursor = bdd.query(MySQLiteHelper.TABLE_GPSGEOM, new String[]{MySQLiteHelper.COLUMN_GPSGEOMCOORD, MySQLiteHelper.COLUMN_GPSGEOMID}, "gpsGeom_id" + " =" + gpid, null, null, null, null);
+        cursor.moveToFirst();
+        GpsGeom gps = new GpsGeom();
+        gps.setGpsGeomCoord(cursor.getString(0));
+        gps.setGpsGeomId(cursor.getLong(1));
+
+        return gps;
+    }
+
+    /**
+     * Ajout d'un gpsGeom
+     *
+     * @param thegeom Géométrie à ajouter
+     * @return id du gpsgeom créé
+     */
+    public long insertGpsgeom(String thegeom) {
+        ContentValues values = new ContentValues();
+        values.put(MySQLiteHelper.COLUMN_GPSGEOMCOORD, thegeom);
+        return bdd.insert(MySQLiteHelper.TABLE_GPSGEOM, null, values);
+    }
+
+    /**
+     * Mise à jour d'un gpsgeom
+     *
+     * @param gpsid Id du gpsgeom
+     * @param geom  Nouvelle Géométrie
+     */
+    public void updateGpsgeom(long gpsid, String geom) {
+        bdd.execSQL("UPDATE GpsGeom SET gpsGeom_thegeom='" + geom + "' WHERE gpsGeom_id =" + gpsid);
+    }
 }

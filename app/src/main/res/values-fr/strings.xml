@@ -32,6 +32,7 @@
     <string name="project_creation_location_instruction">Localiser le projet</string>
     <string name="empty_project_name">Vous n\'avez pas entré le nom du projet</string>
     <string name="project_already_created">Ce nom de projet est déjà pris. Merci d\'en choisir un autre.</string>
+    <string name="project_to_locate"> Veuillez localiser votre projet.</string>
 
     <!-- Resources for project opened-->
     <string name="project">Projet : </string>
