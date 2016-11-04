@@ -15,6 +15,7 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,27 +29,25 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.ArrayList;
 
+import fr.turfu.urbapp2.DB.Data;
 import fr.turfu.urbapp2.DB.Element;
 import fr.turfu.urbapp2.DB.ElementBDD;
+import fr.turfu.urbapp2.DB.PhotoBDD;
 import fr.turfu.urbapp2.DB.PixelGeom;
 import fr.turfu.urbapp2.DB.Project;
 import fr.turfu.urbapp2.DB.ProjectBDD;
+import fr.turfu.urbapp2.Request.Request;
 import fr.turfu.urbapp2.Tools.DrawView;
 
 /**
  * Created by Laura on 10/10/2016.
  */
-public class ElementDefinitionActivity extends AppCompatActivity {
+public class ElementDefinitionActivity extends AppCompatActivity implements Sync {
 
     /**
      * Id du projet ouvert
      */
     private long project_id;
-
-    /**
-     * Id de la photo ouverte
-     */
-    private long photo_id;
 
     /**
      * Path de la photo ouverte
@@ -121,18 +120,23 @@ public class ElementDefinitionActivity extends AppCompatActivity {
         final Intent intent = getIntent();
         photo_path = intent.getStringExtra("photo_path"); // Project ID
         project_id = intent.getLongExtra("project_id", 0);
-        photo_id = intent.getLongExtra("photo_id", 0);
 
         //Initialisation
         actions = new ArrayList<>();
         newElements = new ArrayList<>();
         newPoints = new ArrayList<>();
         newPolygones = new ArrayList<>();
+
+        PhotoBDD pbdd = new PhotoBDD(ElementDefinitionActivity.this);
+        pbdd.open();
+        long photo_id = pbdd.getPhotoByPath(photo_path).getPhoto_id();
+        pbdd.close();
         ElementBDD ebdd = new ElementBDD(ElementDefinitionActivity.this);
         ebdd.open();
         elements = ebdd.getElement(photo_id);
         polygones = ebdd.getPixelGeom(elements);
         ebdd.close();
+
         context = ElementDefinitionActivity.this;
 
         //Photo
@@ -229,7 +233,7 @@ public class ElementDefinitionActivity extends AppCompatActivity {
                     Toast.makeText(ElementDefinitionActivity.this, R.string.one_zone, Toast.LENGTH_SHORT).show();
                 } else {
                     Intent intent = new Intent(ElementDefinitionActivity.this, ElementDefinitionPopUp.class);
-                    intent.putExtra("photo_id", photo_id);
+                    intent.putExtra("photo_path", photo_path);
                     intent.putExtra("pixelGeom_id", select.getPixelGeomId());
                     actions.add("ELEMENT");
                     startActivity(intent);
@@ -372,6 +376,10 @@ public class ElementDefinitionActivity extends AppCompatActivity {
             @Override
             public void onClick(View arg0) {
                 save();
+
+                //Export
+                Data d = Data.ToData(project_id, ElementDefinitionActivity.this);
+                Request.saveProject(ElementDefinitionActivity.this, d);
             }
         });
 
@@ -405,7 +413,6 @@ public class ElementDefinitionActivity extends AppCompatActivity {
                         v.cancelAll();
                         Intent i = new Intent(ElementDefinitionActivity.this, PhotoOpenActivity.class);
                         i.putExtra("photo_path", photo_path);
-                        i.putExtra("photo_id", photo_id);
                         i.putExtra("project_id", project_id);
                         startActivity(i);
                         finish();
@@ -419,9 +426,13 @@ public class ElementDefinitionActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         save();
+
+                        //Export
+                        Data d = Data.ToData(project_id, ElementDefinitionActivity.this);
+                        Request.saveProject(ElementDefinitionActivity.this, d);
+
                         Intent i = new Intent(ElementDefinitionActivity.this, PhotoOpenActivity.class);
                         i.putExtra("photo_path", photo_path);
-                        i.putExtra("photo_id", photo_id);
                         i.putExtra("project_id", project_id);
                         startActivity(i);
                         finish();
@@ -471,6 +482,10 @@ public class ElementDefinitionActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View w) {
                         v.cancelAll();
+
+                        //Fermeture du projet
+                        Request.close(ElementDefinitionActivity.this, project_id);
+
                         Intent i = new Intent(ElementDefinitionActivity.this, MainActivity.class);
                         startActivity(i);
                         finish();
@@ -484,6 +499,11 @@ public class ElementDefinitionActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         save();
+
+                        //Export
+                        Data d = Data.ToData(project_id, ElementDefinitionActivity.this);
+                        Request.closeProject(ElementDefinitionActivity.this, d);
+
                         Intent i = new Intent(ElementDefinitionActivity.this, MainActivity.class);
                         startActivity(i);
                         finish();
@@ -519,6 +539,10 @@ public class ElementDefinitionActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View w) {
                         v.cancelAll();
+
+                        //Fermeture du projet
+                        Request.close(ElementDefinitionActivity.this, project_id);
+
                         Intent i = new Intent(ElementDefinitionActivity.this, SettingsActivity.class);
                         startActivity(i);
                         finish();
@@ -532,6 +556,11 @@ public class ElementDefinitionActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         save();
+
+                        //Export
+                        Data d = Data.ToData(project_id, ElementDefinitionActivity.this);
+                        Request.closeProject(ElementDefinitionActivity.this, d);
+
                         Intent i = new Intent(ElementDefinitionActivity.this, SettingsActivity.class);
                         startActivity(i);
                         finish();
@@ -595,7 +624,7 @@ public class ElementDefinitionActivity extends AppCompatActivity {
      * Lancement de la pop up avec les détails du projet
      */
     public void popUpDetails(String name, String descr) {
-        PopUpDetails pud = new PopUpDetails(ElementDefinitionActivity.this, name, descr, mi);
+        PopUpDetails pud = new PopUpDetails(ElementDefinitionActivity.this, name, descr, mi, project_id);
         pud.show();
     }
 
@@ -617,6 +646,11 @@ public class ElementDefinitionActivity extends AppCompatActivity {
         ebdd.open();
 
         //On supprime les anciens éléments de la photo
+        PhotoBDD pbdd = new PhotoBDD(ElementDefinitionActivity.this);
+        pbdd.open();
+        long photo_id = pbdd.getPhotoByPath(photo_path).getPhoto_id();
+        pbdd.close();
+
         ebdd.deleteElement(photo_id);
 
         //On ajoute les nouveaux
@@ -644,4 +678,17 @@ public class ElementDefinitionActivity extends AppCompatActivity {
         Toast.makeText(ElementDefinitionActivity.this, R.string.saved, Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void updateView() {
+        PhotoBDD pbdd = new PhotoBDD(ElementDefinitionActivity.this);
+        pbdd.open();
+        long photo_id = pbdd.getPhotoByPath(photo_path).getPhoto_id();
+        pbdd.close();
+        ElementBDD ebdd = new ElementBDD(ElementDefinitionActivity.this);
+        ebdd.open();
+        elements = ebdd.getElement(photo_id);
+        Log.v("elemsize",elements.size()+"**"+photo_id);
+        polygones = ebdd.getPixelGeom(elements);
+        ebdd.close();
+    }
 }

@@ -1,7 +1,5 @@
 package fr.turfu.urbapp2.DB;
 
-import java.util.Vector;
-
 public class PixelGeom {
 
 
@@ -19,10 +17,7 @@ public class PixelGeom {
      */
     public boolean selected;
 
-    /**
-     * linked list of pixelGeom
-     */
-    private Vector<PixelGeom> linkedPixelGeom = new Vector<PixelGeom>();
+
 
     //Getters
 

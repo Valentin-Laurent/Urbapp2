@@ -1,3 +1,9 @@
+/**
+ * Activité NewPhotoPopUp
+ * ------------------------
+ * Activity in which users can choose between adding a photo from the gallery or taking a new photo with the camera
+ */
+
 package fr.turfu.urbapp2;
 
 import android.app.Activity;
@@ -23,12 +29,10 @@ import java.util.Date;
 
 import fr.turfu.urbapp2.DB.Photo;
 import fr.turfu.urbapp2.DB.PhotoBDD;
+import fr.turfu.urbapp2.DB.ProjectBDD;
+import fr.turfu.urbapp2.Request.Request;
 import fr.turfu.urbapp2.Tools.Utils;
 
-
-/**
- * Activity in which users can choose between adding a photo from the gallery or taking a new photo with the camera
- */
 public class NewPhotoPopUpActivity extends Activity {
 
     /**
@@ -63,6 +67,10 @@ public class NewPhotoPopUpActivity extends Activity {
      */
     private long project_id;
 
+
+    /**
+     * Constantes
+     */
     private static final int CAMERA_REQUEST = 0;
     private static final int GALLERY_REQUEST = 1;
 
@@ -121,7 +129,6 @@ public class NewPhotoPopUpActivity extends Activity {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(takePictureIntent, CAMERA_REQUEST);
     }
-
 
     /**
      * Méthode pour ouvrir la galerie
@@ -184,6 +191,9 @@ public class NewPhotoPopUpActivity extends Activity {
 
     }
 
+    /**
+     * Méthode pour enregistrer la photo et l'ajouter à la base de donnée locale
+     */
     public void savePhoto() {
         if (currentPhotoPath != null) {
             Intent i = new Intent(NewPhotoPopUpActivity.this, PhotoOpenActivity.class);
@@ -192,15 +202,24 @@ public class NewPhotoPopUpActivity extends Activity {
 
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(NewPhotoPopUpActivity.this);
             String aut = preferences.getString("user_preference", "");
-            Photo p = new Photo(currentPhotoPath, project_id, aut);
+
+            ProjectBDD prbdd = new ProjectBDD(NewPhotoPopUpActivity.this);
+            prbdd.open();
+            long gpsid = prbdd.getMaxGpsgeomId() + 1;
+            prbdd.insertGpsgeom("", gpsid);
+            prbdd.close();
 
             PhotoBDD pbdd = new PhotoBDD(NewPhotoPopUpActivity.this);
             pbdd.open();
+            long id = pbdd.getMaxPhotoId();
+            Photo p = new Photo(currentPhotoPath, project_id, aut, id + 1, gpsid);
             pbdd.insert(p);
-            Photo p1 = pbdd.getPhotoByPath(currentPhotoPath);
             pbdd.close();
 
-            i.putExtra("photo_id", p1.getPhoto_id());
+            //Export sur serveur
+            Request.upload(this,currentPhotoPath);
+
+            i.putExtra("photo_id", p.getPhoto_id());
             startActivity(i);
             finish();
         }

@@ -13,6 +13,7 @@
     <string name="user_summary">Changer d\'utilisateur</string>
     <string name="user_dialog">Veuillez entrer votre nom d\'utilisateur</string>
     <string name="validation">Valider</string>
+    <string name="augmented_reality">Réalité augmentée</string>
 
     <!-- Resources for Augmented Reality activity-->
     <string name="ar_add_image">Ajouter une image</string>
@@ -35,6 +36,7 @@
     <string name="project_to_locate"> Veuillez localiser votre projet.</string>
 
     <!-- Resources for project opened-->
+    <string name="project_not_available"> Ce projet est actuellement ouvert par un autre utilisateur. </string>
     <string name="project">Projet : </string>
     <string name="see_details">Voir détails</string>
     <string name="new_photo">Nouvelle photo</string>
@@ -58,6 +60,7 @@
     <string name="photo_adress"> Adresse</string>
     <string name="photo_localisation_instruction"> Localiser la photo </string>
     <string name="photo_edition_instruction"> Définir des zones sur la photo </string>
+
 
     <!-- Resources for save info pop up-->
     <string name="save"> Enregistrer </string>

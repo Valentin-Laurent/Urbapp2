@@ -32,31 +32,26 @@ public class Photo {
      * contains the last modification
      * set to 0 by default
      */
-
     private int photo_last_modification = 0;
-
 
     /**
      * contains the gpsgeom_id
      */
     private long gpsGeom_id;
 
-    //Getters
-    /**
-     * contains the localization
-     */
-    private String Ext_GpsGeomCoord;
-
-
     /**
      * Constructeur
      *
      * @param path chemin menant à la photo
      */
-    public Photo(String path, Long pid, String author) {
+    public Photo(String path, Long pid, String author, Long id, Long gpsid) {
         this.photo_path = path;
         this.photo_author = author;
         this.project_id = pid;
+        this.photo_name="";
+        this.photo_description="";
+        this.photo_id = id;
+        this.gpsGeom_id=gpsid;
     }
 
     /**
@@ -117,14 +112,6 @@ public class Photo {
     }
 
 
-    /**
-     * getter for localisation fo the photo
-     *
-     * @return
-     */
-    public String getExt_GpsGeomCoord() {
-        return Ext_GpsGeomCoord;
-    }
 
 
     /**
@@ -157,14 +144,7 @@ public class Photo {
 
     //Setters
 
-    /**
-     * setter for the localization of the photo
-     *
-     * @param ext_GpsGeomCoord
-     */
-    public void setExt_GpsGeomCoord(String ext_GpsGeomCoord) {
-        Ext_GpsGeomCoord = ext_GpsGeomCoord;
-    }
+
 
     /**
      * setter for the project id
@@ -236,7 +216,7 @@ public class Photo {
     public String toString() {
         return "Photo [photo_id=" + photo_id + ", photo_description="
                 + photo_description + ", photo_author=" + photo_author
-                + ", photo_name=" + photo_name + ", gps_Geom_id=" + gpsGeom_id + "&" + "  position =" + this.Ext_GpsGeomCoord
+                + ", photo_name=" + photo_name + ", gps_Geom_id=" + gpsGeom_id
                 + "]";
     }
 

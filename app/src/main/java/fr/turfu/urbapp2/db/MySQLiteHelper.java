@@ -26,7 +26,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     /*
      * NB : upgrading the version force the database to be deleted and recreated
      */
-    public static final int DATABASE_VERSION = 7;
+    public static final int DATABASE_VERSION = 9;
 
     /************************************************
      * Declaration of tables
@@ -138,9 +138,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     //-------------------------- Table Material----------------------------
     public static final String COLUMN_MATERIALID = "material_id";
     public static final String COLUMN_MATERIALNAME = "material_name";
-    public static final String COLUMN_MATERIALCONDUCT = "material_conduct";
-    public static final String COLUMN_MATERIALHEAT = "material_heat_capa";
-    public static final String COLUMN_MATERIALMASS = "material_mass_density";
 
     //-------------------------- Table Element----------------------------
     public static final String COLUMN_ELEMENTTYPEID = "elementType_id";
@@ -159,7 +156,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             DATABASE_CREATE =
             "create table "
                     + TABLE_GPSGEOM + " ("
-                    + COLUMN_GPSGEOMID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    + COLUMN_GPSGEOMID + " INTEGER PRIMARY KEY , "
                     + COLUMN_GPSGEOMCOORD + " text not null"
                     + "); ";
 
@@ -170,7 +167,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             DATABASE_CREATE2 =
             "create table "
                     + TABLE_PIXELGEOM + " ("
-                    + COLUMN_PIXELGEOMID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    + COLUMN_PIXELGEOMID + " INTEGER PRIMARY KEY , "
                     + COLUMN_PIXELGEOMCOORD + " text not null"
                     + "); ";
 
@@ -196,7 +193,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             DATABASE_CREATE4 =
             "create table "
                     + TABLE_PHOTO + " ("
-                    + COLUMN_PHOTOID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    + COLUMN_PHOTOID + " INTEGER PRIMARY KEY , "
                     + COLUMN_PHOTODESCRIPTION + " text , "
                     + COLUMN_PHOTOAUTHOR + " text not null, "
                     + COLUMN_PHOTONAME + " text , "
@@ -214,11 +211,9 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             DATABASE_CREATE5 =
             "create table "
                     + TABLE_MATERIAL + " ("
-                    + COLUMN_MATERIALID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                    + COLUMN_MATERIALNAME + " text not null, "
-                    + COLUMN_MATERIALCONDUCT + "DOUBLE PRECISION,"
-                    + COLUMN_MATERIALHEAT + "INTEGER,"
-                    + COLUMN_MATERIALMASS + "INTEGER"
+                    + COLUMN_MATERIALID + " INTEGER PRIMARY KEY , "
+                    + COLUMN_MATERIALNAME + " text not null "
+
                     + ");";
     /**
      * query to create table ELEMENTTYPE
@@ -227,7 +222,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             DATABASE_CREATE6 =
             "create table "
                     + TABLE_ELEMENTTYPE + " ("
-                    + COLUMN_ELEMENTTYPEID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    + COLUMN_ELEMENTTYPEID + " INTEGER PRIMARY KEY , "
                     + COLUMN_ELEMENTTYPENAME + " text not null "
                     + ");";
 
@@ -238,7 +233,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             DATABASE_CREATE8 =
             "create table "
                     + TABLE_ELEMENT + " ("
-                    + COLUMN_ELEMENTID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    + COLUMN_ELEMENTID + " INTEGER PRIMARY KEY , "
                     + COLUMN_PHOTOID + " INTEGER, "
                     + COLUMN_MATERIALID + " INTEGER, "
                     + COLUMN_GPSGEOMID + " INTEGER, "

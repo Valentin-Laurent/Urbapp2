@@ -1,3 +1,10 @@
+/**
+ * Classe ProjectBDD
+ * -------------------------------------------------------------------------------------
+ * Classe qui permet de manipuler les projets enregistrés dans la base de données locale
+ */
+
+
 package fr.turfu.urbapp2.DB;
 
 import android.content.ContentValues;
@@ -7,10 +14,6 @@ import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
-
-/**
- * Classe qui permet de manipuler les projets enregistrés dans la base de données locale
- */
 
 public class ProjectBDD {
 
@@ -116,8 +119,36 @@ public class ProjectBDD {
      */
     public long insert(Project p) {
 
+        Cursor c = bdd.rawQuery("SELECT MAX(project_id) FROM Project", new String[]{});
+        if (c.getCount() != 0) {
+            c.moveToFirst();
+            p.setProjectId(c.getLong(0) + 1);
+        } else {
+            p.setProjectId(1);
+        }
+
+        ContentValues values = new ContentValues();
+        values.put(MySQLiteHelper.COLUMN_PROJECTID, p.getProjectId());
+        values.put(MySQLiteHelper.COLUMN_PROJECTNAME, p.getProjectName());
+        values.put(MySQLiteHelper.COLUMN_PROJECTVERSION, p.getVersion());
+        values.put(MySQLiteHelper.COLUMN_PROJECTDESCRIPTION, p.getProjectDescription());
+        values.put(MySQLiteHelper.COLUMN_GPSGEOMID, p.getGpsGeom_id());
+        values.put(MySQLiteHelper.COLUMN_PROJECTISAVAILABLE, p.getIsAvailable());
+        return bdd.insert(MySQLiteHelper.TABLE_PROJECT, null, values);
+    }
+
+
+    /**
+     * Ajout d'un projet p à la base de données
+     *
+     * @param p Project
+     * @return id du projet
+     */
+    public long insertwithId(Project p) {
+
         ContentValues values = new ContentValues();
 
+        values.put(MySQLiteHelper.COLUMN_PROJECTID, p.getProjectId());
         values.put(MySQLiteHelper.COLUMN_PROJECTNAME, p.getProjectName());
         values.put(MySQLiteHelper.COLUMN_PROJECTVERSION, p.getVersion());
         values.put(MySQLiteHelper.COLUMN_PROJECTDESCRIPTION, p.getProjectDescription());
@@ -146,6 +177,7 @@ public class ProjectBDD {
 
         return lp;
     }
+
 
     /**
      * Mise à jour d'un projet
@@ -183,8 +215,10 @@ public class ProjectBDD {
      * @param thegeom Géométrie à ajouter
      * @return id du gpsgeom créé
      */
-    public long insertGpsgeom(String thegeom) {
+    public long insertGpsgeom(String thegeom, long id) {
+
         ContentValues values = new ContentValues();
+        values.put(MySQLiteHelper.COLUMN_GPSGEOMID, id);
         values.put(MySQLiteHelper.COLUMN_GPSGEOMCOORD, thegeom);
         return bdd.insert(MySQLiteHelper.TABLE_GPSGEOM, null, values);
     }
@@ -197,5 +231,70 @@ public class ProjectBDD {
      */
     public void updateGpsgeom(long gpsid, String geom) {
         bdd.execSQL("UPDATE GpsGeom SET gpsGeom_thegeom='" + geom + "' WHERE gpsGeom_id =" + gpsid);
+    }
+
+    /**
+     * Insertion d'un gpsgeom
+     *
+     * @param gps
+     * @return
+     */
+    public long insertGpsGeom(GpsGeom gps) {
+        if (getGpsGeomById(gps.getGpsGeomsId()) == null) {
+            ContentValues values = new ContentValues();
+
+            values.put(MySQLiteHelper.COLUMN_GPSGEOMID, gps.getGpsGeomsId());
+            values.put(MySQLiteHelper.COLUMN_GPSGEOMCOORD, gps.getGpsGeomCoord());
+            return bdd.insert(MySQLiteHelper.TABLE_GPSGEOM, null, values);
+        } else {
+            return gps.getGpsGeomsId();
+        }
+    }
+
+    /**
+     * Méthode pour vider entièrement la base de données locale (utilisée avant synchronisation)
+     */
+    public void cleanDataBase() {
+        bdd.execSQL("DELETE FROM GpsGeom");
+        bdd.execSQL("DELETE FROM PixelGeom");
+        bdd.execSQL("DELETE FROM Element");
+        bdd.execSQL("DELETE FROM Photo");
+        bdd.execSQL("DELETE FROM Project");
+    }
+
+    /**
+     * Obtenir un gpsgeom avec son id
+     *
+     * @param id id du gpsgeom
+     * @return Gpsgeom
+     */
+    public GpsGeom getGpsGeomById(long id) {
+        GpsGeom gps = null;
+
+        Cursor cursor = bdd.query(MySQLiteHelper.TABLE_GPSGEOM, new String[]{MySQLiteHelper.COLUMN_GPSGEOMCOORD, MySQLiteHelper.COLUMN_GPSGEOMID}, "gpsGeom_id" + " =" + id, null, null, null, null);
+
+        if (cursor.getCount() != 0) {
+            cursor.moveToFirst();
+            gps = new GpsGeom();
+            gps.setGpsGeomCoord(cursor.getString(0));
+            gps.setGpsGeomId(cursor.getLong(1));
+        }
+
+        return gps;
+    }
+
+    /**
+     * Récupérer le max des id des gpsgeom
+     *
+     * @return id max
+     */
+    public long getMaxGpsgeomId() {
+        Cursor c = bdd.rawQuery("SELECT MAX(gpsGeom_id) FROM GpsGeom", new String[]{});
+        if (c.getCount() != 0) {
+            c.moveToFirst();
+            return c.getLong(0);
+        } else {
+            return 0;
+        }
     }
 }

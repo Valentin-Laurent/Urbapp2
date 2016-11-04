@@ -1,3 +1,10 @@
+/**
+ * Dialogue CustomPopUp
+ * -------------------------------------------------------------------
+ * PopUp comprenant un titre, une carte et deux boutons (ok et cancel).
+ * Elle est destinée à la géolocalisation d'un projet et sera affichée dans l'activité NewProjectActivity
+ */
+
 package fr.turfu.urbapp2;
 
 import android.Manifest;
@@ -22,11 +29,6 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Polygon;
 
-/**
- * Class CustomPopUp
- * PopUp comprenant un titre, une carte et deux boutons (ok et cancel).
- * Elle est destinée à la géolocalisation d'un projet et sera affichée dans l'activité NewProjectActivity
- */
 public class CustomPopUp extends Dialog implements
         MapEventsReceiver, android.view.View.OnClickListener {
 
@@ -41,10 +43,13 @@ public class CustomPopUp extends Dialog implements
     public Dialog d;
 
     /**
-     * Boutons ok et cancel
+     * Boutons save et cancel
      */
     public Button yes, no;
 
+    /**
+     * Carte
+     */
     private MapView map;
     private GeoPoint point;
 
@@ -165,7 +170,9 @@ public class CustomPopUp extends Dialog implements
         map.getOverlays().add(0, mapEventsOverlay);
     }
 
-
+    /**
+     * Tracé du point
+     */
     public void refresh() {
         drawPoint(point);
         map.invalidate();

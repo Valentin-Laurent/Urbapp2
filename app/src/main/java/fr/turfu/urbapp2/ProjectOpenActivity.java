@@ -1,3 +1,9 @@
+/**
+ * Activité ProjectOpen
+ * ----------------------------------------------------
+ * Activité qui permet de visualiser un projet ouvert
+ */
+
 package fr.turfu.urbapp2;
 
 import android.Manifest;
@@ -14,7 +20,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -43,16 +48,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import fr.turfu.urbapp2.DB.Data;
 import fr.turfu.urbapp2.DB.GpsGeom;
 import fr.turfu.urbapp2.DB.Photo;
 import fr.turfu.urbapp2.DB.PhotoBDD;
 import fr.turfu.urbapp2.DB.Project;
 import fr.turfu.urbapp2.DB.ProjectBDD;
+import fr.turfu.urbapp2.Request.Request;
 
-/**
- * Activité qui permet de visualiser un projet ouvert
- */
-public class ProjectOpenActivity extends AppCompatActivity implements MapEventsReceiver {
+public class ProjectOpenActivity extends AppCompatActivity implements MapEventsReceiver, Sync {
 
     /**
      * Bouton pour ajouter une nouvelle photo
@@ -72,7 +76,7 @@ public class ProjectOpenActivity extends AppCompatActivity implements MapEventsR
     /**
      * Projet
      */
-    private Long project_id;
+    private long project_id;
 
     /**
      * Menu item pour le nom du projet
@@ -88,6 +92,7 @@ public class ProjectOpenActivity extends AppCompatActivity implements MapEventsR
      * Map controller
      */
     private IMapController mapController;
+
 
     /**
      * Création de l'activité
@@ -107,17 +112,227 @@ public class ProjectOpenActivity extends AppCompatActivity implements MapEventsR
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         mainToolbar.setTitle("");
         mainToolbar.setSubtitle("");
+        Menu menu = mainToolbar.getMenu();
 
-        //Nom du projet
-        final Intent intent = getIntent();
-        String name = intent.getStringExtra("projectName");
+        //On sérialise le fichier menu.xml pour l'afficher dans la barre de menu
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
 
-        //Id du projet
-        ProjectBDD pbdd = new ProjectBDD(ProjectOpenActivity.this); //Instanciation de ProjectBdd pour manipuler les projets de la base de données
+        //projet
+        Intent intent = getIntent();
+        project_id = intent.getLongExtra("project_id", 0);
+    }
+
+
+    /**
+     * Method to inflate the xml menu file (Ajout des différents onglets dans la toolbar)
+     *
+     * @param menu the menu
+     * @return true if everything went good
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+
+        //On sérialise le fichier menu.xml pour l'afficher dans la barre de menu
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+
+        //Display Username
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String u = preferences.getString("user_preference", "");
+        MenuItem i = menu.findItem(R.id.connectedAs);
+        i.setTitle(u);
+
+        //Affichage du bouton pour voir les détails du projet
+        MenuItem i2 = menu.findItem(R.id.seeDetails);
+        i2.setVisible(true);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    /**
+     * Method to handle the clicks on the items of the toolbar
+     *
+     * @param item the item
+     * @return true if everything went good
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
+        switch (item.getItemId()) {
+            case R.id.home:
+                //Fermeture du projet
+                Data d = Data.ToData(project_id, ProjectOpenActivity.this);
+                Request.closeProject(ProjectOpenActivity.this, d);
+
+                intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
+                finish();
+                return true;
+
+            case R.id.settings:
+                //Fermeture du projet
+                Data d1 = Data.ToData(project_id, ProjectOpenActivity.this);
+                Request.closeProject(ProjectOpenActivity.this, d1);
+
+                intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                finish();
+                return true;
+
+            case R.id.seeDetails:
+                ProjectBDD pbdd = new ProjectBDD(ProjectOpenActivity.this);
+                pbdd.open();
+                Project projet = pbdd.getProjectById(project_id);
+                pbdd.close();
+                popUpDetails(projet.getProjectName(), projet.getProjectDescription());
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+    }
+
+    @Override
+    protected void onResume() {
+        //Ouverture du projet : on récupère les données du serveur
+        Request.openProject(this, project_id);
+        super.onResume();
+    }
+
+    @Override
+    public void updateView() {
+        loadData();
+    }
+
+    @Override
+    public boolean singleTapConfirmedHelper(GeoPoint geoPoint) {
+        return false;
+    }
+
+    @Override
+    public boolean longPressHelper(GeoPoint geoPoint) {
+        return false;
+    }
+
+    /**
+     * Lancement de la pop up avec les détails du projet
+     */
+    public void popUpDetails(String name, String descr) {
+        PopUpDetails pud = new PopUpDetails(ProjectOpenActivity.this, name, descr, mi, project_id);
+        pud.show();
+    }
+
+
+    /**
+     * Lister les photos du projet
+     *
+     * @return Liste des photos du projet
+     */
+    public List<Photo> getPhoto() {
+        PhotoBDD pbdd = new PhotoBDD(ProjectOpenActivity.this); //Instanciation de PhotoBdd pour manipuler les photos de la base de données
         pbdd.open(); //Ouverture de la base de données
-        Project p = pbdd.getProjectByName(name); // Récupération du projet
+        List<Photo> lp = pbdd.getPhotos(project_id);
         pbdd.close(); // Fermeture de la base de données
-        project_id = p.getProjectId();
+        return lp;
+    }
+
+    /**
+     * Obtention du path d'une photo à partir de son titre. Le titre est composé de la manière suivante : nom de  la photo - path de la photo
+     *
+     * @param t Titre
+     * @return Path
+     */
+    public static String getPathFromTitle(String t) {
+        StringTokenizer st = new StringTokenizer(t, "-");
+        st.nextToken();
+        String path = "";
+        while (st.hasMoreTokens()) {
+            path = path + "-" + st.nextToken();
+        }
+        path = path.substring(2, path.length());
+        return path;
+    }
+
+    /**
+     * Méthode pour tracer la position gps du projet
+     */
+    public void drawZone() {
+        try {
+            //On récupère le GpsGeom du projet
+            ProjectBDD pbdd = new ProjectBDD(this);
+            pbdd.open();
+            Project projet = pbdd.getProjectById(project_id);
+            GpsGeom gp = pbdd.getGpsGeomById(projet.getGpsGeom_id());
+
+            //On en extrait le point
+            GeometryFactory gf = new GeometryFactory();
+            WKTReader wktr = new WKTReader(gf);
+            String thegeom = gp.getGpsGeomCoord();
+            while (thegeom.charAt(0) == 's') {
+                thegeom = thegeom.substring(10, thegeom.length());
+            }
+            pbdd.updateGpsgeom(gp.getGpsGeomsId(), thegeom);
+            pbdd.close();
+            Geometry geom = wktr.read(thegeom);
+            Coordinate[] coord = geom.getCoordinates();
+            GeoPoint geo = new GeoPoint(coord[0].x, coord[0].y);
+
+            //On le trace
+            drawPoint(geo);
+            //On centre la carte
+            center(geo);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     * Tracé d'un point p
+     *
+     * @param p Point à tracer
+     */
+    public void drawPoint(GeoPoint p) {
+        Polygon circle = new Polygon(this);
+        circle.setPoints(Polygon.pointsAsCircle(p, 20));
+        circle.setFillColor(Color.RED);
+        circle.setStrokeColor(Color.RED);
+        circle.setStrokeWidth(3);
+        map.getOverlays().add(circle);
+        map.invalidate();
+    }
+
+    /**
+     * Méthode pour centrer la carte sur le point p
+     *
+     * @param p
+     */
+    public void center(GeoPoint p) {
+        mapController.setCenter(p);
+    }
+
+    /**
+     * Chargement des données du projet une fois qu'elles ont été récupérées du serveur
+     */
+    public void loadData() {
+
+        //Display ProjectName
+        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        Menu menu = toolbar.getMenu();
+        MenuItem i1 = menu.findItem(R.id.projectTitle);
+        i1.setVisible(true);
+        Resources res = getResources();
+        String s = res.getString(R.string.project);
+        ProjectBDD pbdd = new ProjectBDD(ProjectOpenActivity.this);
+        pbdd.open();
+        String name = pbdd.getProjectById(project_id).getProjectName();
+        pbdd.close();
+        i1.setTitle(s + " " + name);
+        mi = i1;
 
         // Button new photo
         b1 = (Button) findViewById(R.id.buttonNewPhoto);
@@ -132,8 +347,8 @@ public class ProjectOpenActivity extends AppCompatActivity implements MapEventsR
             }
         });
 
+        // MAP
 
-        // Map
         org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants.setUserAgentValue(BuildConfig.APPLICATION_ID);
         map = (MapView) findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
@@ -158,89 +373,11 @@ public class ProjectOpenActivity extends AppCompatActivity implements MapEventsR
         }
         Location lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-
         MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, this);
         map.getOverlays().add(0, mapEventsOverlay);
-
         drawZone();
-    }
 
-
-    /**
-     * Method to inflate the xml menu file (Ajout des différents onglets dans la toolbar)
-     *
-     * @param menu the menu
-     * @return true if everything went good
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-
-        //On sérialise le fichier menu.xml pour l'afficher dans la barre de menu
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
-
-        //Display Username
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String u = preferences.getString("user_preference", "");
-        MenuItem i = menu.findItem(R.id.connectedAs);
-        i.setTitle(u);
-
-        //Display ProjectName
-        MenuItem i1 = menu.findItem(R.id.projectTitle);
-        i1.setVisible(true);
-        Resources res = getResources();
-        String s = res.getString(R.string.project);
-        Project p = getProject();
-        i1.setTitle(s + " " + p.getProjectName());
-        mi = i1;
-
-        //Affichage du bouton pour voir les détails du projet
-        MenuItem i2 = menu.findItem(R.id.seeDetails);
-        i2.setVisible(true);
-
-        return super.onCreateOptionsMenu(menu);
-    }
-
-
-    /**
-     * Method to handle the clicks on the items of the toolbar
-     *
-     * @param item the item
-     * @return true if everything went good
-     */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent;
-        switch (item.getItemId()) {
-            case R.id.home:
-                intent = new Intent(this, MainActivity.class);
-                startActivity(intent);
-                finish();
-                return true;
-
-            case R.id.settings:
-                intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
-                finish();
-                return true;
-
-            case R.id.seeDetails:
-                Project p = getProject();
-                popUpDetails(p.getProjectName(), p.getProjectDescription());
-                return true;
-
-            default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
-                return super.onOptionsItemSelected(item);
-        }
-
-    }
-
-
-    @Override
-    protected void onResume() {
+        // LISTE DES PHOTOS
 
         /* Lister les photos*/
         List<Photo> lp = getPhoto();
@@ -282,145 +419,16 @@ public class ProjectOpenActivity extends AppCompatActivity implements MapEventsR
 
                 intent.putExtra("project_id", project_id);
                 intent.putExtra("photo_path", p.getPhoto_path());
-                intent.putExtra("photo_id", p.getPhoto_id());
                 startActivity(intent);
                 finish();
             }
         });
-
 
         //Si il n'y a pas de photo, affichage d'un message
         if (lpn.size() == 0) {
             TextView tv = (TextView) findViewById(R.id.textViewNoPhoto);
             tv.setVisibility(View.VISIBLE);
         }
-
-
-        /*On rafraîchit la localisation*/
-        map.getOverlays().clear();
-        MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, this);
-        map.getOverlays().add(0, mapEventsOverlay);
-        drawZone();
-
-        super.onResume();
     }
-
-    /**
-     * Lancement de la pop up avec les détails du projet
-     */
-    public void popUpDetails(String name, String descr) {
-        PopUpDetails pud = new PopUpDetails(ProjectOpenActivity.this, name, descr, mi);
-        pud.show();
-    }
-
-
-    /**
-     * Obtenir le projet ouvert
-     *
-     * @return Projet ouvert
-     */
-    public Project getProject() {
-        ProjectBDD pbdd = new ProjectBDD(ProjectOpenActivity.this); //Instanciation de ProjectBdd pour manipuler les projets de la base de données
-        pbdd.open(); //Ouverture de la base de données
-        Project p = pbdd.getProjectById(project_id); // Récupération du projet
-        pbdd.close(); // Fermeture de la base de données
-        return p;
-    }
-
-    /**
-     * Lister les photos du projet
-     *
-     * @return Liste des photos du projet
-     */
-    public List<Photo> getPhoto() {
-        PhotoBDD pbdd = new PhotoBDD(ProjectOpenActivity.this); //Instanciation de ProjectBdd pour manipuler les projets de la base de données
-        pbdd.open(); //Ouverture de la base de données
-        List<Photo> lp = pbdd.getPhotos(project_id);
-        pbdd.close(); // Fermeture de la base de données
-        return lp;
-    }
-
-    /**
-     * Obtention du path d'une photo à partir de son titre. Le titre est composé de la manière suivante : nom de  la photo - path de la photo
-     *
-     * @param t Titre
-     * @return Path
-     */
-    public static String getPathFromTitle(String t) {
-        StringTokenizer st = new StringTokenizer(t, "-");
-        st.nextToken();
-        String path = "";
-        while (st.hasMoreTokens()) {
-            path = path + "-" + st.nextToken();
-        }
-        path = path.substring(2, path.length());
-        return path;
-    }
-
-
-    /**
-     * Méthode pour tracer la zone du projet
-     */
-    public void drawZone() {
-        try {
-            //On récupère le GpsGeom du projet
-            ProjectBDD pbdd = new ProjectBDD(this);
-            pbdd.open();
-            GpsGeom gp = pbdd.getGpsGeom(project_id);
-            pbdd.close();
-
-            //On en extrait le polygone et ses sommets
-            GeometryFactory gf = new GeometryFactory();
-            WKTReader wktr = new WKTReader(gf);
-            String thegeom = gp.getGpsGeomCoord();
-            Log.v("GEO", thegeom);
-            thegeom = thegeom.substring(10, thegeom.length());
-            Geometry geom = wktr.read(thegeom);
-            Coordinate[] coord = geom.getCoordinates();
-            GeoPoint geo = new GeoPoint(coord[0].x, coord[0].y);
-            drawPoint(geo);
-            center(geo);
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    /**
-     * Tracé d'un point p
-     *
-     * @param p Point à tracer
-     */
-    public void drawPoint(GeoPoint p) {
-        Polygon circle = new Polygon(this);
-        circle.setPoints(Polygon.pointsAsCircle(p, 20));
-        circle.setFillColor(Color.RED);
-        circle.setStrokeColor(Color.RED);
-        circle.setStrokeWidth(3);
-        map.getOverlays().add(circle);
-        map.invalidate();
-    }
-
-
-    /**
-     * Méthode pour centrer la carte sur le point p
-     *
-     * @param p
-     */
-    public void center(GeoPoint p) {
-        mapController.setCenter(p);
-    }
-
-    @Override
-    public boolean singleTapConfirmedHelper(GeoPoint geoPoint) {
-        return false;
-    }
-
-    @Override
-    public boolean longPressHelper(GeoPoint geoPoint) {
-        return false;
-    }
-
 
 }

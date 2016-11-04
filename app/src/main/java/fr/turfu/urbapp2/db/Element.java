@@ -1,7 +1,5 @@
 package fr.turfu.urbapp2.DB;
 
-import java.util.Vector;
-
 //TODO WTF import src.com.ecn.urbapp.syncToExt.Sync;
 
 public class Element  {
@@ -32,10 +30,7 @@ public class Element  {
      * element_color of the element
      */
     private String element_color;
-    /**
-     * List of the Elements linked to <code>this</code> Element
-     */
-    private Vector<Element> linkedElement = new Vector<Element>();
+
     /**
      * True if <code>this</code> Element is selected
      */
@@ -99,14 +94,7 @@ public class Element  {
         return element_color;
     }
 
-    /**
-     * getter for the list of the Elements linked to <code>this</code> Element
-     *
-     * @return the list of the Elements linked to <code>this</code> Element
-     */
-    public Vector<Element> getLinkedElement() {
-        return linkedElement;
-    }
+
 
     /**
      * Return whether <code>this</code> Element is selected or not
@@ -175,14 +163,7 @@ public class Element  {
         this.element_color = element_color;
     }
 
-    /**
-     * setter for the list of the Elements linked to <code>this</code> Element
-     *
-     * @param selectedElement list of the Elements linked to <code>this</code> Element
-     */
-    public void setLinkedElement(Vector<Element> selectedElement) {
-        linkedElement = selectedElement;
-    }
+
 
     /**
      * set whether <code>this</code> Element is selected or not

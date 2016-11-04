@@ -1,3 +1,8 @@
+/**
+ * Activité PhotoOpen
+ * ----------------------------------
+ * Activité pour visualiser une photo et ses informations
+ */
 package fr.turfu.urbapp2;
 
 import android.content.Intent;
@@ -21,25 +26,19 @@ import android.widget.Toast;
 
 import java.io.File;
 
+import fr.turfu.urbapp2.DB.Data;
 import fr.turfu.urbapp2.DB.Photo;
 import fr.turfu.urbapp2.DB.PhotoBDD;
 import fr.turfu.urbapp2.DB.Project;
 import fr.turfu.urbapp2.DB.ProjectBDD;
+import fr.turfu.urbapp2.Request.Request;
 
-/**
- * Created by Laura on 10/10/2016.
- */
-public class PhotoOpenActivity extends AppCompatActivity {
+public class PhotoOpenActivity extends AppCompatActivity implements Sync {
 
     /**
      * Id du projet ouvert
      */
     private long project_id;
-
-    /**
-     * Id de la photo ouverte
-     */
-    private long photo_id;
 
     /**
      * Path de la photo ouverte
@@ -76,11 +75,8 @@ public class PhotoOpenActivity extends AppCompatActivity {
         Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
         i.setImageBitmap(myBitmap);
 
-        // Project ID
+        // Project
         project_id = intent.getLongExtra("project_id", 0);
-
-        //Photo ID
-        photo_id = intent.getLongExtra("photo_id", 0);
 
         //Mise en place de la toolbar
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
@@ -96,7 +92,6 @@ public class PhotoOpenActivity extends AppCompatActivity {
             public void onClick(View arg0) {
                 Intent i = new Intent(PhotoOpenActivity.this, SavePhotoInfosPopUpActivity.class);
                 i.putExtra("project_id", project_id);
-                i.putExtra("photo_id", photo_id);
                 i.putExtra("photo_path", photo_path);
                 i.putExtra("redirect", "PROJECT_OPEN");
 
@@ -125,21 +120,18 @@ public class PhotoOpenActivity extends AppCompatActivity {
                 EditText et2 = (EditText) findViewById(R.id.EditTextDescrPhoto);
                 String newDescr = et2.getText().toString();
 
-                //Sauvegarde
-                PhotoBDD pbdd = new PhotoBDD(PhotoOpenActivity.this); //Instanciation de ProjectBdd pour manipuler les projets de la base de données
+                //Sauvegarde en local
+                PhotoBDD pbdd = new PhotoBDD(PhotoOpenActivity.this);
                 pbdd.open(); //Ouverture de la base de données
-                Photo p = pbdd.getPhotoById(photo_id); // Récupération de la photo
-
-                //Vérification de l'unicité du nom de la photo
-                Photo p1 = pbdd.getPhotoByName(newName);
-                if (p1 == null || p1.getPhoto_id() == p.getPhoto_id()) {
-                    p.setPhoto_name(newName); //Mise à jour du nom
-                } else {
-                    Toast.makeText(PhotoOpenActivity.this, R.string.photoName_taken, Toast.LENGTH_SHORT).show();
-                }
+                Photo p = pbdd.getPhotoByPath(photo_path); // Récupération de la photo
+                p.setPhoto_name(newName);
                 p.setPhoto_description(newDescr); //Mise à jour de la description
                 pbdd.updatePhotoInfos(p); //Mise à jour
                 pbdd.close(); // Fermeture de la base de données
+
+                //Export
+                Data d = Data.ToData(project_id, PhotoOpenActivity.this);
+                Request.saveProject(PhotoOpenActivity.this, d);
 
                 Toast.makeText(PhotoOpenActivity.this, R.string.saved, Toast.LENGTH_SHORT).show();
             }
@@ -148,16 +140,18 @@ public class PhotoOpenActivity extends AppCompatActivity {
         //Affichage des infos de la photo
         PhotoBDD pbdd = new PhotoBDD(PhotoOpenActivity.this); //Instanciation de ProjectBdd pour manipuler les projets de la base de données
         pbdd.open(); //Ouverture de la base de données
-        Photo p = pbdd.getPhotoById(photo_id); // Récupération de la photo
+        Photo p = pbdd.getPhotoByPath(photo_path); // Récupération de la photo
         pbdd.close();
 
-        EditText et1 = (EditText) findViewById(R.id.EditTextNamePhoto);
-        if (!p.getPhoto_name().equals("")) {
-            et1.setText(p.getPhoto_name());
-        }
-        EditText et2 = (EditText) findViewById(R.id.EditTextDescrPhoto);
-        if (!p.getPhoto_description().equals("")) {
-            et2.setText(p.getPhoto_description());
+        if (p != null) {
+            EditText et1 = (EditText) findViewById(R.id.EditTextNamePhoto);
+            if (!p.getPhoto_name().equals("")) {
+                et1.setText(p.getPhoto_name());
+            }
+            EditText et2 = (EditText) findViewById(R.id.EditTextDescrPhoto);
+            if (!p.getPhoto_description().equals("")) {
+                et2.setText(p.getPhoto_description());
+            }
         }
 
 
@@ -167,11 +161,11 @@ public class PhotoOpenActivity extends AppCompatActivity {
             @Override
             public void onClick(View arg0) {
                 Intent i = new Intent(PhotoOpenActivity.this, ElementDefinitionActivity.class);
-                i.putExtra("project_id",project_id);
-                i.putExtra("photo_id",photo_id);
-                i.putExtra("photo_path",photo_path);
+                i.putExtra("project_id", project_id);
+                i.putExtra("photo_path", photo_path);
                 startActivity(i);
-            }});
+            }
+        });
 
         //Bouton Localisation photo
         Button bouton3 = (Button) findViewById(R.id.buttonLocalisationPhoto);
@@ -179,11 +173,11 @@ public class PhotoOpenActivity extends AppCompatActivity {
             @Override
             public void onClick(View arg0) {
                 Intent i = new Intent(PhotoOpenActivity.this, PhotoLocalisationActivity.class);
-                i.putExtra("project_id",project_id);
-                i.putExtra("photo_id",photo_id);
-                i.putExtra("photo_path",photo_path);
+                i.putExtra("project_id", project_id);
+                i.putExtra("photo_path", photo_path);
                 startActivity(i);
-            }});
+            }
+        });
     }
 
 
@@ -200,7 +194,6 @@ public class PhotoOpenActivity extends AppCompatActivity {
             case R.id.home:
                 Intent i = new Intent(PhotoOpenActivity.this, SavePhotoInfosPopUpActivity.class);
                 i.putExtra("project_id", project_id);
-                i.putExtra("photo_id", photo_id);
                 i.putExtra("photo_path", photo_path);
                 i.putExtra("redirect", "HOME");
 
@@ -220,7 +213,6 @@ public class PhotoOpenActivity extends AppCompatActivity {
 
                 Intent i1 = new Intent(PhotoOpenActivity.this, SavePhotoInfosPopUpActivity.class);
                 i1.putExtra("project_id", project_id);
-                i1.putExtra("photo_id", photo_id);
                 i1.putExtra("photo_path", photo_path);
                 i1.putExtra("redirect", "SETTINGS");
 
@@ -242,8 +234,6 @@ public class PhotoOpenActivity extends AppCompatActivity {
                 return true;
 
             default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
         }
     }
@@ -285,14 +275,18 @@ public class PhotoOpenActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void updateView() {
+    }
+
+
     /**
      * Lancement de la pop up avec les détails du projet
      */
     public void popUpDetails(String name, String descr) {
-        PopUpDetails pud = new PopUpDetails(PhotoOpenActivity.this, name, descr, mi);
+        PopUpDetails pud = new PopUpDetails(PhotoOpenActivity.this, name, descr, mi, project_id);
         pud.show();
     }
-
 
     /**
      * Obtenir le projet ouvert
@@ -306,5 +300,6 @@ public class PhotoOpenActivity extends AppCompatActivity {
         pbdd.close(); // Fermeture de la base de données
         return p;
     }
+
 
 }

@@ -1,3 +1,10 @@
+/**
+ * Activité ElementDefinitionPopUp
+ * ---------------------------
+ * Pop up dans laquelle l'utilisateur peut caractériser un élément en définissant
+ * son matériau, son type et sa couleur.
+ */
+
 package fr.turfu.urbapp2;
 
 import android.app.Activity;
@@ -15,18 +22,17 @@ import java.util.List;
 
 import fr.turfu.urbapp2.DB.Element;
 import fr.turfu.urbapp2.DB.ElementBDD;
+import fr.turfu.urbapp2.DB.PhotoBDD;
+import fr.turfu.urbapp2.Request.Request;
 import fr.turfu.urbapp2.Tools.ColorPicker;
 
-/**
- * Created by Laura on 10/10/2016.
- */
 public class ElementDefinitionPopUp extends Activity {
 
 
     /**
-     * Id de la photo ouverte
+     * photo ouverte
      */
-    private long photo_id;
+    private String photo_path;
 
     /**
      * PixelGeom à définir
@@ -56,19 +62,26 @@ public class ElementDefinitionPopUp extends Activity {
 
         //Photo ID
         final Intent intent = getIntent();
-        photo_id = intent.getLongExtra("photo_id", 0);
+        photo_path = intent.getStringExtra("photo_path");
 
         //PixelGeom
         pixelGeom_id = intent.getLongExtra("pixelGeom_id", 0);
+
+        //chargement des listes
+        Request.getDataElem(this);
+
+    }
+
+    /**
+     * Affichage des listes de matériaux et de types
+     */
+    public void display() {
 
         //Ajout de la liste des matériaux et de la liste des types d'éléments
         ElementBDD ebdd = new ElementBDD(ElementDefinitionPopUp.this);
         ebdd.open();
 
         List mat = ebdd.getMaterials();
-        /*mat.add("Bois");
-        mat.add("Béton");
-        mat.add("Verre");*/
 
         ArrayAdapter adapter = new ArrayAdapter(
                 this,
@@ -81,9 +94,6 @@ public class ElementDefinitionPopUp extends Activity {
 
         ArrayList<String> elemType = ebdd.getTypes();
         ebdd.close();
-        /*elemType.add("Sol");
-        elemType.add("Mur");
-        elemType.add("Toit");*/
 
         ArrayAdapter adapter1 = new ArrayAdapter(
                 this,
@@ -112,10 +122,9 @@ public class ElementDefinitionPopUp extends Activity {
 
         if (e != null) {
             //Affichage du type de surface
-            spin1.setSelection((int) (e.getElementType_id()));
-            Log.v("type", e.getElementType_id() + "");
+            spin1.setSelection((int) (e.getElementType_id()) - 1);
             //Affichage du matériau
-            spin.setSelection((int) e.getMaterial_id());
+            spin.setSelection((int) e.getMaterial_id() - 1);
             Log.v("mat", e.getMaterial_id() + "");
             //Affichage de la couleur
             ColorPicker colorPicker = (ColorPicker) findViewById(R.id.colorPicker);
@@ -163,10 +172,10 @@ public class ElementDefinitionPopUp extends Activity {
 
                 if (e != null) {
                     Spinner spin = (Spinner) findViewById(R.id.MaterialValue);
-                    e.setMaterial_id(spin.getSelectedItemId());
+                    e.setMaterial_id(spin.getSelectedItemId() + 1);
 
                     Spinner spin1 = (Spinner) findViewById(R.id.TypeValue);
-                    e.setElementType_id(spin1.getSelectedItemId());
+                    e.setElementType_id(spin1.getSelectedItemId() + 1);
 
                     ColorPicker colorPicker = (ColorPicker) findViewById(R.id.colorPicker);
                     e.setElement_color(colorPicker.getColor() + "");
@@ -174,16 +183,21 @@ public class ElementDefinitionPopUp extends Activity {
                     e = new Element();
 
                     Spinner spin = (Spinner) findViewById(R.id.MaterialValue);
-                    e.setMaterial_id(spin.getSelectedItemId());
+                    e.setMaterial_id(spin.getSelectedItemId() + 1);
 
                     Spinner spin1 = (Spinner) findViewById(R.id.TypeValue);
-                    e.setElementType_id(spin1.getSelectedItemId());
+
+                    e.setElementType_id(spin1.getSelectedItemId() + 1);
 
                     ColorPicker colorPicker = (ColorPicker) findViewById(R.id.colorPicker);
                     e.setElement_color(colorPicker.getColor() + "");
 
                     e.setPixelGeom_id(pixelGeom_id);
-                    e.setPhoto_id(photo_id);
+                    PhotoBDD pbdd = new PhotoBDD(ElementDefinitionPopUp.this);
+                    pbdd.open();
+                    long pid = pbdd.getPhotoByPath(photo_path).getPhoto_id();
+                    pbdd.close();
+                    e.setPhoto_id(pid);
 
                     ElementBDD ebdd = new ElementBDD(ElementDefinitionPopUp.this);
                     ebdd.open();
@@ -201,7 +215,6 @@ public class ElementDefinitionPopUp extends Activity {
                 finish();
             }
         });
-
 
     }
 

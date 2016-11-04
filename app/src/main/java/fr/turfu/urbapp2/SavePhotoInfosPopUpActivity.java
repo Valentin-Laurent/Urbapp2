@@ -1,3 +1,9 @@
+/**
+ * Activité SavePhotoInfosPopUp
+ * -----------------------------------------------------------
+ * Activité (sous la forme d'une pop up) dans laquelle on demande à l'utilisateur s'il veut sauvegarder
+ * les modifications qu'il a faites portant sur le nom et la descr d'une photo. On agit en conséquence.
+ */
 package fr.turfu.urbapp2;
 
 import android.app.Activity;
@@ -7,20 +13,15 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.Toast;
 
-import com.google.android.gms.common.api.GoogleApiClient;
-
+import fr.turfu.urbapp2.DB.Data;
 import fr.turfu.urbapp2.DB.Photo;
 import fr.turfu.urbapp2.DB.PhotoBDD;
 import fr.turfu.urbapp2.DB.Project;
 import fr.turfu.urbapp2.DB.ProjectBDD;
+import fr.turfu.urbapp2.Request.Request;
 
-
-/**
- * Activity in which users can choose between adding a photo from the gallery or taking a new photo with the camera
- */
-public class SavePhotoInfosPopUpActivity extends Activity {
+public class SavePhotoInfosPopUpActivity extends Activity implements Sync {
 
     /**
      * Boite de dialogue
@@ -28,7 +29,7 @@ public class SavePhotoInfosPopUpActivity extends Activity {
     public Dialog d;
 
     /**
-     * Bouton cancel, valider ou close
+     * Bouton cancel, save ou close
      */
     public Button no, yes, close;
 
@@ -43,31 +44,21 @@ public class SavePhotoInfosPopUpActivity extends Activity {
      */
     private long project_id;
 
-    /**
-     * Photo id
-     */
-    private long photo_id;
 
     /**
      * Nom de la photo
      */
     private String newName;
-
     /**
      * Description de la photo
      */
     private String newDescr;
 
-
     /**
-     * Redirection
+     * Direction de redirection
      */
     private String redirect;
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
+
 
     /**
      * Création de la pop up.
@@ -89,83 +80,108 @@ public class SavePhotoInfosPopUpActivity extends Activity {
         yes = (Button) findViewById(R.id.btn_save_change);
         close = (Button) findViewById(R.id.btn_close_pop);
 
-        //paramètres
+        //Paramètres
         final Intent intent = getIntent();
         project_id = intent.getLongExtra("project_id", 0);
-        photo_id = intent.getLongExtra("photo_id", 0);
         currentPhotoPath = intent.getStringExtra("photo_path");
         redirect = intent.getStringExtra("redirect");
         newName = intent.getStringExtra("name");
         newDescr = intent.getStringExtra("descr");
 
         //Ajout des actions
+
+        //Bouton cancel : on redirige sans sauvegarder
         no.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                redirect();
+                redirect(false);
             }
         });
 
+        //Bouton save : on redirige et on sauvegarde
         yes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Sauvegarde
                 PhotoBDD pbdd = new PhotoBDD(SavePhotoInfosPopUpActivity.this); //Instanciation de ProjectBdd pour manipuler les projets de la base de données
                 pbdd.open(); //Ouverture de la base de données
-                Photo p = pbdd.getPhotoById(photo_id); // Récupération de la photo
-
-                //Vérification de l'unicité du nom de la photo
-                Photo p1 = pbdd.getPhotoByName(newName);
-                if (p1 == null || p1.getPhoto_id() == p.getPhoto_id()) {
-                    p.setPhoto_name(newName); //Mise à jour du nom
-                } else {
-                    Toast.makeText(SavePhotoInfosPopUpActivity.this, R.string.photoName_taken, Toast.LENGTH_SHORT).show();
-                }
-
+                Photo p = pbdd.getPhotoByPath(currentPhotoPath); // Récupération de la photo
+                p.setPhoto_name(newName); //Mise à jour du nom
                 p.setPhoto_description(newDescr); //Mise à jour de la description
-
                 pbdd.updatePhotoInfos(p); //Mise à jour
-
                 pbdd.close(); // Fermeture de la base de données
 
                 //Redirection
-                redirect();
+                redirect(true);
             }
         });
 
+        //Bouton close : on ferme la boite de dialogue
         close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 redirect = "PHOTO_OPEN";
-                redirect();
+                redirect(false);
             }
         });
     }
 
     /**
      * Redirection vers l'activité demandée
+     *
+     * @param save booléen indiquand si il fut sauvegarder les modifications ou non
      */
-    public void redirect() {
+    public void redirect(Boolean save) {
+
+        //Récupération des données du projet
+        Data d = Data.ToData(project_id, SavePhotoInfosPopUpActivity.this);
+
         switch (redirect) {
             case "PHOTO_OPEN":
                 Intent i = new Intent(SavePhotoInfosPopUpActivity.this, PhotoOpenActivity.class);
                 i.putExtra("project_id", project_id);
-                i.putExtra("photo_id", photo_id);
                 i.putExtra("photo_path", currentPhotoPath);
                 startActivity(i);
                 finish();
                 break;
             case "HOME":
+
+                if (save) {
+                    //Export sur serveur
+                    Request.closeProject(SavePhotoInfosPopUpActivity.this, d);
+                } else {
+                    //Simple fermeture du projet
+                    Request.close(SavePhotoInfosPopUpActivity.this, project_id);
+                }
+
+                //Redirection
                 Intent i1 = new Intent(SavePhotoInfosPopUpActivity.this, MainActivity.class);
                 startActivity(i1);
                 finish();
                 break;
             case "SETTINGS":
+
+                if (save) {
+                    //Export
+                    Request.closeProject(SavePhotoInfosPopUpActivity.this, d);
+                } else {
+                    //Simple fermeture du projet
+                    Request.close(SavePhotoInfosPopUpActivity.this, project_id);
+                }
+
+                //Redirection
                 Intent i2 = new Intent(SavePhotoInfosPopUpActivity.this, SettingsActivity.class);
                 startActivity(i2);
                 finish();
                 break;
             case "PROJECT_OPEN":
+
+                if (save) {
+                    //Export
+                    Request.saveProject(SavePhotoInfosPopUpActivity.this, d);
+                }
+
+                //Redirection
                 Intent i3 = new Intent(SavePhotoInfosPopUpActivity.this, ProjectOpenActivity.class);
                 i3.putExtra("project_id", project_id);
 
@@ -174,7 +190,7 @@ public class SavePhotoInfosPopUpActivity extends Activity {
                 Project p = pbdd.getProjectById(project_id); // Récupération du projet
                 pbdd.close(); // Fermeture de la base de données
 
-                i3.putExtra("projectName",p.getProjectName());
+                i3.putExtra("projectName", p.getProjectName());
                 startActivity(i3);
                 finish();
                 break;
@@ -185,5 +201,8 @@ public class SavePhotoInfosPopUpActivity extends Activity {
     }
 
 
+    @Override
+    public void updateView() {
+    }
 }
 

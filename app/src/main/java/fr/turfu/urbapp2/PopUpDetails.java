@@ -1,3 +1,9 @@
+/**
+ * Dialog PopUpDetails
+ * ----------------------------------------------------
+ * Pop up dans laquelle sont récapitulées toutes les informations d'un projet
+ */
+
 package fr.turfu.urbapp2;
 
 import android.Manifest;
@@ -10,13 +16,11 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -32,14 +36,13 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Polygon;
 
+import fr.turfu.urbapp2.DB.Data;
 import fr.turfu.urbapp2.DB.GpsGeom;
 import fr.turfu.urbapp2.DB.Project;
 import fr.turfu.urbapp2.DB.ProjectBDD;
+import fr.turfu.urbapp2.Request.Request;
 
-/**
- * Pop up dans laquelle sont récapitulées toutes les information d'un projet
- */
-public class PopUpDetails extends Dialog implements MapEventsReceiver, android.view.View.OnClickListener {
+public class PopUpDetails extends Dialog implements MapEventsReceiver, android.view.View.OnClickListener, Sync {
 
     /**
      * Activité dans laquelle on affiche la pop up
@@ -76,6 +79,11 @@ public class PopUpDetails extends Dialog implements MapEventsReceiver, android.v
     private MenuItem mi;
 
     /**
+     * Id du projet
+     */
+    private long project_id;
+
+    /**
      * Carte
      */
     private MapView map;
@@ -84,19 +92,20 @@ public class PopUpDetails extends Dialog implements MapEventsReceiver, android.v
     /**
      * Constructeur
      *
-     * @param a  Activité
-     * @param n  Nom du projet
-     * @param d  Description du projet
-     * @param mi Menu item de l'activité dans lequel est inscrit le nom du projet
+     * @param a          Activité
+     * @param n          Nom du projet
+     * @param d          Description du projet
+     * @param mi         Menu item de l'activité dans lequel est inscrit le nom du projet
+     * @param project_id Id du projet
      */
-    public PopUpDetails(Activity a, String n, String d, MenuItem mi) {
+    public PopUpDetails(Activity a, String n, String d, MenuItem mi, long project_id) {
         super(a);
         this.c = a;
         this.name = n;
         this.descr = d;
         this.mi = mi;
+        this.project_id = project_id;
     }
-
 
     /**
      * Création de la pop up.
@@ -114,7 +123,6 @@ public class PopUpDetails extends Dialog implements MapEventsReceiver, android.v
         //Ajout des informations
         EditText et1 = (EditText) findViewById(R.id.NameValue);
         et1.setText(name);
-
         EditText et2 = (EditText) findViewById(R.id.DescrValue);
         et2.setText(descr);
 
@@ -125,7 +133,6 @@ public class PopUpDetails extends Dialog implements MapEventsReceiver, android.v
         //Ajout des actions
         yes.setOnClickListener(this);
         no.setOnClickListener(this);
-
 
         //Carte
         org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants.setUserAgentValue(BuildConfig.APPLICATION_ID);
@@ -152,7 +159,6 @@ public class PopUpDetails extends Dialog implements MapEventsReceiver, android.v
         }
         Location lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-
         MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(c, this);
         map.getOverlays().add(0, mapEventsOverlay);
 
@@ -161,12 +167,14 @@ public class PopUpDetails extends Dialog implements MapEventsReceiver, android.v
         pbdd.open();
         GpsGeom gp = pbdd.getGpsGeom(pbdd.getProjectByName(name).getProjectId());
 
-        //On en extrait le polygone et ses sommets
+        //On en extrait la position gps
         GeometryFactory gf = new GeometryFactory();
         WKTReader wktr = new WKTReader(gf);
         String thegeom = gp.getGpsGeomCoord();
-        Log.v("GEO", thegeom);
-        thegeom = thegeom.substring(10, thegeom.length());
+        while (thegeom.charAt(0) == 's') {
+            thegeom = thegeom.substring(10, thegeom.length());
+        }
+        pbdd.updateGpsgeom(gp.getGpsGeomsId(), thegeom);
         Geometry geom = null;
         try {
             geom = wktr.read(thegeom);
@@ -177,8 +185,8 @@ public class PopUpDetails extends Dialog implements MapEventsReceiver, android.v
         point = new GeoPoint(coord[0].x, coord[0].y);
         pbdd.close();
 
+        //On affiche le point
         refresh();
-
     }
 
     /**
@@ -189,7 +197,6 @@ public class PopUpDetails extends Dialog implements MapEventsReceiver, android.v
      * @param v Vue représentant la pop up elle-même
      */
     @Override
-    //TODO : prendre en compte la carte
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_ok:
@@ -203,24 +210,19 @@ public class PopUpDetails extends Dialog implements MapEventsReceiver, android.v
                 ProjectBDD pbdd = new ProjectBDD(this.getContext()); //Instanciation de ProjectBdd pour manipuler les projets de la base de données
                 pbdd.open(); //Ouverture de la base de données
                 Project p = pbdd.getProjectByName(name); // Récupération du projet
-
-                //Vérification de l'unicité du nom du projet
-                Project p1 = pbdd.getProjectByName(newName);
-                if (p1 == null || p1.getProjectId() == p.getProjectId()) {
-                    p.setProjectName(newName); //Mise à jour du nom
-                } else {
-                    Toast.makeText(c, R.string.projectName_taken, Toast.LENGTH_SHORT).show();
-                }
-
+                p.setProjectName(newName);
                 p.setProjectDescription(newDescr); //Mise à jour de la description
-
                 pbdd.update(p); //Mise à jour
 
                 //Mise à jour de la position gps
                 String thegeom = "POINT(" + point.getLatitude() + " " + point.getLongitude() + ")";
                 pbdd.updateGpsgeom(p.getGpsGeom_id(), thegeom);
-
                 pbdd.close(); // Fermeture de la base de données
+
+                //Synchronisation
+                //Export
+                Data d = Data.ToData(project_id, c);
+                Request.saveProject(c, d);
 
                 //Mise à jour de l'affichage
                 mi.setTitle("Projet : " + p.getProjectName());
@@ -251,6 +253,11 @@ public class PopUpDetails extends Dialog implements MapEventsReceiver, android.v
         return false;
     }
 
+    @Override
+    public void updateView() {
+
+    }
+
     /**
      * Tracé d'un point p
      *
@@ -275,10 +282,14 @@ public class PopUpDetails extends Dialog implements MapEventsReceiver, android.v
         map.getOverlays().add(0, mapEventsOverlay);
     }
 
-
+    /**
+     * Méthode pour rafraichir le tracé de la localisation gps du projet
+     */
     public void refresh() {
         drawPoint(point);
         mapController.setCenter(point);
         map.invalidate();
     }
+
+
 }

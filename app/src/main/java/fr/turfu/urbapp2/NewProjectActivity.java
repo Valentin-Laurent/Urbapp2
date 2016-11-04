@@ -1,3 +1,8 @@
+/**
+ * Activité NewProject
+ * -----------------------------------------
+ * Activité pour la création d'un nouveau projet
+ */
 package fr.turfu.urbapp2;
 
 import android.Manifest;
@@ -13,6 +18,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -29,20 +35,22 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Polygon;
 
+import fr.turfu.urbapp2.DB.Data;
 import fr.turfu.urbapp2.DB.Project;
 import fr.turfu.urbapp2.DB.ProjectBDD;
+import fr.turfu.urbapp2.Request.Request;
 
-/**
- * Activité pour la création d'un nouveau projet
- */
-public class NewProjectActivity extends AppCompatActivity implements MapEventsReceiver {
+public class NewProjectActivity extends AppCompatActivity implements MapEventsReceiver, Sync {
 
     /**
      * Vue pour la carte
      */
     private MapView map;
 
-    public static GeoPoint point=null;
+    /**
+     * Point correspondant à la localisation du projet
+     */
+    public static GeoPoint point = null;
 
     /**
      * Création de l'activité
@@ -77,7 +85,6 @@ public class NewProjectActivity extends AppCompatActivity implements MapEventsRe
         valid.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 EditText et1 = (EditText) findViewById(R.id.EditTextName);
                 String name = et1.getText().toString();
 
@@ -86,7 +93,6 @@ public class NewProjectActivity extends AppCompatActivity implements MapEventsRe
 
                 if (control(name)) {
                     save(name, descr);
-
                 }
             }
         });
@@ -181,6 +187,33 @@ public class NewProjectActivity extends AppCompatActivity implements MapEventsRe
         }
     }
 
+    @Override
+    public boolean singleTapConfirmedHelper(GeoPoint geoPoint) {
+        return false;
+    }
+
+    @Override
+    public boolean longPressHelper(GeoPoint geoPoint) {
+        return false;
+    }
+
+    @Override
+    public void updateView() {
+
+        EditText et1 = (EditText) findViewById(R.id.EditTextName);
+        String name = et1.getText().toString();
+
+        ProjectBDD pbdd = new ProjectBDD(NewProjectActivity.this);
+        pbdd.open();
+        Project p = pbdd.getProjectByName(name);
+        pbdd.close();
+
+        Intent intent = new Intent(NewProjectActivity.this, ProjectOpenActivity.class);
+        intent.putExtra("project_id", p.getProjectId());
+        startActivity(intent);
+        finish();
+    }
+
     /**
      * Lancement de la pop up de localisation
      */
@@ -191,46 +224,37 @@ public class NewProjectActivity extends AppCompatActivity implements MapEventsRe
 
     /**
      * Sauvegarde d'un nouveau projet
+     *
+     * @param name  Nom du projet
+     * @param descr Description du projet
      */
-
     public void save(String name, String descr) {
 
         long gpsgeomId = saveLocalisation();
-
+        Log.v("gpsgeom", gpsgeomId + "+");
         if (gpsgeomId > 0) {
             ProjectBDD pbdd = new ProjectBDD(NewProjectActivity.this);
-
             pbdd.open();
-
-            Project p = pbdd.getProjectByName(name);
-            long id = 0;
-
-            if (p == null) {
-                Project p1 = new Project(name, descr, gpsgeomId);
-                pbdd.insert(p1);
-
-                Intent intent = new Intent(NewProjectActivity.this, ProjectOpenActivity.class);
-                intent.putExtra("projectName", p1.getProjectName());
-                startActivity(intent);
-                finish();
-
-            } else {
-                Toast.makeText(this, R.string.project_already_created, Toast.LENGTH_SHORT).show();
-            }
+            Project p = new Project(name, descr, gpsgeomId);
+            pbdd.insert(p);
             pbdd.close();
+
+            //Export sur le serveur
+            Data d = Data.ToData(p.getProjectId(), NewProjectActivity.this);
+            Request.insert(NewProjectActivity.this, d);
         } else {
             Toast.makeText(this, R.string.project_to_locate, Toast.LENGTH_SHORT).show();
         }
+
     }
 
 
     /**
-     * Méthode pour verifier que les champs du formulaire sont bien remplis : project_name non vide et géolocalisation effectuée
+     * Méthode pour verifier que les champs du formulaire sont bien remplis : project_name non vide et non déjà pris
      *
      * @param n Project_name
      * @return Boolean
      */
-    // TODO : Prendre en compte la géolocalisation
     public boolean control(String n) {
         if (n.matches("")) {
             Toast.makeText(this, R.string.empty_project_name, Toast.LENGTH_SHORT).show();
@@ -255,28 +279,25 @@ public class NewProjectActivity extends AppCompatActivity implements MapEventsRe
         map.invalidate();
     }
 
-    @Override
-    public boolean singleTapConfirmedHelper(GeoPoint geoPoint) {
-        return false;
-    }
-
-    @Override
-    public boolean longPressHelper(GeoPoint geoPoint) {
-        return false;
-    }
-
+    /**
+     * Enregistrement de la localisation du projet dans la base de données locale
+     *
+     * @return id du nouveau gpsgeom créé
+     */
     public long saveLocalisation() {
-        if(point==null){
+        if (point == null) {
             return 0;
-        }else{
-        String thegeom = "POINT(" + point.getLatitude() + " " + point.getLongitude() + ")";
-        ProjectBDD pbdd = new ProjectBDD(this);
-        pbdd.open();
-        long id = pbdd.insertGpsgeom(thegeom);
-        pbdd.close();
-        return id;
+        } else {
+            String thegeom = "POINT(" + point.getLatitude() + " " + point.getLongitude() + ")";
+
+            ProjectBDD pbdd = new ProjectBDD(this);
+            pbdd.open();
+            long id = pbdd.insertGpsgeom(thegeom, pbdd.getMaxGpsgeomId() + 1);
+            pbdd.close();
+            return id;
         }
     }
+
 
 }
 

@@ -36,10 +36,6 @@ public class Project {
      * long id of the gpsgeom that locates to the project
      */
     private long gpsGeom_id;
-    /**
-     * value String that contains the value of the GpsGeom designed by the previous attribute
-     */
-    private String Ext_GpsGeomCoord;
 
     /*******************
      * CONSTRUCTORS
@@ -100,15 +96,6 @@ public class Project {
     }
 
     /**
-     * get the value of the gpsgeom
-     *
-     * @return String gpsgeom
-     */
-    public String getExt_GpsGeomCoord() {
-        return Ext_GpsGeomCoord;
-    }
-
-    /**
      * get the value of the version
      *
      * @return Int version
@@ -131,14 +118,6 @@ public class Project {
      * SETTERS
      *******************/
 
-    /**
-     * setter for the gpsgeomcoord
-     *
-     * @param ext_GpsGeomCoord
-     */
-    public void setExt_GpsGeomCoord(String ext_GpsGeomCoord) {
-        Ext_GpsGeomCoord = ext_GpsGeomCoord;
-    }
 
     /**
      * setter for the gpsgeom id

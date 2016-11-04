@@ -11,18 +11,7 @@ public class Material {
      * String name of the material
      */
     private String material_name;
-    /**
-     * String value of conductivity
-     */
-    private double material_conduct;
-    /**
-     * String value of heat capacity
-     */
-    private long material_heat_capa;
-    /**
-     * String value of mass density
-     */
-    private long material_mass_density;
+
 
     //Getters
 
@@ -42,33 +31,6 @@ public class Material {
      */
     public String getMaterial_name() {
         return material_name;
-    }
-
-    /**
-     * getter for the attribute conductivity of material
-     *
-     * @return float material_conduct
-     */
-    public double getMaterial_conduct() {
-        return material_conduct;
-    }
-
-    /**
-     * getter for the attribute heat capacity of material
-     *
-     * @return long material_heat_capa
-     */
-    public long getMaterial_heat_capa() {
-        return material_heat_capa;
-    }
-
-    /**
-     * getter for the attribute mass density of material
-     *
-     * @return long material_conduct
-     */
-    public long getMaterial_mass_density() {
-        return material_mass_density;
     }
 
 
@@ -92,40 +54,12 @@ public class Material {
         this.material_name = material_name;
     }
 
-    /**
-     * setter for the conductivity of material
-     *
-     * @param material_conduct float
-     */
-    public void setMaterial_conduct(double material_conduct) {
-        this.material_conduct = material_conduct;
-    }
-
-    /**
-     * setter for the heat capacity of material
-     *
-     * @param material_heat_capa long
-     */
-    public void setMaterial_heat_capa(long material_heat_capa) {
-        this.material_heat_capa = material_heat_capa;
-    }
-
-    /**
-     * setter for the mass density of material
-     *
-     * @param material_mass_density long
-     */
-    public void setMaterial_mass_density(long material_mass_density) {
-        this.material_mass_density = material_mass_density;
-    }
 
     //Override Methods
     @Override
     public String toString() {
         return "Material [material_id=" + material_id + ", material_name="
-                + material_name + ", material_conduct=" + material_conduct
-                + ", material_heat_capa=" + material_heat_capa
-                + ", material_mass_density=" + material_mass_density + "]";
+                + material_name + "]";
     }
 
 

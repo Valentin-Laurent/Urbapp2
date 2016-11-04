@@ -1,10 +1,15 @@
+/**
+ * Classe Utils
+ * --------------------------------------
+ * Méthodes utilitaires pour l'ouverture d'une photo
+ */
+
 package fr.turfu.urbapp2.Tools;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,9 +18,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-/**
- * Created by Laura on 11/10/2016.
- */
 public class Utils {
 
     /**
@@ -65,14 +67,5 @@ public class Utils {
         }
     }
 
-    /**
-     * Function displaying a toast
-     * @param context Context of the Toast
-     * @param text Text write into the toast
-     * @param duration Time during which the toast is displayed
-     */
-    public static void showToast(Context context, CharSequence text, int duration){
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
-    }
+
 }

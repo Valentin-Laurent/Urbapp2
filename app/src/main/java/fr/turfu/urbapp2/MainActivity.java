@@ -1,3 +1,8 @@
+/**
+ * Activité principale
+ * ---------------------------
+ * Activité qui se lance à l'ouverture de l'application et qui affiche la liste des projets
+ */
 package fr.turfu.urbapp2;
 
 import android.Manifest;
@@ -25,6 +30,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.events.MapEventsReceiver;
@@ -39,9 +45,8 @@ import java.util.List;
 
 import fr.turfu.urbapp2.DB.Project;
 import fr.turfu.urbapp2.DB.ProjectBDD;
+import fr.turfu.urbapp2.Request.Request;
 import fr.turfu.urbapp2.Tools.ConnexionCheck;
-
-//TODO Gérer le cycle d'activité de façon à ce qu'une seule activité Main puisse exister
 
 public class MainActivity extends AppCompatActivity implements MapEventsReceiver {
 
@@ -64,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements MapEventsReceiver
      * Tableau pour les projets
      */
     private String[] list_projs = new String[]{};
+    public static ArrayList<Project> projects;
 
     /**
      * Link to ask google to create a specific connexion code to check if there is no portal between android and server
@@ -104,6 +110,8 @@ public class MainActivity extends AppCompatActivity implements MapEventsReceiver
         alertDialog = new AlertDialog.Builder(MainActivity.this);
         isInternetOn();
 
+        //Initialisation des projets
+        projects = new ArrayList<>();
 
         //Handling toolbar
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
@@ -111,7 +119,6 @@ public class MainActivity extends AppCompatActivity implements MapEventsReceiver
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         mainToolbar.setTitle("");
         mainToolbar.setSubtitle("");
-
 
         // Button new project
         b1 = (Button) findViewById(R.id.buttonNewProject);
@@ -161,6 +168,16 @@ public class MainActivity extends AppCompatActivity implements MapEventsReceiver
         }
         mapController.setCenter(startPoint);
         drawPoint(startPoint);
+
+        //Bouton réalité augmentée
+        Button ar = (Button) findViewById(R.id.buttonAugmentedReality);
+        ar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, AugmentedRealityActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
 
@@ -213,11 +230,25 @@ public class MainActivity extends AppCompatActivity implements MapEventsReceiver
                 return true;
 
             default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
 
         }
+    }
+
+    @Override
+    protected void onResume() {
+        Request.getProjects(this);
+        super.onResume();
+    }
+
+    @Override
+    public boolean singleTapConfirmedHelper(GeoPoint geoPoint) {
+        return false;
+    }
+
+    @Override
+    public boolean longPressHelper(GeoPoint geoPoint) {
+        return false;
     }
 
     /**
@@ -233,47 +264,6 @@ public class MainActivity extends AppCompatActivity implements MapEventsReceiver
         return lp;
     }
 
-    @Override
-    protected void onResume() {
-
-        /* Lister les projets*/
-        List<Project> lp = getProjects();
-
-        List<String> lpn = new ArrayList<>();
-        for (Project p : lp) {
-            lpn.add(p.getProjectName());
-        }
-
-        list_projs = new String[lpn.size()];
-        for (int i = 0; i < lpn.size(); i++) {
-            list_projs[i] = lpn.get(i);
-        }
-
-        //Displaying the list
-        mListView = (ListView) findViewById(R.id.listView);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this,
-                android.R.layout.simple_list_item_1, list_projs);
-        mListView.setAdapter(adapter);
-
-        //Ajouter les listeners
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(MainActivity.this, ProjectOpenActivity.class);
-                String name = (String) mListView.getItemAtPosition(position);
-                intent.putExtra("projectName", name);
-                startActivity(intent);
-            }
-        });
-
-        //Si il n'y a pas de projets, affichage d'un message
-        if (lpn.size() == 0) {
-            TextView tv = (TextView) findViewById(R.id.textViewNoProject);
-            tv.setVisibility(View.VISIBLE);
-        }
-
-        super.onResume();
-    }
 
     /**
      * Method to check if internet is available (and no portal !)
@@ -292,7 +282,6 @@ public class MainActivity extends AppCompatActivity implements MapEventsReceiver
             new ConnexionCheck().Connectivity();
         }
     }
-
 
     /**
      * Method if no internet connectivity to print a Dialog.
@@ -318,13 +307,81 @@ public class MainActivity extends AppCompatActivity implements MapEventsReceiver
         map.invalidate();
     }
 
-    @Override
-    public boolean singleTapConfirmedHelper(GeoPoint geoPoint) {
-        return false;
+    /**
+     * Affichage de la liste des projets obtenue en requetant le serveur
+     */
+    public void refreshList() {
+
+        List<String> lpn = new ArrayList<>();
+        for (Project p : projects) {
+            lpn.add(p.getProjectName());
+        }
+
+        list_projs = new String[lpn.size()];
+        for (int i = 0; i < lpn.size(); i++) {
+            list_projs[i] = lpn.get(i);
+        }
+
+        //Displaying the list
+        mListView = (ListView) findViewById(R.id.listView);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this,
+                android.R.layout.simple_list_item_1, list_projs);
+        mListView.setAdapter(adapter);
+
+        //Ajouter les listeners
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String name = (String) mListView.getItemAtPosition(position);
+                if (isAvailable(name)) {
+                    Intent intent = new Intent(MainActivity.this, ProjectOpenActivity.class);
+                    intent.putExtra("projectName", name);
+                    intent.putExtra("project_id", getIdOfProject(name));
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(MainActivity.this, R.string.project_not_available, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        //Si il n'y a pas de projets, affichage d'un message
+        TextView tv = (TextView) findViewById(R.id.textViewNoProject);
+        if (lpn.size() == 0) {
+            tv.setVisibility(View.VISIBLE);
+        } else {
+            tv.setVisibility(View.INVISIBLE);
+        }
     }
 
-    @Override
-    public boolean longPressHelper(GeoPoint geoPoint) {
-        return false;
+    /**
+     * Méthode pour savoir si un projet est available ou non
+     *
+     * @param projectName Intitulé du projet
+     * @return Booléen isavailable
+     */
+    public boolean isAvailable(String projectName) {
+        boolean b = false;
+        for (Project p : projects) {
+            if (p.getProjectName().equals(projectName)) {
+                b = p.getIsAvailable();
+            }
+        }
+        return b;
+    }
+
+    /**
+     * Récupérer l'id d'un projet par son nom
+     *
+     * @param projectName Nom du projet
+     * @return id du projet
+     */
+    public long getIdOfProject(String projectName) {
+        long id = 0;
+        for (Project p : projects) {
+            if (p.getProjectName().equals(projectName)) {
+                id = p.getProjectId();
+            }
+        }
+        return id;
     }
 }

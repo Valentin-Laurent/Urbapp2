@@ -1,3 +1,10 @@
+/**
+ * Activité PhotoLocalisationActivity
+ * -----------------------------------------
+ * Activité dans laquelle l'utilisateur définit la zone d'intéret de la photo,
+ * qui peut être une ligne ou une surface.
+ */
+
 package fr.turfu.urbapp2;
 
 import android.Manifest;
@@ -15,7 +22,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,25 +47,20 @@ import org.osmdroid.views.overlay.Polygon;
 
 import java.util.ArrayList;
 
+import fr.turfu.urbapp2.DB.Data;
 import fr.turfu.urbapp2.DB.GpsGeom;
+import fr.turfu.urbapp2.DB.Photo;
 import fr.turfu.urbapp2.DB.PhotoBDD;
 import fr.turfu.urbapp2.DB.Project;
 import fr.turfu.urbapp2.DB.ProjectBDD;
+import fr.turfu.urbapp2.Request.Request;
 
-/**
- * Created by Laura on 10/10/2016.
- */
-public class PhotoLocalisationActivity extends AppCompatActivity implements MapEventsReceiver {
+public class PhotoLocalisationActivity extends AppCompatActivity implements MapEventsReceiver, Sync {
 
     /**
      * Id du projet ouvert
      */
     private long project_id;
-
-    /**
-     * Id de la photo ouverte
-     */
-    private long photo_id;
 
     /**
      * Path de la photo ouverte
@@ -80,7 +81,6 @@ public class PhotoLocalisationActivity extends AppCompatActivity implements MapE
      * Carte
      */
     private MapView map;
-
 
     /**
      * Liste des anciens points  délimitant la zone de la photo
@@ -124,9 +124,6 @@ public class PhotoLocalisationActivity extends AppCompatActivity implements MapE
         // Project ID
         project_id = intent.getLongExtra("project_id", 0);
 
-        //Photo ID
-        photo_id = intent.getLongExtra("photo_id", 0);
-
         //Initialisation
         points = new ArrayList<>();
         oldpoints = new ArrayList<>();
@@ -135,8 +132,14 @@ public class PhotoLocalisationActivity extends AppCompatActivity implements MapE
         //On récupère le gpsgeom
         PhotoBDD pbdd = new PhotoBDD(this);
         pbdd.open();
-        gpsgeom = pbdd.getGpsGeomOfPhoto(photo_id);
+        Photo p = pbdd.getPhotoByPath(photo_path);
         pbdd.close();
+
+        ProjectBDD prbdd = new ProjectBDD(this);
+        prbdd.open();
+        gpsgeom = prbdd.getGpsGeomById(p.getGpsGeom_id());
+        prbdd.close();
+
         //On initialise le tableau de points
         initPoints();
 
@@ -209,7 +212,6 @@ public class PhotoLocalisationActivity extends AppCompatActivity implements MapE
         //Tracé des anciens points
         refresh();
 
-
         //Bouton Annuler
         Button cancel = (Button) findViewById(R.id.buttonCancel);
         cancel.setOnClickListener(new View.OnClickListener() {
@@ -236,6 +238,11 @@ public class PhotoLocalisationActivity extends AppCompatActivity implements MapE
             @Override
             public void onClick(View arg0) {
                 save();
+
+                //Export
+                Data d = Data.ToData(project_id, PhotoLocalisationActivity.this);
+                Request.saveProject(PhotoLocalisationActivity.this, d);
+
             }
         });
 
@@ -280,7 +287,6 @@ public class PhotoLocalisationActivity extends AppCompatActivity implements MapE
                     public void onClick(View w) {
                         Intent i = new Intent(PhotoLocalisationActivity.this, PhotoOpenActivity.class);
                         i.putExtra("photo_path", photo_path);
-                        i.putExtra("photo_id", photo_id);
                         i.putExtra("project_id", project_id);
                         startActivity(i);
                         finish();
@@ -293,10 +299,15 @@ public class PhotoLocalisationActivity extends AppCompatActivity implements MapE
                 save.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        //Sauvegarde locale
                         save();
+
+                        //Export
+                        Data d = Data.ToData(project_id, PhotoLocalisationActivity.this);
+                        Request.saveProject(PhotoLocalisationActivity.this, d);
+
                         Intent i = new Intent(PhotoLocalisationActivity.this, PhotoOpenActivity.class);
                         i.putExtra("photo_path", photo_path);
-                        i.putExtra("photo_id", photo_id);
                         i.putExtra("project_id", project_id);
                         startActivity(i);
                         finish();
@@ -309,7 +320,6 @@ public class PhotoLocalisationActivity extends AppCompatActivity implements MapE
         });
 
     }
-
 
     /**
      * Method to handle the clicks on the items of the toolbar
@@ -345,6 +355,9 @@ public class PhotoLocalisationActivity extends AppCompatActivity implements MapE
                 cancel.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View w) {
+                        //Fermeture du projet
+                        Request.close(PhotoLocalisationActivity.this, project_id);
+
                         Intent i = new Intent(PhotoLocalisationActivity.this, MainActivity.class);
                         startActivity(i);
                         finish();
@@ -357,7 +370,13 @@ public class PhotoLocalisationActivity extends AppCompatActivity implements MapE
                 save.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        //Sauvegarde
                         save();
+
+                        //Export
+                        Data d = Data.ToData(project_id, PhotoLocalisationActivity.this);
+                        Request.closeProject(PhotoLocalisationActivity.this, d);
+
                         Intent i = new Intent(PhotoLocalisationActivity.this, MainActivity.class);
                         startActivity(i);
                         finish();
@@ -392,6 +411,9 @@ public class PhotoLocalisationActivity extends AppCompatActivity implements MapE
                 cancel1.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View w) {
+                        //Fermeture du projet
+                        Request.close(PhotoLocalisationActivity.this, project_id);
+
                         Intent i = new Intent(PhotoLocalisationActivity.this, SettingsActivity.class);
                         startActivity(i);
                         finish();
@@ -404,14 +426,19 @@ public class PhotoLocalisationActivity extends AppCompatActivity implements MapE
                 save1.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        //Sauvegarde
                         save();
+
+                        //Export
+                        Data d = Data.ToData(project_id, PhotoLocalisationActivity.this);
+                        Request.closeProject(PhotoLocalisationActivity.this, d);
+
                         Intent i = new Intent(PhotoLocalisationActivity.this, SettingsActivity.class);
                         startActivity(i);
                         finish();
                         dialog1.dismiss();
                     }
                 });
-
                 dialog1.show();
 
                 return true;
@@ -422,8 +449,6 @@ public class PhotoLocalisationActivity extends AppCompatActivity implements MapE
                 return true;
 
             default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
         }
     }
@@ -464,29 +489,25 @@ public class PhotoLocalisationActivity extends AppCompatActivity implements MapE
         return super.onCreateOptionsMenu(menu);
     }
 
+    @Override
+    public void updateView() {
 
-    /**
-     * Lancement de la pop up avec les détails du projet
-     */
+        //On récupère le gpsgeom
+        PhotoBDD pbdd = new PhotoBDD(this);
+        pbdd.open();
+        Photo p = pbdd.getPhotoByPath(photo_path);
+        pbdd.close();
 
-    public void popUpDetails(String name, String descr) {
-        PopUpDetails pud = new PopUpDetails(PhotoLocalisationActivity.this, name, descr, mi);
-        pud.show();
+        ProjectBDD prbdd = new ProjectBDD(this);
+        prbdd.open();
+        gpsgeom = prbdd.getGpsGeomById(p.getGpsGeom_id());
+        prbdd.close();
+
+        //On l'affiche
+        initPoints();
+        clear();
+        refresh();
     }
-
-    /**
-     * Obtenir le projet ouvert
-     *
-     * @return Projet ouvert
-     */
-    public Project getProject() {
-        ProjectBDD pbdd = new ProjectBDD(PhotoLocalisationActivity.this); //Instanciation de ProjectBdd pour manipuler les projets de la base de données
-        pbdd.open(); //Ouverture de la base de données
-        Project p = pbdd.getProjectById(project_id); // Récupération du projet
-        pbdd.close(); // Fermeture de la base de données
-        return p;
-    }
-
 
     @Override
     public boolean singleTapConfirmedHelper(GeoPoint geoPoint) {
@@ -609,6 +630,7 @@ public class PhotoLocalisationActivity extends AppCompatActivity implements MapE
             if (i == 0) {
                 //Tracé du premier point
                 drawPoint(oldpoints.get(i));
+                map.getController().setCenter(oldpoints.get(i));
 
             } else {
                 //Tracé du point
@@ -623,7 +645,7 @@ public class PhotoLocalisationActivity extends AppCompatActivity implements MapE
             if (i == 0) {
                 //Tracé du premier point
                 drawPoint(points.get(i));
-
+                map.getController().setCenter(points.get(i));
                 //Tracé du segment entre le point courant et le précédent point
                 // Ici, le point précédent est un des anciens points, soit le premier, soit le dernier du tableau oldpoints.
                 //On prend celui qui est le plus proche
@@ -702,7 +724,7 @@ public class PhotoLocalisationActivity extends AppCompatActivity implements MapE
         ArrayList<GeoPoint> pts = new ArrayList<>();
 
         if (!oldpoints.isEmpty()) {
-            if (!points.isEmpty()&&dist(oldpoints.get(0), points.get(0)) < dist(oldpoints.get(oldpoints.size() - 1), points.get(0))) {
+            if (!points.isEmpty() && dist(oldpoints.get(0), points.get(0)) < dist(oldpoints.get(oldpoints.size() - 1), points.get(0))) {
                 for (int i = points.size() - 1; i >= 0; i--) {
                     pts.add(points.get(i));
                 }
@@ -763,28 +785,39 @@ public class PhotoLocalisationActivity extends AppCompatActivity implements MapE
     }
 
     /**
-     * Initialisation du tableau de points à l'ouverture de l'activité
+     * Initialisation du tableau de points à l'ouverture de l'activité et à la synchronisation
      */
     public void initPoints() {
+        //On vide le tableau
+        oldpoints.clear();
+
+        //On récupère la géométrie
         String geom = gpsgeom.getGpsGeomCoord();
 
-        if (geom != null && geom.length() > 20) {
-            geom = geom.substring(20, geom.length());
+        if (geom != null && !geom.equals("")) {
 
-            GeometryFactory gf = new GeometryFactory();
-            WKTReader wktr = new WKTReader(gf);
+            while (!geom.equals("") && geom.charAt(0) == 's') {
+                geom = geom.substring(10, geom.length());
+            }
+            ProjectBDD pbdd = new ProjectBDD(this);
+            pbdd.open();
+            pbdd.updateGpsgeom(gpsgeom.getGpsGeomsId(), geom);
+            pbdd.close();
 
-            try {
-                Log.v("GEOM", geom);
-                Geometry g = wktr.read(geom);
-                Coordinate[] coord = g.getCoordinates();
+            if (!geom.equals("")) {
+                GeometryFactory gf = new GeometryFactory();
+                WKTReader wktr = new WKTReader(gf);
 
-                for (Coordinate c : coord) {
-                    oldpoints.add(new GeoPoint(c.x, c.y));
+                try {
+                    //On récupère les points et on les ajoute au tableau
+                    Geometry g = wktr.read(geom);
+                    Coordinate[] coord = g.getCoordinates();
+                    for (Coordinate c : coord) {
+                        oldpoints.add(new GeoPoint(c.x, c.y));
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
                 }
-
-            } catch (ParseException e) {
-                e.printStackTrace();
             }
         }
     }
@@ -807,5 +840,25 @@ public class PhotoLocalisationActivity extends AppCompatActivity implements MapE
 
     }
 
+    /**
+     * Lancement de la pop up avec les détails du projet
+     */
+    public void popUpDetails(String name, String descr) {
+        PopUpDetails pud = new PopUpDetails(PhotoLocalisationActivity.this, name, descr, mi, project_id);
+        pud.show();
+    }
+
+    /**
+     * Obtenir le projet ouvert
+     *
+     * @return Projet ouvert
+     */
+    public Project getProject() {
+        ProjectBDD pbdd = new ProjectBDD(PhotoLocalisationActivity.this); //Instanciation de ProjectBdd pour manipuler les projets de la base de données
+        pbdd.open(); //Ouverture de la base de données
+        Project p = pbdd.getProjectById(project_id); // Récupération du projet
+        pbdd.close(); // Fermeture de la base de données
+        return p;
+    }
 
 }
