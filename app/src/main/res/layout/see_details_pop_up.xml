@@ -132,7 +132,7 @@
             android:layout_weight=".50"
             android:background="@drawable/button_cancel"
             android:clickable="true"
-            android:text="CANCEL"
+            android:text="@string/cancel"
             android:textColor="#ffffff" />
     </LinearLayout>
 

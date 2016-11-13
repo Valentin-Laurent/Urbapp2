@@ -103,7 +103,7 @@
             android:clickable="true"
             android:foregroundGravity="center_vertical|center|center_horizontal"
             android:gravity="center_vertical|center|center_horizontal"
-            android:text="CANCEL"
+            android:text="@string/cancel"
             android:textSize="16dp"
             android:textColor="#ffffff" />
     </LinearLayout>
