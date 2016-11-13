@@ -13,7 +13,7 @@
     <string name="user_dialog">Please type your username</string>
 
 
-    <!-- Resources for Augmented Reality activity-->
+    <string name="open_project">Open existing project:</string>
     <string name="ar_validation">Activate </string>
     <string name="ar_instruction">Set up the image with two-touch gestures</string>
     <string name="ar_add_image">Add image</string>
@@ -80,5 +80,6 @@
     <string name="ungroup_success">Selection is now degrouped</string>
     <string name="summarize">Summary</string>
     <string name="see_details">Show details</string>
+    <string name="new_project">New project</string>
 
 </resources>

@@ -26,6 +26,7 @@
 
     <!-- Resources for project creation-->
     <string name="no_project">Aucun projet disponible. </string>
+    <string name="open_project">Ouvrir un projet existant :</string>
     <string name="project_creation_title">Création d\'un projet</string>
     <string name="project_creation_name">Intitulé</string>
     <string name="project_creation_description">Description</string>
@@ -101,5 +102,6 @@
     <!-- Resources for photo localisation-->
     <string name="photo_localisation_locked"> Le tracé délimite une zone fermée. vous ne pouvez plus ajouter de points. Pour modifier, annulez ou supprimez le tracé. </string>
     <string name="erase"> Tout effacer</string>
+    <string name="new_project">Nouveau projet</string>
 
 </resources>
