@@ -1,7 +1,5 @@
 package fr.turfu.urbapp2.DB;
 
-//TODO WTF import src.com.ecn.urbapp.syncToExt.Sync;
-
 public class Element  {
 
 

@@ -70,8 +70,6 @@ public class UploadRequest extends AsyncTask<String, Void, String> {
 
             //Pixels
             String b = Base64.encodeToString(pixels, Base64.DEFAULT);
-
-            Log.v("pix", b);
             request.writeChars(b);
 
             //End content wrapper

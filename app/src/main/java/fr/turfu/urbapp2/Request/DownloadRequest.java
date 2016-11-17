@@ -23,7 +23,9 @@ public class DownloadRequest extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String[] url) {
-        return Util.httpRequest(url[0]);
+        String u = url[0];
+        //TODO
+        return "";
     }
 
     @Override

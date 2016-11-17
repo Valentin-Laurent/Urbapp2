@@ -168,6 +168,7 @@ public class NewPhotoPopUpActivity extends Activity {
 
                 try {
                     ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    //Erreur sur la ligne suivante : compression de l'image
                     bit.compress(Bitmap.CompressFormat.PNG, 100, out);
                     out.close();
                     OutputStream outputStream = new FileOutputStream(photo);
